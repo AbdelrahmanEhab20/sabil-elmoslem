@@ -233,20 +233,20 @@ export default function PrayerTimesPage() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     {preferences.language === 'ar' ? 'البحث عن مدينة' : 'Search City'}
                                 </label>
-                                <div className="flex space-x-2 rtl:space-x-reverse">
+                                <div className="space-y-2">
                                     <input
                                         type="text"
                                         value={searchCity}
                                         onChange={(e) => setSearchCity(e.target.value)}
                                         placeholder={preferences.language === 'ar' ? 'ابحث عن مدينة...' : 'Search for a city...'}
-                                        className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
                                         onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
                                         disabled={searchLoading}
                                     />
                                     <button
                                         onClick={handleLocationSearch}
                                         disabled={searchLoading || !searchCity.trim()}
-                                        className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2 rtl:space-x-reverse"
+                                        className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center space-x-2 rtl:space-x-reverse"
                                     >
                                         {searchLoading ? (
                                             <>

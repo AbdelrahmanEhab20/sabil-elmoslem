@@ -1,52 +1,41 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation } from '@/utils/api';
-import { PrayerTimes } from '@/types';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
 
-const PrayerTimesCard: React.FC = () => {
+export default function PrayerTimesCard() {
     const { location, setLocation, prayerTimes, setPrayerTimes, loading, setLoading, preferences } = useUser();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [nextPrayer, setNextPrayer] = useState<string | null>(null);
     const t = useTranslations(preferences.language);
     const toast = useToast();
 
-    // Update current time every minute
+    // Update current time every second
     useEffect(() => {
         const timer = setInterval(() => {
             setCurrentTime(new Date());
-        }, 60000);
+        }, 1000);
         return () => clearInterval(timer);
     }, []);
 
-    // Get location and prayer times on mount
+    // Get location on mount if not available
     useEffect(() => {
         const initializeLocation = async () => {
             if (!location) {
                 try {
-                    setLoading(true);
                     const userLocation = await getCurrentLocation();
                     setLocation(userLocation);
-                } catch (error) {
-                    let errorMsg = 'Unknown error';
-                    let errorCode = '';
-                    if (error && typeof error === 'object') {
-                        errorMsg = (error as any).message || errorMsg;
-                        errorCode = (error as any).code !== undefined ? ` (code: ${(error as any).code})` : '';
-                    }
-                    console.error(`Error getting location: ${errorMsg}${errorCode}`, error);
-                    toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
-                } finally {
-                    setLoading(false);
+                } catch {
+                    toast.showToast({ type: 'error', message: t.errorGettingLocation });
                 }
             }
         };
 
         initializeLocation();
-    }, [location, setLocation, setLoading, toast, t]);
+    }, [location, setLocation, t.errorGettingLocation, toast]);
 
     // Fetch prayer times when location changes
     useEffect(() => {
@@ -54,10 +43,9 @@ const PrayerTimesCard: React.FC = () => {
             if (location) {
                 try {
                     setLoading(true);
-                    const times = await fetchPrayerTimes(location);
+                    const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab);
                     setPrayerTimes(times);
-                } catch (error) {
-                    console.error('Error fetching prayer times:', error);
+                } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
                 } finally {
                     setLoading(false);
@@ -66,7 +54,7 @@ const PrayerTimesCard: React.FC = () => {
         };
 
         getPrayerTimes();
-    }, [location, setPrayerTimes, setLoading, toast, t]);
+    }, [location, preferences.calculationMethod, preferences.madhab, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer
     useEffect(() => {
@@ -220,6 +208,4 @@ const PrayerTimesCard: React.FC = () => {
             </div>
         </div>
     );
-};
-
-export default PrayerTimesCard; 
+} 

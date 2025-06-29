@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation, searchCityCoordinates } from '@/utils/api';
-import { Location } from '@/types';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
 
@@ -34,7 +33,7 @@ export default function PrayerTimesPage() {
                     setLocationLoading(true);
                     const userLocation = await getCurrentLocation();
                     setLocation(userLocation);
-                } catch (error) {
+                } catch {
                     toast.showToast({ type: 'error', message: t.errorGettingLocation });
                 } finally {
                     setLocationLoading(false);
@@ -43,7 +42,7 @@ export default function PrayerTimesPage() {
         };
 
         initializeLocation();
-    }, [location, setLocation, preferences.language]);
+    }, [location, setLocation, t.errorGettingLocation, toast]);
 
     // Fetch prayer times when location changes
     useEffect(() => {
@@ -53,7 +52,7 @@ export default function PrayerTimesPage() {
                     setLoading(true);
                     const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab);
                     setPrayerTimes(times);
-                } catch (error) {
+                } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
                 } finally {
                     setLoading(false);
@@ -62,7 +61,7 @@ export default function PrayerTimesPage() {
         };
 
         getPrayerTimes();
-    }, [location, preferences.calculationMethod, preferences.madhab, setPrayerTimes, setLoading, preferences.language]);
+    }, [location, preferences.calculationMethod, preferences.madhab, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer and time until
     useEffect(() => {
@@ -116,8 +115,9 @@ export default function PrayerTimesPage() {
             setLocation(cityLocation);
             setSearchCity('');
             toast.showToast({ type: 'success', message: t.locationSet });
-        } catch (error: any) {
-            toast.showToast({ type: 'error', message: error.message || t.cityNotFound });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : t.cityNotFound;
+            toast.showToast({ type: 'error', message: errorMessage });
         } finally {
             setSearchLoading(false);
         }
@@ -128,7 +128,7 @@ export default function PrayerTimesPage() {
             setLocationLoading(true);
             const userLocation = await getCurrentLocation();
             setLocation(userLocation);
-        } catch (error) {
+        } catch {
             toast.showToast({ type: 'error', message: t.errorGettingLocation });
         } finally {
             setLocationLoading(false);

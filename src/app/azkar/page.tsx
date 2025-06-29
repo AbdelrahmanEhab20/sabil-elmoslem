@@ -32,15 +32,16 @@ export default function AzkarPage() {
                     }
                 });
                 setCounters(initialCounters);
-            } catch (error: any) {
-                toast.showToast({ type: 'error', message: error.message || t.errorLoadingAzkar });
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : t.errorLoadingAzkar;
+                toast.showToast({ type: 'error', message: errorMessage });
             } finally {
                 setLoading(false);
             }
         };
 
         loadAzkar();
-    }, [preferences.language]);
+    }, [preferences.language, t.errorLoadingAzkar, toast]);
 
     // Get unique categories
     const categories = ['all', ...Array.from(new Set(azkar.map(zikr => zikr.category)))];

@@ -18,9 +18,9 @@ export const fetchPrayerTimes = async (
 
         const data = await response.json();
         return data.data.timings;
-    } catch (error) {
-        console.error('Error fetching prayer times:', error);
-        throw error;
+    } catch {
+        console.error('Error fetching prayer times');
+        throw new Error('Failed to fetch prayer times');
     }
 };
 
@@ -37,9 +37,9 @@ export const fetchHijriDate = async (): Promise<HijriDate> => {
 
         const data = await response.json();
         return data.data.hijri;
-    } catch (error) {
-        console.error('Error fetching Hijri date:', error);
-        throw error;
+    } catch {
+        console.error('Error fetching Hijri date');
+        throw new Error('Failed to fetch Hijri date');
     }
 };
 
@@ -55,9 +55,9 @@ export const fetchQuranSurahs = async (): Promise<QuranSurah[]> => {
 
         const data = await response.json();
         return data.data;
-    } catch (error) {
-        console.error('Error fetching Quran surahs:', error);
-        throw error;
+    } catch {
+        console.error('Error fetching Quran surahs');
+        throw new Error('Failed to fetch Quran surahs');
     }
 };
 
@@ -73,9 +73,9 @@ export const fetchQuranAyahs = async (surahNumber: number): Promise<QuranAyah[]>
 
         const data = await response.json();
         return data.data.ayahs;
-    } catch (error) {
-        console.error('Error fetching Quran ayahs:', error);
-        throw error;
+    } catch {
+        console.error('Error fetching Quran ayahs');
+        throw new Error('Failed to fetch Quran ayahs');
     }
 };
 
@@ -107,7 +107,7 @@ export const fetchAzkar = async (language: 'en' | 'ar' = 'en'): Promise<Azkar[]>
         });
 
         return flattenedAzkar;
-    } catch (error) {
+    } catch {
         throw new Error(language === 'ar' ? 'فشل في جلب الأذكار' : 'Failed to fetch Azkar');
     }
 };
@@ -164,7 +164,8 @@ export const searchCityCoordinates = async (cityName: string, language: string =
             city: data[0].name,
             country: data[0].country
         };
-    } catch (error: any) {
-        throw new Error(error.message || (language === 'ar' ? 'حدث خطأ أثناء البحث عن المدينة' : 'Error searching city'));
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : (language === 'ar' ? 'حدث خطأ أثناء البحث عن المدينة' : 'Error searching city');
+        throw new Error(errorMessage);
     }
 }; 

@@ -2,6 +2,10 @@
 
 A comprehensive Islamic web platform providing prayer times, daily azkar (supplications), and Quran reading with a beautiful, modern UI.
 
+## 🌐 Live Demo
+
+**Visit the live site:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)
+
 ## 🌟 Features
 
 ### 🕌 Prayer Times
@@ -12,11 +16,12 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 - **Beautiful visual display** with prayer time cards
 
 ### 📿 Daily Azkar
-- **Categorized supplications** (Morning, Evening, After Prayer)
+- **Categorized supplications** (Morning, Evening, After Prayer, Tasbeeh, Quranic Duas, Prophets' Duas)
 - **Interactive counters** for tracking progress
-- **Arabic text with transliteration** and English translation
+- **Arabic text with English translations**
 - **Reference citations** from authentic sources
 - **Progress indicators** and completion tracking
+- **Bilingual support** (Arabic and English)
 
 ### 📖 Quran Reader
 - **Complete Quran** with all 114 surahs
@@ -24,9 +29,11 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 - **Ayah-by-ayah display** with proper Arabic formatting
 - **Sajda verse indicators** and detailed metadata
 - **Responsive design** for all devices
+- **Surah navigation sidebar**
 
 ### 🎨 User Experience
 - **Dark/Light theme** toggle
+- **Bilingual interface** (Arabic/English)
 - **Responsive design** for mobile and desktop
 - **Fast loading** with optimized performance
 - **Accessible design** with proper contrast and navigation
@@ -34,15 +41,16 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 
 ## 🚀 Tech Stack
 
-- **Frontend**: Next.js 14 with App Router
+- **Frontend**: Next.js 15 with App Router
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
 - **State Management**: React Context API
 - **APIs**: 
   - Aladhan API (Prayer Times)
   - AlQuran Cloud API (Quran)
+  - OpenWeatherMap API (City Search)
   - Static JSON (Azkar)
-- **Deployment**: Vercel (ready)
+- **Deployment**: Vercel
 
 ## 📦 Installation
 
@@ -57,12 +65,18 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
    npm install
    ```
 
-3. **Run the development server**
+3. **Set up environment variables**
+   Create a `.env.local` file:
+   ```env
+   NEXT_PUBLIC_OPENWEATHERMAP_API_KEY=your_api_key_here
+   ```
+
+4. **Run the development server**
    ```bash
    npm run dev
    ```
 
-4. **Open your browser**
+5. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
 ## 🌐 APIs Used
@@ -78,7 +92,7 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 
 ### Azkar
 - **Static Data**: Curated collection of authentic supplications
-- **Categories**: Morning, Evening, After Prayer, General
+- **Categories**: Morning Adhkar, Evening Adhkar, Post-Prayer Azkar, Tasbeeh, Azkar Before Sleep, Azkar Upon Waking, Quranic Duas, Prophets' Duas
 
 ## 📁 Project Structure
 
@@ -93,13 +107,18 @@ islamic-site/
 │   ├── components/          # Reusable UI components
 │   │   ├── Navbar.tsx
 │   │   ├── Footer.tsx
-│   │   └── PrayerTimesCard.tsx
+│   │   ├── PrayerTimesCard.tsx
+│   │   └── ToastProvider.tsx
 │   ├── contexts/           # React Context providers
 │   │   └── UserContext.tsx
 │   ├── types/              # TypeScript type definitions
 │   │   └── index.ts
-│   └── utils/              # Utility functions
-│       └── api.ts
+│   ├── utils/              # Utility functions
+│   │   ├── api.ts
+│   │   └── translations.ts
+│   └── data/               # Static data files
+│       ├── azkar.json      # Arabic Azkar
+│       └── azkar-en.json   # English Azkar
 ├── public/                 # Static assets
 └── tailwind.config.ts      # Tailwind configuration
 ```
@@ -110,6 +129,7 @@ islamic-site/
 Manages global state including:
 - User location and prayer times
 - Theme preferences (dark/light)
+- Language preferences (Arabic/English)
 - Loading states
 - Local storage persistence
 
@@ -126,6 +146,7 @@ Interactive supplication system with:
 - Individual counters
 - Progress tracking
 - Completion indicators
+- Bilingual content
 
 ### Quran Reader
 Complete Quran reading experience:
@@ -133,6 +154,7 @@ Complete Quran reading experience:
 - Ayah-by-ayah display
 - Arabic text formatting
 - Metadata display
+- Responsive sidebar navigation
 
 ## 🌙 Features in Detail
 
@@ -143,10 +165,14 @@ Complete Quran reading experience:
 - Real-time updates and countdown timers
 
 ### Azkar Categories
-- **Morning Azkar**: Supplications for the morning
-- **Evening Azkar**: Supplications for the evening
-- **After Prayer**: Post-prayer supplications
-- **General**: Miscellaneous supplications
+- **Morning Adhkar**: Supplications for the morning
+- **Evening Adhkar**: Supplications for the evening
+- **Post-Prayer Azkar**: Supplications after prayer
+- **Tasbeeh**: Glorification and remembrance
+- **Azkar Before Sleep**: Bedtime supplications
+- **Azkar Upon Waking**: Morning awakening supplications
+- **Quranic Duas**: Supplications from the Quran
+- **Prophets' Duas**: Supplications of the prophets
 
 ### Quran Features
 - **Surah List**: Browse all 114 surahs
@@ -154,13 +180,17 @@ Complete Quran reading experience:
 - **Ayah Display**: Read individual verses
 - **Metadata**: Juz, page numbers, revelation type
 - **Sajda Indicators**: Mark verses requiring prostration
+- **Responsive Sidebar**: Easy navigation between surahs
 
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
 1. Push code to GitHub
 2. Connect repository to Vercel
-3. Deploy automatically
+3. Add environment variables in Vercel dashboard
+4. Deploy automatically
+
+**Live Demo:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)
 
 ### Other Platforms
 The app can be deployed to any platform supporting Next.js:
@@ -172,7 +202,9 @@ The app can be deployed to any platform supporting Next.js:
 ## 🔧 Customization
 
 ### Adding More Azkar
-Edit `src/utils/api.ts` to add more supplications to the `fetchAzkar` function.
+Edit the JSON files in `src/data/` to add more supplications:
+- `azkar.json` for Arabic content
+- `azkar-en.json` for English content
 
 ### Changing Prayer Calculation Method
 Update the `calculationMethod` in `UserContext.tsx`:
@@ -203,6 +235,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - **Aladhan API** for prayer times calculation
 - **AlQuran Cloud API** for Quran data
+- **OpenWeatherMap API** for city search functionality
 - **Islamic scholars** for authentic azkar content
 - **Open source community** for tools and libraries
 
@@ -210,8 +243,22 @@ This project is open source and available under the [MIT License](LICENSE).
 
 For questions or support, please open an issue on GitHub.
 
----
+## 🌟 About This Project
+
+This Islamic site was built with the intention of providing Muslims worldwide with easy access to essential Islamic tools and resources. The platform combines modern web technologies with authentic Islamic content to create a comprehensive digital companion for daily Islamic practices.
+
+**Key Goals:**
+- Provide accurate prayer times for any location
+- Offer authentic azkar with proper translations
+- Enable easy Quran reading and study
+- Create a beautiful, accessible, and user-friendly interface
+- Support both Arabic and English languages
+- Maintain Islamic authenticity and respect
 
 **May Allah accept our efforts and guide us all. آمين**
 
+---
+
 *Built with ❤️ for the Ummah*
+
+**Live Site:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)

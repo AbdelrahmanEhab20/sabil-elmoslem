@@ -27,18 +27,18 @@ export default function QuranPage() {
                 setLoading(true);
                 const surahsData = await fetchQuranSurahs();
                 setSurahs(surahsData);
-            } catch (error) {
-                console.error('Error loading surahs:', error);
-                toast.showToast({ type: 'error', message: t.errorLoadingQuran });
+            } catch (error: unknown) {
+                const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
+                toast.showToast({ type: 'error', message: errorMessage });
             } finally {
                 setLoading(false);
             }
         };
 
         loadSurahs();
-    }, []);
+    }, [t.errorLoadingQuran, toast]);
 
-    // Fetch ayahs when surah is selected
+    // Fetch ayahs when selectedSurah changes
     useEffect(() => {
         const loadAyahs = async () => {
             if (selectedSurah) {
@@ -46,10 +46,9 @@ export default function QuranPage() {
                     setSurahLoading(true);
                     const ayahsData = await fetchQuranAyahs(selectedSurah.number);
                     setAyahs(ayahsData);
-                    setView('ayah-view');
-                } catch (error) {
-                    console.error('Error loading ayahs:', error);
-                    toast.showToast({ type: 'error', message: t.errorLoadingQuran });
+                } catch (error: unknown) {
+                    const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
+                    toast.showToast({ type: 'error', message: errorMessage });
                 } finally {
                     setSurahLoading(false);
                 }
@@ -57,7 +56,7 @@ export default function QuranPage() {
         };
 
         loadAyahs();
-    }, [selectedSurah]);
+    }, [selectedSurah, t.errorLoadingQuran, toast]);
 
     // Filter surahs by search term
     const filteredSurahs = surahs.filter(surah =>

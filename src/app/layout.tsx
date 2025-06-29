@@ -17,20 +17,106 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Islamic Site - Prayer Times, Azkar & Quran",
-  description: "A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.",
-  keywords: "prayer times, azkar, quran, islamic, muslim, salah, dua, supplication",
-  authors: [{ name: "Islamic Site" }],
+  title: {
+    default: "الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran",
+    template: "%s | الموقع الإسلامي | Islamic Site"
+  },
+  description: "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.",
+  keywords: [
+    "أوقات الصلاة", "prayer times", "أذكار", "azkar", "قرآن", "quran", "إسلامي", "islamic",
+    "مسلم", "muslim", "صلاة", "salah", "دعاء", "dua", "تضرع", "supplication",
+    "القرآن الكريم", "holy quran", "أذكار الصباح", "morning adhkar", "أذكار المساء", "evening adhkar",
+    "تسابيح", "tasbeeh", "أدعية قرآنية", "quranic duas", "أدعية الأنبياء", "prophets duas",
+    "موقع إسلامي", "islamic website", "تطبيق إسلامي", "islamic app", "أوقات الصلاة دقيقة", "accurate prayer times"
+  ],
+  authors: [{ name: "Islamic Site", url: "https://islamic-site.com" }],
+  creator: "Islamic Site",
+  publisher: "Islamic Site",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL('https://islamic-site.com'),
+  alternates: {
+    canonical: '/',
+    languages: {
+      'ar': '/ar',
+      'en': '/en',
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'ar_SA',
+    alternateLocale: 'en_US',
+    url: 'https://islamic-site.com',
+    siteName: 'الموقع الإسلامي | Islamic Site',
+    title: 'الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran',
+    description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',
+    images: [
+      {
+        url: '/images/logo.png',
+        width: 1200,
+        height: 630,
+        alt: 'الموقع الإسلامي | Islamic Site',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran',
+    description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',
+    images: ['/images/logo.png'],
+    creator: '@islamicsite',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'your-google-verification-code',
+    yandex: 'your-yandex-verification-code',
+    yahoo: 'your-yahoo-verification-code',
+  },
+  category: 'religion',
+  classification: 'Islamic',
   icons: {
-    icon: '/favicon.ico',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
     shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#16a34a' },
+    ],
+  },
+  manifest: '/site.webmanifest',
+  other: {
+    'msapplication-TileColor': '#16a34a',
+    'theme-color': '#16a34a',
   },
 };
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#16a34a' },
+    { media: '(prefers-color-scheme: dark)', color: '#15803d' },
+  ],
 };
 
 export default function RootLayout({
@@ -39,7 +125,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ar" dir="rtl">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -49,6 +135,48 @@ export default function RootLayout({
         />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <meta name="application-name" content="الموقع الإسلامي | Islamic Site" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="الموقع الإسلامي | Islamic Site" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-config" content="/browserconfig.xml" />
+        <meta name="msapplication-TileColor" content="#16a34a" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#16a34a" />
+
+        {/* Structured Data for Islamic Site */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "name": "الموقع الإسلامي | Islamic Site",
+              "alternateName": ["Islamic Site", "الموقع الإسلامي"],
+              "url": "https://islamic-site.com",
+              "description": {
+                "@type": "Text",
+                "ar": "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم",
+                "en": "A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading"
+              },
+              "inLanguage": ["ar", "en"],
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://islamic-site.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Islamic Site",
+                "url": "https://islamic-site.com"
+              }
+            })
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900 min-h-screen font-sans`}

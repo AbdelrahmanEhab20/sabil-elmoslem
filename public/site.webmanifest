@@ -1,0 +1,83 @@
+{
+    "name": "الموقع الإسلامي | Islamic Site",
+    "short_name": "Islamic Site",
+    "description": "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم | A comprehensive Islamic platform for prayer times, azkar, and Quran",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#16a34a",
+    "theme_color": "#16a34a",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "ar",
+    "dir": "rtl",
+    "categories": [
+        "religion",
+        "lifestyle",
+        "education"
+    ],
+    "icons": [
+        {
+            "src": "/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        },
+        {
+            "src": "/apple-touch-icon.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "أوقات الصلاة | Prayer Times",
+            "short_name": "Prayer Times",
+            "description": "عرض أوقات الصلاة | View prayer times",
+            "url": "/prayer-times",
+            "icons": [
+                {
+                    "src": "/favicon-32x32.png",
+                    "sizes": "32x32"
+                }
+            ]
+        },
+        {
+            "name": "الأذكار | Azkar",
+            "short_name": "Azkar",
+            "description": "قراءة الأذكار | Read azkar",
+            "url": "/azkar",
+            "icons": [
+                {
+                    "src": "/favicon-32x32.png",
+                    "sizes": "32x32"
+                }
+            ]
+        },
+        {
+            "name": "القرآن | Quran",
+            "short_name": "Quran",
+            "description": "قراءة القرآن | Read Quran",
+            "url": "/quran",
+            "icons": [
+                {
+                    "src": "/favicon-32x32.png",
+                    "sizes": "32x32"
+                }
+            ]
+        }
+    ]
+}

@@ -111,7 +111,7 @@ export default function QuranPage() {
             {/* Sidebar: Surah List */}
             <aside
                 className={`
-                    fixed top-0 left-0 h-full w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto z-40 transition-transform duration-300
+                    fixed top-0 left-0 h-full w-full md:w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 p-4 overflow-y-auto z-40 transition-transform duration-300
                     md:static md:translate-x-0 md:block md:h-[80vh] md:rounded-lg md:shadow-lg md:mr-6 rtl:md:mr-0 rtl:md:ml-6
                     ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                     md:transform-none
@@ -241,7 +241,7 @@ export default function QuranPage() {
                     ) : (
                         <>
                             {/* Ayah View Header */}
-                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                            <div className="sticky top-16 z-40 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border-b border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                                         <button

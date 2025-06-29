@@ -20,7 +20,7 @@ const defaultPreferences: UserPreferences = {
     calculationMethod: 1, // MWL
     madhab: 1, // Shafi
     theme: 'light',
-    language: 'en'
+    language: 'ar'
 };
 
 const defaultContextValue: UserContextType = {

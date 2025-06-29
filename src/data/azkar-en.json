@@ -5,70 +5,70 @@
             "count": "1",
             "description": "When you say this in the morning, you have fulfilled your dhikr for the morning",
             "reference": "Abu Dawud",
-            "content": "O Allah, by You we enter the morning and by You we enter the evening, by You we live and by You we die, and to You is the resurrection."
+            "content": "O Allah, by You we enter the morning and by You we enter the evening, by You we live and by You we die, and to You is the resurrection"
         },
         {
             "category": "Morning Adhkar",
             "count": "1",
             "description": "Whoever says this in the morning and evening and dies that night, he will enter Paradise",
             "reference": "Bukhari",
-            "content": "O Allah, You are my Lord, there is none worthy of worship except You. You created me and I am Your servant, and I am faithful to my covenant and promise to You as much as I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for indeed none can forgive sins except You."
+            "content": "O Allah, You are my Lord, there is none worthy of worship except You. You created me and I am Your servant, and I am faithful to my covenant and promise to You as much as I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for indeed none can forgive sins except You"
         },
         {
             "category": "Morning Adhkar",
             "count": "3",
             "description": "Whoever says this in the morning and evening, it becomes incumbent upon Allah to please him on the Day of Resurrection",
             "reference": "Abu Dawud",
-            "content": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace be upon him) as my Prophet."
+            "content": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace be upon him) as my Prophet"
         },
         {
             "category": "Morning Adhkar",
             "count": "4",
             "description": "Whoever says this, Allah will free him from the Fire",
             "reference": "Abu Dawud",
-            "content": "O Allah, I have reached the morning and at this very time all of creation is testifying to You. O Allah, grant me a share of all the good that You cause to reach me in this day, and protect me from all the evil that You cause to reach me in this day."
+            "content": "O Allah, I have reached the morning and at this very time all of creation is testifying to You. O Allah, grant me a share of all the good that You cause to reach me in this day, and protect me from all the evil that You cause to reach me in this day"
         },
         {
             "category": "Morning Adhkar",
             "count": "7",
             "description": "Whoever says this, Allah will suffice him against his concerns in this world and the next",
             "reference": "Abu Dawud",
-            "content": "Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne."
+            "content": "Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne"
         },
         {
             "category": "Morning Adhkar",
             "count": "3",
             "description": "Nothing will harm him",
             "reference": "Abu Dawud",
-            "content": "In the name of Allah, with Whose name nothing can harm on earth or in heaven, and He is the Hearing, the Knowing."
+            "content": "In the name of Allah, with Whose name nothing can harm on earth or in heaven, and He is the Hearing, the Knowing"
         },
         {
             "category": "Morning Adhkar",
             "count": "1",
             "description": "General morning dhikr",
             "reference": "Abu Dawud",
-            "content": "We have reached the morning and at this very time the dominion belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent."
+            "content": "We have reached the morning and at this very time the dominion belongs to Allah. All praise is for Allah. None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
         },
         {
             "category": "Morning Adhkar",
             "count": "3",
             "description": "Praise and glorification",
             "reference": "Muslim",
-            "content": "Glory be to Allah and praise be to Him, by the multitude of His creation, by His pleasure, by the weight of His Throne, and by the extent of His words."
+            "content": "Glory be to Allah and praise be to Him, by the multitude of His creation, by His pleasure, by the weight of His Throne, and by the extent of His words"
         },
         {
             "category": "Morning Adhkar",
             "count": "3",
             "description": "Seeking protection",
             "reference": "Abu Dawud",
-            "content": "O Allah, protect me in my body, O Allah, protect me in my hearing, O Allah, protect me in my sight, there is none worthy of worship except You."
+            "content": "O Allah, protect me in my body, O Allah, protect me in my hearing, O Allah, protect me in my sight, there is none worthy of worship except You"
         },
         {
             "category": "Morning Adhkar",
             "count": "100",
             "description": "It will be equal to freeing ten slaves, and one hundred good deeds will be written for him, and one hundred bad deeds will be erased from him, and it will be a protection for him from Satan",
             "reference": "Muslim",
-            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent."
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
         }
     ],
     "Evening Adhkar": [
@@ -77,65 +77,114 @@
             "count": "1",
             "description": "When you say this in the evening, you have fulfilled your dhikr for the evening",
             "reference": "Abu Dawud",
-            "content": "O Allah, by You we enter the evening and by You we enter the morning, by You we live and by You we die, and to You is the resurrection."
+            "content": "O Allah, by You we enter the evening and by You we enter the morning, by You we live and by You we die, and to You is the resurrection"
         },
         {
             "category": "Evening Adhkar",
             "count": "1",
             "description": "Whoever says this in the morning and evening and dies that night, he will enter Paradise",
             "reference": "Bukhari",
-            "content": "O Allah, You are my Lord, there is none worthy of worship except You. You created me and I am Your servant, and I am faithful to my covenant and promise to You as much as I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for indeed none can forgive sins except You."
+            "content": "O Allah, You are my Lord, there is none worthy of worship except You. You created me and I am Your servant, and I am faithful to my covenant and promise to You as much as I can. I seek refuge in You from the evil of what I have done. I acknowledge Your favor upon me and I acknowledge my sin, so forgive me, for indeed none can forgive sins except You"
         },
         {
             "category": "Evening Adhkar",
             "count": "3",
             "description": "Whoever says this in the morning and evening, it becomes incumbent upon Allah to please him on the Day of Resurrection",
             "reference": "Abu Dawud",
-            "content": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace be upon him) as my Prophet."
+            "content": "I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad (peace be upon him) as my Prophet"
         },
         {
             "category": "Evening Adhkar",
             "count": "1",
             "description": "Whoever says this in the evening has fulfilled his gratitude for that day",
             "reference": "Abu Dawud",
-            "content": "O Allah, whatever blessing has reached me or anyone of Your creation, it is from You alone, You have no partner, so for You is all praise and for You is all gratitude."
+            "content": "O Allah, whatever blessing has reached me or anyone of Your creation, it is from You alone, You have no partner, so for You is all praise and for You is all gratitude"
         },
         {
             "category": "Evening Adhkar",
             "count": "7",
             "description": "Whoever says this, Allah will suffice him against his concerns in this world and the next",
             "reference": "Abu Dawud",
-            "content": "Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne."
+            "content": "Sufficient for me is Allah; there is no deity except Him. On Him I have relied, and He is the Lord of the Great Throne"
         },
         {
             "category": "Evening Adhkar",
             "count": "3",
             "description": "Nothing will harm him",
             "reference": "Abu Dawud",
-            "content": "In the name of Allah, with Whose name nothing can harm on earth or in heaven, and He is the Hearing, the Knowing."
+            "content": "In the name of Allah, with Whose name nothing can harm on earth or in heaven, and He is the Hearing, the Knowing"
         },
         {
             "category": "Evening Adhkar",
             "count": "3",
             "description": "Praise and glorification",
             "reference": "Muslim",
-            "content": "Glory be to Allah and praise be to Him, by the multitude of His creation, by His pleasure, by the weight of His Throne, and by the extent of His words."
+            "content": "Glory be to Allah and praise be to Him, by the multitude of His creation, by His pleasure, by the weight of His Throne, and by the extent of His words"
         },
         {
             "category": "Evening Adhkar",
             "count": "100",
             "description": "It will be equal to freeing ten slaves, and one hundred good deeds will be written for him, and one hundred bad deeds will be erased from him, and it will be a protection for him from Satan",
             "reference": "Muslim",
-            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent."
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
         }
     ],
     "Post-Prayer Azkar": [
         {
             "category": "Post-Prayer Azkar",
             "count": "1",
-            "description": "",
-            "reference": "",
-            "content": "Translation needed"
+            "description": "Seeking forgiveness after prayer",
+            "reference": "Muslim",
+            "content": "I seek forgiveness from Allah, I seek forgiveness from Allah, I seek forgiveness from Allah. O Allah, You are Peace and from You is peace, blessed are You, O Possessor of majesty and honor"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "Complete monotheism after prayer",
+            "reference": "Muslim",
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent. O Allah, none can withhold what You give and none can give what You withhold, and the fortune of a fortunate one cannot benefit him against You"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "33",
+            "description": "Glorification, praise, and magnification",
+            "reference": "Muslim",
+            "content": "Glory be to Allah, and praise be to Allah, and Allah is the Greatest"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "Complete monotheism",
+            "reference": "Muslim",
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "10",
+            "description": "Ten times after Maghrib and Fajr",
+            "reference": "Muslim",
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise, He gives life and causes death and He is over all things omnipotent"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "After the greeting of Fajr prayer",
+            "reference": "Abu Dawud",
+            "content": "O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "7",
+            "description": "After Fajr and Maghrib prayers",
+            "reference": "Abu Dawud",
+            "content": "O Allah, protect me from the Fire"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "Seeking help for remembrance and gratitude",
+            "reference": "Abu Dawud",
+            "content": "O Allah, help me to remember You, to thank You, and to worship You in the best manner"
         }
     ],
     "Tasbeeh": [
@@ -214,18 +263,74 @@
         {
             "category": "Azkar Before Sleep",
             "count": "1",
-            "description": "",
-            "reference": "",
-            "content": "Translation needed"
+            "description": "Basic bedtime dhikr",
+            "reference": "Bukhari",
+            "content": "In Your name, my Lord, I lie down and in Your name I rise, so if You should take my soul then have mercy upon it, and if You should return my soul then protect it in the manner You do so with Your righteous servants"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "1",
+            "description": "Trusting in Allah before sleep",
+            "reference": "Bukhari",
+            "content": "O Allah, You created my soul and You will take its life, to You belongs its life and death. If You should keep my soul alive then protect it, and if You should take its life then forgive it. O Allah, I ask You for well-being"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "3",
+            "description": "Seeking protection from the punishment of the grave",
+            "reference": "Abu Dawud",
+            "content": "O Allah, protect me from Your punishment on the day You resurrect Your servants"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "1",
+            "description": "Trusting in Allah",
+            "reference": "Bukhari",
+            "content": "In Your name, O Allah, I die and I live"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "33",
+            "description": "Glorification before sleep",
+            "reference": "Muslim",
+            "content": "Glory be to Allah"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "33",
+            "description": "Praise before sleep",
+            "reference": "Muslim",
+            "content": "All praise is for Allah"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "34",
+            "description": "Magnification before sleep",
+            "reference": "Muslim",
+            "content": "Allah is the Greatest"
         }
     ],
     "Azkar Upon Waking": [
         {
             "category": "Azkar Upon Waking",
             "count": "1",
-            "description": "",
-            "reference": "",
-            "content": "Translation needed"
+            "description": "Praise upon waking",
+            "reference": "Bukhari",
+            "content": "All praise is for Allah who gave us life after causing us to die and unto Him is the resurrection"
+        },
+        {
+            "category": "Azkar Upon Waking",
+            "count": "1",
+            "description": "Thanking Allah for well-being",
+            "reference": "Abu Dawud",
+            "content": "All praise is for Allah who restored to me my health and returned my soul and permitted me to remember Him"
+        },
+        {
+            "category": "Azkar Upon Waking",
+            "count": "1",
+            "description": "Monotheism and seeking forgiveness upon waking",
+            "reference": "Abu Dawud",
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent. Glory be to Allah, and praise be to Allah, and none has the right to be worshipped except Allah and Allah is the Greatest, and there is no might and no power except with Allah, the Most High, the Most Great. My Lord, forgive me"
         }
     ],
     "Quranic Duas": [
@@ -234,65 +339,107 @@
             "count": "1",
             "description": "The most comprehensive dua from the Qur'an",
             "reference": "Qur'an 2:201",
-            "content": "Our Lord, grant us good in this world and good in the Hereafter and protect us from the punishment of the Fire."
+            "content": "Our Lord, grant us good in this world and good in the Hereafter and protect us from the punishment of the Fire"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for patience and victory",
             "reference": "Qur'an 2:250",
-            "content": "Our Lord, pour upon us patience and plant firmly our feet and give us victory over the disbelieving people."
+            "content": "Our Lord, pour upon us patience and plant firmly our feet and give us victory over the disbelieving people"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for forgiveness and mercy",
             "reference": "Qur'an 2:286",
-            "content": "Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people."
+            "content": "Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for guidance and mercy",
             "reference": "Qur'an 3:8",
-            "content": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower."
+            "content": "Our Lord, let not our hearts deviate after You have guided us and grant us from Yourself mercy. Indeed, You are the Bestower"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for forgiveness and protection from Fire",
             "reference": "Qur'an 3:16",
-            "content": "Our Lord, indeed we have believed, so forgive us our sins and protect us from the punishment of the Fire."
+            "content": "Our Lord, indeed we have believed, so forgive us our sins and protect us from the punishment of the Fire"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for righteous offspring",
             "reference": "Qur'an 3:38",
-            "content": "My Lord, grant me from Yourself a good offspring. Indeed, You are the Hearer of supplication."
+            "content": "My Lord, grant me from Yourself a good offspring. Indeed, You are the Hearer of supplication"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua for knowledge",
             "reference": "Qur'an 20:114",
-            "content": "My Lord, increase me in knowledge."
+            "content": "My Lord, increase me in knowledge"
         },
         {
             "category": "Quranic Duas",
             "count": "1",
             "description": "Dua of Prophet Yunus (Jonah)",
             "reference": "Qur'an 21:87",
-            "content": "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers."
+            "content": "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers"
         }
     ],
     "Prophets' Duas": [
         {
             "category": "Prophets' Duas",
             "count": "1",
-            "description": "",
-            "reference": "",
-            "content": "Translation needed"
+            "description": "Dua of Prophet Adam (peace be upon him)",
+            "reference": "Qur'an 7:23",
+            "content": "Our Lord, we have wronged ourselves, and if You do not forgive us and have mercy upon us, we will surely be among the losers"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Nuh (Noah) (peace be upon him)",
+            "reference": "Qur'an 71:28",
+            "content": "My Lord, forgive me and my parents and whoever enters my house a believer and the believing men and believing women. And do not increase the wrongdoers except in destruction"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Ibrahim (Abraham) (peace be upon him)",
+            "reference": "Qur'an 14:40-41",
+            "content": "My Lord, make me an establisher of prayer and from my descendants. Our Lord, and accept my supplication. Our Lord, forgive me and my parents and the believers the Day the account is established"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Musa (Moses) (peace be upon him)",
+            "reference": "Qur'an 20:25-28",
+            "content": "My Lord, expand for me my breast and ease for me my task and untie the knot from my tongue that they may understand my speech"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Ayyub (Job) (peace be upon him)",
+            "reference": "Qur'an 21:83",
+            "content": "Indeed, adversity has touched me, and You are the Most Merciful of the merciful"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Sulayman (Solomon) (peace be upon him)",
+            "reference": "Qur'an 27:19",
+            "content": "My Lord, enable me to be grateful for Your favor which You have bestowed upon me and upon my parents and to do righteousness of which You approve. And admit me by Your mercy into [the ranks of] Your righteous servants"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Zakariyya (Zechariah) (peace be upon him)",
+            "reference": "Qur'an 3:38",
+            "content": "My Lord, grant me from Yourself a good offspring. Indeed, You are the Hearer of supplication"
         }
     ]
 }

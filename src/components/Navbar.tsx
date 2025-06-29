@@ -2,13 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
 import Image from 'next/image';
 
 const Navbar: React.FC = () => {
-    const { preferences, toggleTheme, toggleLanguage } = useUser();
+    const { preferences, toggleLanguage } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const pathname = usePathname();
     const t = useTranslations(preferences.language);
 
     const navItems = [
@@ -17,6 +19,14 @@ const Navbar: React.FC = () => {
         { href: '/azkar', label: t.azkar, icon: '📿' },
         { href: '/quran', label: t.quran, icon: '📖' }
     ];
+
+    // Check if a nav item is active
+    const isActive = (href: string) => {
+        if (href === '/') {
+            return pathname === '/';
+        }
+        return pathname.startsWith(href);
+    };
 
     return (
         <nav className="bg-white dark:bg-gray-900 shadow-lg border-b border-gray-200 dark:border-gray-700">
@@ -34,37 +44,51 @@ const Navbar: React.FC = () => {
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
-                        {navItems.map((item) => (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200"
-                            >
-                                <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
-                                {item.label}
-                            </Link>
-                        ))}
+                        {navItems.map((item) => {
+                            const active = isActive(item.href);
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${active
+                                            ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-b-2 border-green-600 dark:border-green-400'
+                                            : 'text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                        }`}
+                                >
+                                    <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
+                                    {item.label}
+                                </Link>
+                            );
+                        })}
                     </div>
 
-                    {/* Theme & Language Toggle & Mobile Menu Button */}
+                    {/* Language Toggle & Mobile Menu Button */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                         {/* Language Toggle */}
-                        <button
-                            onClick={toggleLanguage}
-                            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-                            aria-label={preferences.language === 'en' ? t.arabic : t.english}
-                        >
-                            {preferences.language === 'en' ? t.arabic : t.english}
-                        </button>
-
-                        {/* Theme Toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
-                            aria-label={preferences.theme === 'light' ? t.darkMode : t.lightMode}
-                        >
-                            {preferences.theme === 'light' ? '🌙' : '☀️'}
-                        </button>
+                        <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+                            <button
+                                onClick={() => preferences.language !== 'en' && toggleLanguage()}
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                    preferences.language === 'en'
+                                        ? 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 shadow-sm'
+                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                }`}
+                                aria-label="English"
+                            >
+                                English
+                            </button>
+                            <button
+                                onClick={() => preferences.language !== 'ar' && toggleLanguage()}
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors duration-200 ${
+                                    preferences.language === 'ar'
+                                        ? 'bg-white dark:bg-gray-700 text-green-600 dark:text-green-400 shadow-sm'
+                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                                }`}
+                                aria-label="العربية"
+                            >
+                                العربية
+                            </button>
+                        </div>
 
                         {/* Mobile menu button */}
                         <button
@@ -87,17 +111,23 @@ const Navbar: React.FC = () => {
                 {isMenuOpen && (
                     <div className="md:hidden">
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
-                            {navItems.map((item) => (
-                                <Link
-                                    key={item.href}
-                                    href={item.href}
-                                    className="text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200"
-                                    onClick={() => setIsMenuOpen(false)}
-                                >
-                                    <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
-                                    {item.label}
-                                </Link>
-                            ))}
+                            {navItems.map((item) => {
+                                const active = isActive(item.href);
+                                return (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${active
+                                                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-l-4 border-green-600 dark:border-green-400'
+                                                : 'text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                            }`}
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
+                                        {item.label}
+                                    </Link>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

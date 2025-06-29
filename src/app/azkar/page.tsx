@@ -16,6 +16,27 @@ export default function AzkarPage() {
     const [counters, setCounters] = useState<{ [key: number]: number }>({});
     const toast = useToast();
 
+    // Categories that should have counters (Azkar and Tasbeeh)
+    const categoriesWithCounters = [
+        'Morning Adhkar',
+        'Evening Adhkar',
+        'Post-Prayer Azkar',
+        'Tasbeeh',
+        'Azkar Before Sleep',
+        'Azkar Upon Waking',
+        'أذكار الصباح',
+        'أذكار المساء',
+        'أذكار بعد السلام من الصلاة المفروضة',
+        'تسابيح',
+        'أذكار النوم',
+        'أذكار الاستيقاظ'
+    ];
+
+    // Check if a zikr should have a counter
+    const shouldHaveCounter = (category: string) => {
+        return categoriesWithCounters.includes(category);
+    };
+
     // Fetch azkar on mount and when language changes
     useEffect(() => {
         const loadAzkar = async () => {
@@ -24,10 +45,10 @@ export default function AzkarPage() {
                 const azkarData = await fetchAzkar(preferences.language);
                 setAzkar(azkarData);
 
-                // Initialize counters
+                // Initialize counters only for categories that need them
                 const initialCounters: { [key: number]: number } = {};
                 azkarData.forEach(zikr => {
-                    if (zikr.id) {
+                    if (zikr.id && shouldHaveCounter(zikr.category)) {
                         initialCounters[zikr.id] = 0;
                     }
                 });
@@ -71,7 +92,7 @@ export default function AzkarPage() {
     const resetAllCounters = () => {
         const resetCounters: { [key: number]: number } = {};
         azkar.forEach(zikr => {
-            if (zikr.id) {
+            if (zikr.id && shouldHaveCounter(zikr.category)) {
                 resetCounters[zikr.id] = 0;
             }
         });
@@ -145,12 +166,14 @@ export default function AzkarPage() {
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {filteredAzkar.length} {preferences.language === 'ar' ? 'دعاء' : 'supplication'}{filteredAzkar.length !== 1 ? (preferences.language === 'ar' ? 'ات' : 's') : ''} {preferences.language === 'ar' ? 'في هذه الفئة' : 'in this category'}
                             </p>
-                            <button
-                                onClick={resetAllCounters}
-                                className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
-                            >
-                                {preferences.language === 'ar' ? 'إعادة تعيين جميع العدادات' : 'Reset All Counters'}
-                            </button>
+                            {filteredAzkar.some(zikr => shouldHaveCounter(zikr.category)) && (
+                                <button
+                                    onClick={resetAllCounters}
+                                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                                >
+                                    {preferences.language === 'ar' ? 'إعادة تعيين جميع العدادات' : 'Reset All Counters'}
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -160,9 +183,10 @@ export default function AzkarPage() {
                     {filteredAzkar.map((zikr) => {
                         if (!zikr.id) return null;
 
-                        const currentCount = counters[zikr.id] || 0;
-                        const targetCount = parseInt(zikr.count) || 1;
-                        const isComplete = currentCount >= targetCount;
+                        const hasCounter = shouldHaveCounter(zikr.category);
+                        const currentCount = hasCounter ? (counters[zikr.id] || 0) : 0;
+                        const targetCount = hasCounter ? (parseInt(zikr.count) || 1) : 1;
+                        const isComplete = hasCounter ? (currentCount >= targetCount) : false;
 
                         return (
                             <div
@@ -170,44 +194,46 @@ export default function AzkarPage() {
                                 className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-200 ${isComplete ? 'ring-2 ring-green-500' : ''
                                     }`}
                             >
-                                {/* Counter Section */}
-                                <div className="flex justify-between items-center mb-4">
-                                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                        <div className="text-center">
-                                            <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                                                {currentCount}
+                                {/* Counter Section - Only show for Azkar and Tasbeeh */}
+                                {hasCounter && (
+                                    <div className="flex justify-between items-center mb-4">
+                                        <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                                            <div className="text-center">
+                                                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                                                    {currentCount}
+                                                </div>
+                                                <div className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {preferences.language === 'ar' ? 'من' : 'of'} {zikr.count}
+                                                </div>
                                             </div>
-                                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                                                {preferences.language === 'ar' ? 'من' : 'of'} {zikr.count}
+                                            <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full bg-green-500 transition-all duration-300"
+                                                    style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
+                                                ></div>
                                             </div>
                                         </div>
-                                        <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-green-500 transition-all duration-300"
-                                                style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
-                                            ></div>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex space-x-2 rtl:space-x-reverse">
-                                        <button
-                                            onClick={() => incrementCounter(zikr.id!)}
-                                            disabled={isComplete}
-                                            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isComplete
-                                                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200 cursor-not-allowed'
-                                                : 'bg-green-600 text-white hover:bg-green-700'
-                                                }`}
-                                        >
-                                            {isComplete ? (preferences.language === 'ar' ? '✓ مكتمل' : '✓ Complete') : (preferences.language === 'ar' ? 'عد' : 'Count')}
-                                        </button>
-                                        <button
-                                            onClick={() => resetCounter(zikr.id!)}
-                                            className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
-                                        >
-                                            {preferences.language === 'ar' ? 'إعادة تعيين' : 'Reset'}
-                                        </button>
+                                        <div className="flex space-x-2 rtl:space-x-reverse">
+                                            <button
+                                                onClick={() => incrementCounter(zikr.id!)}
+                                                disabled={isComplete}
+                                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${isComplete
+                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200 cursor-not-allowed'
+                                                    : 'bg-green-600 text-white hover:bg-green-700'
+                                                    }`}
+                                            >
+                                                {isComplete ? (preferences.language === 'ar' ? '✓ مكتمل' : '✓ Complete') : (preferences.language === 'ar' ? 'عد' : 'Count')}
+                                            </button>
+                                            <button
+                                                onClick={() => resetCounter(zikr.id!)}
+                                                className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                                            >
+                                                {preferences.language === 'ar' ? 'إعادة تعيين' : 'Reset'}
+                                            </button>
+                                        </div>
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Content */}
                                 <div className="mb-4">

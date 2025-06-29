@@ -68,6 +68,7 @@ export default function QuranPage() {
 
     const handleSurahSelect = (surah: QuranSurah) => {
         setSelectedSurah(surah);
+        setView('ayah-view');
     };
 
     const handleBackToList = () => {

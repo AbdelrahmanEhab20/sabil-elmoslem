@@ -5,6 +5,7 @@ import { UserProvider } from "@/contexts/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/ToastProvider";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -187,6 +188,7 @@ export default function RootLayout({
               <Navbar />
               <main className="flex-grow">
                 {children}
+                <SpeedInsights />
               </main>
               <Footer />
             </div>

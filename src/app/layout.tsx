@@ -5,6 +5,7 @@ import { UserProvider } from "@/contexts/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ToastProvider } from "@/components/ToastProvider";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const geistSans = Geist({
@@ -91,15 +92,15 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/images/logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/images/logo.png', sizes: '32x32', type: 'image/png' },
     ],
     shortcut: '/favicon.ico',
     apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '180x180', type: 'image/png' },
     ],
     other: [
-      { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#16a34a' },
+      { rel: 'mask-icon', url: '/images/logo.png', color: '#16a34a' },
     ],
   },
   manifest: '/site.webmanifest',
@@ -128,15 +129,9 @@ export default function RootLayout({
   return (
     <html lang="ar" dir="rtl">
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
         <link rel="icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/images/logo.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="application-name" content="الموقع الإسلامي | Islamic Site" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -182,18 +177,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900 min-h-screen font-sans`}
       >
-        <ToastProvider>
-          <UserProvider>
-            <div className="flex flex-col min-h-screen">
-              <Navbar />
-              <main className="flex-grow">
-                {children}
-                <SpeedInsights />
-              </main>
-              <Footer />
-            </div>
-          </UserProvider>
-        </ToastProvider>
+        <ErrorBoundary>
+          <ToastProvider>
+            <UserProvider>
+              <div className="flex flex-col min-h-screen">
+                <Navbar />
+                <main className="flex-grow">
+                  {children}
+                  <SpeedInsights />
+                </main>
+                <Footer />
+              </div>
+            </UserProvider>
+          </ToastProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

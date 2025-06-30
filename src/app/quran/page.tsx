@@ -62,7 +62,6 @@ export default function QuranPage() {
     const filteredSurahs = surahs.filter(surah =>
         surah.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         surah.englishName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        surah.englishNameTranslation.toLowerCase().includes(searchTerm.toLowerCase()) ||
         surah.number.toString().includes(searchTerm)
     );
 
@@ -211,9 +210,6 @@ export default function QuranPage() {
                                         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
                                             {surah.englishName}
                                         </h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                            {surah.englishNameTranslation}
-                                        </p>
                                         <p className="text-lg text-gray-700 dark:text-gray-300 mb-3 font-arabic">
                                             {surah.name}
                                         </p>
@@ -255,7 +251,7 @@ export default function QuranPage() {
                                                 {selectedSurah?.englishName}
                                             </h2>
                                             <p className="text-gray-600 dark:text-gray-400">
-                                                {selectedSurah?.englishNameTranslation} • {selectedSurah?.numberOfAyahs} {preferences.language === 'ar' ? 'آية' : 'verses'}
+                                                {selectedSurah?.numberOfAyahs} {preferences.language === 'ar' ? 'آية' : 'verses'}
                                             </p>
                                         </div>
                                     </div>
@@ -270,6 +266,18 @@ export default function QuranPage() {
                                 </div>
                             </div>
 
+                            {/* Bismillah Header for non-Fatiha surahs */}
+                            {selectedSurah && selectedSurah.number !== 1 && (
+                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6">
+                                    <div className="text-center">
+                                        <div className="text-3xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-4">
+                                            بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
+                                        </div>
+                                        <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Ayahs */}
                             {surahLoading ? (
                                 <div className="animate-pulse space-y-4">
@@ -283,37 +291,49 @@ export default function QuranPage() {
                                 </div>
                             ) : (
                                 <div className="space-y-6">
-                                    {ayahs.map((ayah) => (
-                                        <div key={ayah.number} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                                    <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-                                                        <span className="text-sm font-bold text-green-600 dark:text-green-400">
-                                                            {ayah.numberInSurah}
+                                    {ayahs.map((ayah) => {
+                                        // Skip Bismillah for non-Fatiha surahs as it's already displayed as header
+                                        if (selectedSurah && selectedSurah.number !== 1 && ayah.numberInSurah === 1 && ayah.text.includes('بِسۡمِ ٱللَّهِ')) {
+                                            return null;
+                                        }
+
+                                        return (
+                                            <div key={ayah.number} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
+                                                            <span className="text-sm font-bold text-green-600 dark:text-green-400">
+                                                                {ayah.numberInSurah}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                                                            {preferences.language === 'ar' ? 'آية' : 'Ayah'} {ayah.numberInSurah}
                                                         </span>
                                                     </div>
-                                                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                        {preferences.language === 'ar' ? 'آية' : 'Ayah'} {ayah.numberInSurah}
-                                                    </span>
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                        {preferences.language === 'ar' ? 'جزء' : 'Juz'} {ayah.juz}
+                                                    </div>
                                                 </div>
-                                                <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {preferences.language === 'ar' ? 'جزء' : 'Juz'} {ayah.juz}
-                                                </div>
-                                            </div>
 
-                                            <div className="text-right text-2xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-4">
-                                                {ayah.text}
-                                            </div>
-
-                                            {ayah.sajda && (
-                                                <div className="mb-4 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                                                    <p className="text-sm text-purple-800 dark:text-purple-200 font-medium">
-                                                        {preferences.language === 'ar' ? 'سجدة' : 'Sajda'} - {preferences.language === 'ar' ? 'آية سجدة' : 'Prostration Verse'}
-                                                    </p>
+                                                <div className="text-right text-2xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-4">
+                                                    {selectedSurah && selectedSurah.number !== 1 && ayah.numberInSurah === 1 ? ayah.text.split("بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ")[1] : ayah.text}
                                                 </div>
-                                            )}
-                                        </div>
-                                    ))}
+                                                {preferences.language === 'en' && ayah.translation && (
+                                                    <div className="text-left text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4 border-l-4 border-green-500 pl-4">
+                                                        {ayah.translation}
+                                                    </div>
+                                                )}
+
+                                                {ayah.sajda && (
+                                                    <div className="mb-4 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                                                        <p className="text-sm text-purple-800 dark:text-purple-200 font-medium">
+                                                            {preferences.language === 'ar' ? 'سجدة' : 'Sajda'} - {preferences.language === 'ar' ? 'آية سجدة' : 'Prostration Verse'}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </>

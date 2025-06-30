@@ -69,6 +69,62 @@
             "description": "It will be equal to freeing ten slaves, and one hundred good deeds will be written for him, and one hundred bad deeds will be erased from him, and it will be a protection for him from Satan",
             "reference": "Muslim",
             "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "1",
+            "description": "Ayat al-Kursi - Whoever recites it after every obligatory prayer, nothing will prevent him from entering Paradise except death",
+            "reference": "An-Nasa'i",
+            "content": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "3",
+            "description": "Qul Huwa Allahu Ahad - Equivalent to one-third of the Qur'an",
+            "reference": "Bukhari",
+            "content": "Say, He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan - For protection from all evil",
+            "reference": "Bukhari",
+            "content": "Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan - For protection from all evil",
+            "reference": "Bukhari",
+            "content": "Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer - Who whispers [evil] into the breasts of mankind - From among the jinn and mankind"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "10",
+            "description": "Blessings upon the Prophet - Whoever sends blessings upon me ten times, Allah will send blessings upon him one hundred times",
+            "reference": "Muslim",
+            "content": "O Allah, send prayers and peace and blessings upon our Prophet Muhammad"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "1",
+            "description": "Seeking blessings for the new day",
+            "reference": "Ibn Majah",
+            "content": "O Allah, whatever blessing I or any of Your creation have reached this morning, it is from You alone, without partner, so for You is all praise and all thanks"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "1",
+            "description": "Comprehensive dua for forgiveness and well-being",
+            "reference": "Abu Dawud",
+            "content": "O Allah, I ask You for pardon and well-being in this world and the next. O Allah, I ask You for pardon and well-being in my religion, my worldly affairs, my family, and my wealth. O Allah, veil my weaknesses and set at ease my dismay. O Allah, preserve me from the front and from behind and on my right and on my left and from above, and I take refuge with You lest I be swallowed up by the earth"
+        },
+        {
+            "category": "Morning Adhkar",
+            "count": "3",
+            "description": "Seeking Allah's protection and relying on Him",
+            "reference": "Abu Dawud",
+            "content": "O Allah, Creator of the heavens and the earth, Knower of the unseen and the witnessed, Lord and Sovereign of all things, I testify that there is no deity except You. I take refuge in You from the evil of my soul and from the evil and shirk of the devil"
         }
     ],
     "Evening Adhkar": [
@@ -127,6 +183,55 @@
             "description": "It will be equal to freeing ten slaves, and one hundred good deeds will be written for him, and one hundred bad deeds will be erased from him, and it will be a protection for him from Satan",
             "reference": "Muslim",
             "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "1",
+            "description": "Ayat al-Kursi - Protection from Satan until morning",
+            "reference": "Bukhari",
+            "content": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "3",
+            "description": "Qul Huwa Allahu Ahad - Equivalent to one-third of the Qur'an",
+            "reference": "Bukhari",
+            "content": "Say, He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan - For protection from all evil",
+            "reference": "Bukhari",
+            "content": "Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan - For protection from all evil",
+            "reference": "Bukhari",
+            "content": "Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer - Who whispers [evil] into the breasts of mankind - From among the jinn and mankind"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "10",
+            "description": "Blessings upon the Prophet - Whoever sends blessings upon me ten times, Allah will send blessings upon him one hundred times",
+            "reference": "Muslim",
+            "content": "O Allah, send prayers and peace and blessings upon our Prophet Muhammad"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "1",
+            "description": "We have reached the evening upon the fitrah of Islam",
+            "reference": "Muslim",
+            "content": "We have reached the evening upon the fitrah of Islam, and the word of pure faith, and upon the religion of our Prophet Muhammad (peace be upon him), and upon the religion of our father Ibrahim, a Muslim and of true faith, and he was not of the polytheists"
+        },
+        {
+            "category": "Evening Adhkar",
+            "count": "1",
+            "description": "Comprehensive dua for forgiveness and well-being",
+            "reference": "Abu Dawud",
+            "content": "O Allah, I ask You for pardon and well-being in this world and the next. O Allah, I ask You for pardon and well-being in my religion, my worldly affairs, my family, and my wealth. O Allah, veil my weaknesses and set at ease my dismay. O Allah, preserve me from the front and from behind and on my right and on my left and from above, and I take refuge with You lest I be swallowed up by the earth"
         }
     ],
     "Post-Prayer Azkar": [
@@ -185,6 +290,41 @@
             "description": "Seeking help for remembrance and gratitude",
             "reference": "Abu Dawud",
             "content": "O Allah, help me to remember You, to thank You, and to worship You in the best manner"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "Ayat al-Kursi - Whoever recites it after every obligatory prayer, nothing will prevent him from entering Paradise except death",
+            "reference": "An-Nasa'i",
+            "content": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "3",
+            "description": "Qul Huwa Allahu Ahad - Equivalent to one-third of the Qur'an",
+            "reference": "Bukhari",
+            "content": "Say, He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan after prayer",
+            "reference": "Abu Dawud",
+            "content": "Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "3",
+            "description": "The Mu'awwidhatan after prayer",
+            "reference": "Abu Dawud",
+            "content": "Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer - Who whispers [evil] into the breasts of mankind - From among the jinn and mankind"
+        },
+        {
+            "category": "Post-Prayer Azkar",
+            "count": "1",
+            "description": "Comprehensive dua after prayer",
+            "reference": "Muslim",
+            "content": "O Allah, distance me from my sins just as You have distanced the East from the West, O Allah, purify me from my sins as a white robe is purified from filth, O Allah, cleanse me from my sins with snow, water, and ice"
         }
     ],
     "Tasbeeh": [
@@ -308,6 +448,48 @@
             "description": "Magnification before sleep",
             "reference": "Muslim",
             "content": "Allah is the Greatest"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "1",
+            "description": "Ayat al-Kursi - Protection from Satan until morning",
+            "reference": "Bukhari",
+            "content": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "3",
+            "description": "Reciting Surah Al-Ikhlas and the Mu'awwidhatan",
+            "reference": "Abu Dawud",
+            "content": "Say, He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "3",
+            "description": "Reciting Surah Al-Ikhlas and the Mu'awwidhatan",
+            "reference": "Abu Dawud",
+            "content": "Say: I seek refuge in the Lord of daybreak, From the evil of that which He created, And from the evil of darkness when it settles, And from the evil of the blowers in knots, And from the evil of an envier when he envies"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "3",
+            "description": "Reciting Surah Al-Ikhlas and the Mu'awwidhatan",
+            "reference": "Abu Dawud",
+            "content": "Say: I seek refuge in the Lord of mankind, The Sovereign of mankind, The God of mankind, From the evil of the retreating whisperer - Who whispers [evil] into the breasts of mankind - From among the jinn and mankind"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "1",
+            "description": "Dua for protection when going to sleep",
+            "reference": "Muslim",
+            "content": "O Allah, I submit my soul unto You, and I entrust my affair unto You, and I turn my face toward You, and I totally rely on You, in hope and fear of You. Verily there is no refuge nor safe haven from You except with You. I believe in Your Book which You have revealed and in Your Prophet whom You have sent"
+        },
+        {
+            "category": "Azkar Before Sleep",
+            "count": "1",
+            "description": "The last two verses of Surah Al-Baqarah - They will suffice him against all evil",
+            "reference": "Bukhari",
+            "content": "The Messenger has believed in what was revealed to him from his Lord, and [so have] the believers. All of them have believed in Allah and His angels and His books and His messengers, [saying], We make no distinction between any of His messengers. And they say, We hear and we obey. [We seek] Your forgiveness, our Lord, and to You is the [final] destination. Allah does not charge a soul except [with that within] its capacity. It will have [the consequence of] what [good] it has gained, and it will bear [the consequence of] what [evil] it has earned. Our Lord, do not impose blame upon us if we have forgotten or erred. Our Lord, and lay not upon us a burden like that which You laid upon those before us. Our Lord, and burden us not with that which we have no ability to bear. And pardon us; and forgive us; and have mercy upon us. You are our protector, so give us victory over the disbelieving people"
         }
     ],
     "Azkar Upon Waking": [
@@ -331,6 +513,27 @@
             "description": "Monotheism and seeking forgiveness upon waking",
             "reference": "Abu Dawud",
             "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent. Glory be to Allah, and praise be to Allah, and none has the right to be worshipped except Allah and Allah is the Greatest, and there is no might and no power except with Allah, the Most High, the Most Great. My Lord, forgive me"
+        },
+        {
+            "category": "Azkar Upon Waking",
+            "count": "1",
+            "description": "Dua upon waking at night",
+            "reference": "Bukhari",
+            "content": "None has the right to be worshipped except Allah, alone, without any partner, to Him belongs all sovereignty and praise and He is over all things omnipotent. All praise is for Allah, and glory be to Allah, and none has the right to be worshipped except Allah, and Allah is the Greatest, and there is no might and no power except with Allah, then he said: O Allah, forgive me"
+        },
+        {
+            "category": "Azkar Upon Waking",
+            "count": "1",
+            "description": "Dua for wiping sleep from the face",
+            "reference": "Muslim",
+            "content": "O Allah, the stars have disappeared, the eyes have slept, and You are Ever-Living, Self-Subsisting, neither slumber nor sleep overtakes You. O Ever-Living, O Self-Sustaining, grant me a peaceful night and put my eyes to sleep"
+        },
+        {
+            "category": "Azkar Upon Waking",
+            "count": "1",
+            "description": "Upon seeing a good dream",
+            "reference": "Muslim",
+            "content": "All praise is for Allah Who has honored me with this good dream"
         }
     ],
     "Quranic Duas": [
@@ -389,6 +592,41 @@
             "description": "Dua of Prophet Yunus (Jonah)",
             "reference": "Qur'an 21:87",
             "content": "There is no deity except You; exalted are You. Indeed, I have been of the wrongdoers"
+        },
+        {
+            "category": "Quranic Duas",
+            "count": "1",
+            "description": "Dua for righteous spouses and offspring",
+            "reference": "Qur'an 25:74",
+            "content": "Our Lord, grant us from among our wives and offspring comfort to our eyes and make us an example for the righteous"
+        },
+        {
+            "category": "Quranic Duas",
+            "count": "1",
+            "description": "Dua for parents",
+            "reference": "Qur'an 17:24",
+            "content": "My Lord, have mercy upon them as they brought me up [when I was] small"
+        },
+        {
+            "category": "Quranic Duas",
+            "count": "1",
+            "description": "Dua for increased faith",
+            "reference": "Qur'an 23:109",
+            "content": "Our Lord, we have believed, so forgive us and have mercy upon us, and You are the best of the merciful"
+        },
+        {
+            "category": "Quranic Duas",
+            "count": "1",
+            "description": "Dua for righteousness",
+            "reference": "Qur'an 42:10",
+            "content": "Our Lord, decide between us and our people in truth, and You are the best of those who give decision"
+        },
+        {
+            "category": "Quranic Duas",
+            "count": "1",
+            "description": "Dua for escape from darkness",
+            "reference": "Qur'an 6:63",
+            "content": "Our Lord, remove us from this city of wrongdoing people and appoint for us from Yourself a protector and appoint for us from Yourself a helper"
         }
     ],
     "Prophets' Duas": [
@@ -440,6 +678,34 @@
             "description": "Dua of Prophet Zakariyya (Zechariah) (peace be upon him)",
             "reference": "Qur'an 3:38",
             "content": "My Lord, grant me from Yourself a good offspring. Indeed, You are the Hearer of supplication"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Yusuf (Joseph) (peace be upon him)",
+            "reference": "Qur'an 12:101",
+            "content": "My Lord, You have given me [something] of sovereignty and taught me of the interpretation of dreams. Creator of the heavens and earth, You are my protector in this world and in the Hereafter. Cause me to die a Muslim and join me with the righteous"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Al-Khidr (peace be upon him)",
+            "reference": "Qur'an 18:10",
+            "content": "Our Lord, grant us from Yourself mercy and prepare for us from our affair right guidance"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Isma'il (Ishmael) (peace be upon him)",
+            "reference": "Qur'an 2:127",
+            "content": "Our Lord, accept [this] from us. Indeed You are the Hearing, the Knowing"
+        },
+        {
+            "category": "Prophets' Duas",
+            "count": "1",
+            "description": "Dua of Prophet Harun (Aaron) (peace be upon him)",
+            "reference": "Qur'an 20:29-32",
+            "content": "My Lord, expand for me my breast and ease for me my task and untie the knot from my tongue that they may understand my speech"
         }
     ]
 }

@@ -43,6 +43,7 @@ export interface QuranSurah {
 export interface QuranAyah {
     number: number;
     text: string;
+    translation?: string;
     numberInSurah: number;
     juz: number;
     manzil: number;

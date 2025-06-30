@@ -61,7 +61,7 @@ export default function PrayerTimesPage() {
         };
 
         getPrayerTimes();
-    }, [location, preferences.calculationMethod, preferences.madhab, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
+    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer and time until
     useEffect(() => {

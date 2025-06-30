@@ -297,5 +297,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
 };
 
 export const useTranslations = (language: 'en' | 'ar') => {
-    return translations[language];
+    // Fallback to English if language is not supported
+    const supportedLanguage = ['en', 'ar'].includes(language) ? language : 'en';
+    return translations[supportedLanguage];
 }; 

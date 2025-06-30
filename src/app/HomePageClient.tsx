@@ -51,7 +51,7 @@ export default function HomePageClient() {
 
                     <div className="text-lg text-green-200">
                         <p className="mb-2 font-arabic text-2xl">{t.bismillah}</p>
-                        <p>{t.bismillahTranslation}</p>
+                        {preferences.language === 'en' && <p>{t.bismillahTranslation}</p>}
                     </div>
                 </div>
             </section>

@@ -1,53 +1,37 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { fetchAzkar } from '@/utils/api';
-import { Azkar } from '@/types';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useUser } from '@/contexts/UserContext';
-import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
+import { useTranslations } from '@/utils/translations';
+import { Azkar } from '@/types';
 
 export default function AzkarPage() {
     const { preferences } = useUser();
     const t = useTranslations(preferences.language);
+    const toast = useToast();
     const [azkar, setAzkar] = useState<Azkar[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [counters, setCounters] = useState<{ [key: number]: number }>({});
-    const toast = useToast();
 
-    // Categories that should have counters (Azkar and Tasbeeh)
-    const categoriesWithCounters = [
-        'Morning Adhkar',
-        'Evening Adhkar',
-        'Post-Prayer Azkar',
-        'Tasbeeh',
-        'Azkar Before Sleep',
-        'Azkar Upon Waking',
-        'أذكار الصباح',
-        'أذكار المساء',
-        'أذكار بعد السلام من الصلاة المفروضة',
-        'تسابيح',
-        'أذكار النوم',
-        'أذكار الاستيقاظ'
-    ];
-
-    // Check if a zikr should have a counter
-    const shouldHaveCounter = (category: string) => {
-        return categoriesWithCounters.includes(category);
-    };
+    // Memoize shouldHaveCounter function to prevent unnecessary re-renders
+    const shouldHaveCounter = useCallback((category: string) => {
+        return ['Tasbeeh', 'تسابيح'].includes(category);
+    }, []);
 
     // Fetch azkar on mount and when language changes
     useEffect(() => {
         const loadAzkar = async () => {
+            setLoading(true);
             try {
-                setLoading(true);
-                const azkarData = await fetchAzkar(preferences.language);
-                setAzkar(azkarData);
+                const { fetchAzkar } = await import('@/utils/api');
+                const data = await fetchAzkar(preferences.language);
+                setAzkar(data);
 
                 // Initialize counters only for categories that need them
                 const initialCounters: { [key: number]: number } = {};
-                azkarData.forEach(zikr => {
+                data.forEach(zikr => {
                     if (zikr.id && shouldHaveCounter(zikr.category)) {
                         initialCounters[zikr.id] = 0;
                     }
@@ -62,15 +46,22 @@ export default function AzkarPage() {
         };
 
         loadAzkar();
-    }, [preferences.language, t.errorLoadingAzkar, toast]);
+    }, [preferences.language, t.errorLoadingAzkar, toast, shouldHaveCounter]);
 
     // Get unique categories
-    const categories = ['all', ...Array.from(new Set(azkar.map(zikr => zikr.category)))];
+    const categories = Array.from(new Set(azkar.map(zikr => zikr.category)));
 
     // Filter azkar by category
-    const filteredAzkar = selectedCategory === 'all'
+    const filteredAzkar = selectedCategory === ''
         ? azkar
         : azkar.filter(zikr => zikr.category === selectedCategory);
+
+    // Set first category as default when azkar loads
+    useEffect(() => {
+        if (categories.length > 0 && selectedCategory === '') {
+            setSelectedCategory(categories[0]);
+        }
+    }, [categories, selectedCategory]);
 
     // Handle counter increment
     const incrementCounter = (id: number) => {
@@ -156,12 +147,12 @@ export default function AzkarPage() {
                                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                     }`}
                             >
-                                {category === 'all' ? (preferences.language === 'ar' ? 'جميع الأذكار' : 'All Azkar') : getCategoryDisplayName(category)}
+                                {getCategoryDisplayName(category)}
                             </button>
                         ))}
                     </div>
 
-                    {selectedCategory !== 'all' && (
+                    {selectedCategory && (
                         <div className="mt-4 flex justify-between items-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
                                 {filteredAzkar.length} {preferences.language === 'ar' ? 'دعاء' : 'supplication'}{filteredAzkar.length !== 1 ? (preferences.language === 'ar' ? 'ات' : 's') : ''} {preferences.language === 'ar' ? 'في هذه الفئة' : 'in this category'}

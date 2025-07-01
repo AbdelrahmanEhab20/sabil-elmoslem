@@ -5,7 +5,7 @@ import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
-import { Dialog } from '@headlessui/react';
+import CustomModal from '@/components/CustomModal';
 
 export default function AzkarPage() {
     const { preferences } = useUser();
@@ -361,44 +361,40 @@ export default function AzkarPage() {
                 )}
 
                 {/* Sweet Alert Modal */}
-                <Dialog open={showCongrats} onClose={handleCloseCongrats} className="relative z-50">
-                    <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-                    <div className="fixed inset-0 flex items-center justify-center p-4">
-                        <Dialog.Panel className="mx-auto max-w-md rounded-xl bg-white dark:bg-gray-900 p-8 shadow-2xl border border-green-200 dark:border-green-700">
-                            <Dialog.Title className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2 text-center">
-                                {preferences.language === 'ar'
-                                    ? 'بَارَكَ اللّٰهُ فِيكَ'
-                                    : 'Bāraka Allāhu Fīk'}
-                            </Dialog.Title>
-                            <div className="text-lg text-gray-700 dark:text-gray-200 mb-4 text-center">
-                                {preferences.language === 'ar'
-                                    ? 'لقد أكملت جميع الأذكار في هذه الفئة. جزاك الله خيرًا وبارك فيك.'
-                                    : 'You have completed all adhkar in this category. May Allah reward you and bless you!'}
-                            </div>
-                            {randomDuaa && (
-                                <div className="mb-4 text-center">
-                                    <div className="text-xl font-semibold text-green-800 dark:text-green-200 mb-1">
-                                        {preferences.language === 'ar' ? 'دُعَاءٌ لَكَ:' : 'A Duʿāʾ for You:'}
-                                    </div>
-                                    <div className="text-lg text-gray-900 dark:text-white mb-1">
-                                        {preferences.language === 'ar' ? randomDuaa.ar : randomDuaa.en}
-                                    </div>
-                                </div>
-                            )}
-                            <div className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
-                                {preferences.language === 'ar'
-                                    ? 'تذكّر أن تداوم على الذكر والشكر لله دائمًا.'
-                                    : 'Remember to keep remembering and thanking Allah always.'}
-                            </div>
-                            <button
-                                onClick={handleCloseCongrats}
-                                className="w-full mt-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200"
-                            >
-                                {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
-                            </button>
-                        </Dialog.Panel>
+                <CustomModal
+                    isOpen={showCongrats}
+                    onClose={handleCloseCongrats}
+                    title={preferences.language === 'ar'
+                        ? 'بَارَكَ اللّٰهُ فِيكَ'
+                        : 'Bāraka Allāhu Fīk'}
+                >
+                    <div className="text-lg text-gray-700 dark:text-gray-200 mb-4 text-center">
+                        {preferences.language === 'ar'
+                            ? 'لقد أكملت جميع الأذكار في هذه الفئة. جزاك الله خيرًا وبارك فيك.'
+                            : 'You have completed all adhkar in this category. May Allah reward you and bless you!'}
                     </div>
-                </Dialog>
+                    {randomDuaa && (
+                        <div className="mb-4 text-center">
+                            <div className="text-xl font-semibold text-green-800 dark:text-green-200 mb-1">
+                                {preferences.language === 'ar' ? 'دُعَاءٌ لَكَ:' : 'A Duʿāʾ for You:'}
+                            </div>
+                            <div className="text-lg text-gray-900 dark:text-white mb-1">
+                                {preferences.language === 'ar' ? randomDuaa.ar : randomDuaa.en}
+                            </div>
+                        </div>
+                    )}
+                    <div className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+                        {preferences.language === 'ar'
+                            ? 'تذكّر أن تداوم على الذكر والشكر لله دائمًا.'
+                            : 'Remember to keep remembering and thanking Allah always.'}
+                    </div>
+                    <button
+                        onClick={handleCloseCongrats}
+                        className="w-full mt-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200"
+                    >
+                        {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
+                    </button>
+                </CustomModal>
             </div>
         </div>
     );

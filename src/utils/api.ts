@@ -193,6 +193,37 @@ export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Pr
     return ayahs;
 }, 'fetchQuranAyahs');
 
+// Fetch Quran ayahs with tajweed coloring and English translation from Quran.com API
+// export const fetchQuranAyahsWithTajweed = withErrorHandling(async (surahNumber: number) => {
+//     // Quran.com API endpoints
+//     const tajweedUrl = `https://api.quran.com/api/v4/quran/verses/uthmani_tajweed?chapter_number=${surahNumber}`;
+//     const translationUrl = `https://api.quran.com/api/v4/quran/translations/131?chapter_number=${surahNumber}`; // 131 = Sahih International
+
+//     // Fetch both in parallel
+//     const [tajweedRes, translationRes] = await Promise.all([
+//         fetch(tajweedUrl),
+//         fetch(translationUrl)
+//     ]);
+
+//     const tajweedData = await tajweedRes.json();
+//     const translationData = await translationRes.json();
+
+//     if (!tajweedData.verses || !Array.isArray(tajweedData.verses)) {
+//         throw new ApiError('Invalid tajweed Quran data received', 422);
+//     }
+//     if (!translationData.translations || !Array.isArray(translationData.translations)) {
+//         throw new ApiError('Invalid Quran translation data received', 422);
+//     }
+
+//     // Combine Arabic (tajweed HTML) and English translation
+//     const ayahs = tajweedData.verses.map((ayah: any, idx: number) => ({
+//         arabic: ayah.text_uthmani_tajweed,
+//         translation: translationData.translations[idx]?.text || ''
+//     }));
+
+//     return ayahs;
+// }, 'fetchQuranAyahsWithTajweed');
+
 // Azkar data with enhanced error handling
 export const fetchAzkar = withErrorHandling(async (language: 'en' | 'ar' = 'en'): Promise<Azkar[]> => {
     const cacheKey = `azkar-${language}`;
@@ -226,7 +257,7 @@ export const fetchAzkar = withErrorHandling(async (language: 'en' | 'ar' = 'en')
                             ...azkar,
                             id: idCounter++,
                             category: categoryName
-                        });
+                        } as Azkar);
                     }
                 });
             }

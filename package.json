@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.19",
     "@types/js-cookie": "^3.0.6",
     "@vercel/speed-insights": "^1.2.0",
     "js-cookie": "^3.0.5",

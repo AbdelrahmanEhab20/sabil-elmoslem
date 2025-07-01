@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
+import { Dialog } from '@headlessui/react';
 
 export default function AzkarPage() {
     const { preferences } = useUser();
@@ -14,17 +15,59 @@ export default function AzkarPage() {
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [counters, setCounters] = useState<{ [key: number]: number }>({});
+    const [showCongrats, setShowCongrats] = useState(false);
+    const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
+    const [hasShownCongrats, setHasShownCongrats] = useState(false);
+
+    // Add a list of general duaas for congratulation (move up)
+    const generalDuaas = [
+        {
+            ar: 'اللهم اجعل هذا اليوم مباركًا لنا، واغفر لنا ذنوبنا، وارزقنا السعادة في الدنيا والآخرة.',
+            en: 'O Allah, make this day blessed for us, forgive our sins, and grant us happiness in this life and the Hereafter.'
+        },
+        {
+            ar: 'اللهم احفظنا بحفظك، ووفقنا لطاعتك، وبارك لنا في أعمارنا وأعمالنا.',
+            en: 'O Allah, protect us with Your protection, guide us to Your obedience, and bless our lives and deeds.'
+        },
+        {
+            ar: 'اللهم ارزقنا الإخلاص في القول والعمل، واملأ قلوبنا بنور الإيمان.',
+            en: 'O Allah, grant us sincerity in word and deed, and fill our hearts with the light of faith.'
+        },
+        {
+            ar: 'اللهم اجعلنا من الذاكرين الشاكرين، ووفقنا لما تحب وترضى.',
+            en: 'O Allah, make us among those who remember and thank You, and grant us success in what You love and are pleased with.'
+        },
+        {
+            ar: 'اللهم اجعل القرآن ربيع قلوبنا ونور صدورنا وجلاء أحزاننا.',
+            en: 'O Allah, make the Quran the spring of our hearts, the light of our chests, and the remover of our sorrows.'
+        }
+    ];
 
     // Memoize shouldHaveCounter function to prevent unnecessary re-renders
     const shouldHaveCounter = useCallback((category: string) => {
-        // Quranic duas and Prophets' duas don't need counters as they are supplications recited as needed
+        // Quranic duas, Prophets' duas, and Dua Khatm al-Quran don't need counters as they are supplications recited as needed
         const categoriesWithoutCounters = [
             'أدعية قرآنية',
             'أدعية الأنبياء',
             'Quranic Duas',
-            'Prophets\' Duas'
+            "Prophets' Duas",
+            'Dua Khatm al-Quran',
+            'دعاء ختم القرآن الكريم',
         ];
         return !categoriesWithoutCounters.includes(category);
+    }, []);
+
+    // Helper to check if a category is an "azkar" category (not duaas-only)
+    const isAzkarCategory = useCallback((category: string) => {
+        const duaasOnlyCategories = [
+            'أدعية قرآنية',
+            'أدعية الأنبياء',
+            'Quranic Duas',
+            "Prophets' Duas",
+            'Dua Khatm al-Quran',
+            'دعاء ختم القرآن الكريم',
+        ];
+        return !duaasOnlyCategories.includes(category);
     }, []);
 
     // Fetch azkar on mount and when language changes
@@ -63,27 +106,38 @@ export default function AzkarPage() {
         ? azkar
         : azkar.filter(zikr => zikr.category === selectedCategory);
 
-    // Set first category as default when azkar loads
+    // Helper to check if category is complete
+    const isCategoryComplete = useMemo(() => {
+        return (
+            filteredAzkar.length > 0 &&
+            isAzkarCategory(selectedCategory) &&
+            filteredAzkar.every(zikr => {
+                if (!zikr.id) return true;
+                const hasCounter = shouldHaveCounter(zikr.category);
+                if (!hasCounter) return true;
+                const currentCount = counters[zikr.id] || 0;
+                const targetCount = parseInt(zikr.count) || 1;
+                return currentCount >= targetCount;
+            })
+        );
+    }, [filteredAzkar, counters, shouldHaveCounter, isAzkarCategory, selectedCategory]);
+
+    // Effect to show modal only once per completion
     useEffect(() => {
-        if (categories.length > 0 && selectedCategory === '') {
-            setSelectedCategory(categories[0]);
+        if (isCategoryComplete && !hasShownCongrats) {
+            setRandomDuaa(generalDuaas[Math.floor(Math.random() * generalDuaas.length)]);
+            setShowCongrats(true);
+            setHasShownCongrats(true);
         }
-    }, [categories, selectedCategory]);
+        if (!isCategoryComplete) {
+            setShowCongrats(false);
+            setHasShownCongrats(false);
+            setRandomDuaa(null);
+        }
+    }, [isCategoryComplete, hasShownCongrats, generalDuaas]);
 
-    // Handle counter increment
-    const incrementCounter = (id: number) => {
-        setCounters(prev => ({
-            ...prev,
-            [id]: (prev[id] || 0) + 1
-        }));
-    };
-
-    // Handle counter reset
-    const resetCounter = (id: number) => {
-        setCounters(prev => ({
-            ...prev,
-            [id]: 0
-        }));
+    const handleCloseCongrats = () => {
+        setShowCongrats(false);
     };
 
     // Reset all counters
@@ -95,7 +149,28 @@ export default function AzkarPage() {
             }
         });
         setCounters(resetCounters);
+        setHasShownCongrats(false);
+        setRandomDuaa(null);
     };
+
+    // Handle counter reset
+    const resetCounter = (id: number) => {
+        setCounters(prev => ({
+            ...prev,
+            [id]: 0
+        }));
+        setHasShownCongrats(false);
+        setRandomDuaa(null);
+    };
+
+    // Set first category as default when azkar loads
+    useEffect(() => {
+        if (categories.length > 0 && selectedCategory === '') {
+            setSelectedCategory(categories[0]);
+            setHasShownCongrats(false);
+            setRandomDuaa(null);
+        }
+    }, [categories, selectedCategory]);
 
     // Get category display name
     const getCategoryDisplayName = (category: string) => {
@@ -107,9 +182,19 @@ export default function AzkarPage() {
             'Azkar Before Sleep': preferences.language === 'ar' ? 'أذكار النوم' : 'Azkar Before Sleep',
             'Azkar Upon Waking': preferences.language === 'ar' ? 'أذكار الاستيقاظ' : 'Azkar Upon Waking',
             'Quranic Duas': preferences.language === 'ar' ? 'أدعية قرآنية' : 'Quranic Duas',
-            'Prophets\' Duas': preferences.language === 'ar' ? 'أدعية الأنبياء' : 'Prophets\' Duas'
+            "Prophets' Duas": preferences.language === 'ar' ? 'أدعية الأنبياء' : "Prophets' Duas",
+            'Dua Khatm al-Quran': preferences.language === 'ar' ? 'دعاء ختم القرآن الكريم' : 'Dua Khatm al-Quran',
+            'دعاء ختم القرآن الكريم': preferences.language === 'ar' ? 'دعاء ختم القرآن الكريم' : 'Dua Khatm al-Quran',
         };
         return displayNames[category] || category;
+    };
+
+    // Handle counter increment
+    const incrementCounter = (id: number) => {
+        setCounters(prev => ({
+            ...prev,
+            [id]: (prev[id] || 0) + 1
+        }));
     };
 
     if (loading) {
@@ -162,7 +247,7 @@ export default function AzkarPage() {
                     {selectedCategory && (
                         <div className="mt-4 flex justify-between items-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {filteredAzkar.length} {preferences.language === 'ar' ? 'دعاء' : 'supplication'}{filteredAzkar.length !== 1 ? (preferences.language === 'ar' ? 'ات' : 's') : ''} {preferences.language === 'ar' ? 'في هذه الفئة' : 'in this category'}
+                                {filteredAzkar.length} {preferences.language === 'ar' ? (filteredAzkar.length === 1 ? 'دعاء' : 'أدعية') : `supplication${filteredAzkar.length !== 1 ? 's' : ''}`} {preferences.language === 'ar' ? 'في هذه الفئة' : 'in this category'}
                             </p>
                             {filteredAzkar.some(zikr => shouldHaveCounter(zikr.category)) && (
                                 <button
@@ -257,13 +342,6 @@ export default function AzkarPage() {
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Reference */}
-                                {zikr.reference && (
-                                    <div className="text-sm text-gray-500 dark:text-gray-500">
-                                        <span className="font-medium">{preferences.language === 'ar' ? 'المرجع:' : 'Reference:'}</span> {zikr.reference}
-                                    </div>
-                                )}
                             </div>
                         );
                     })}
@@ -282,19 +360,45 @@ export default function AzkarPage() {
                     </div>
                 )}
 
-                {/* Tips Section */}
-                {/* <div className="mt-12 bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
-                    <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 mb-3">
-                        {t.tipsForReadingAzkar}
-                    </h3>
-                    <ul className="text-sm text-green-700 dark:text-green-300 space-y-1">
-                        <li>• {t.readWithSincerityAndFocusOnTheMeaning}</li>
-                        <li>• {t.tryToUnderstandTheArabicTextAndItsTranslation}</li>
-                        <li>• {t.maintainConsistencyInYourDailyPractice}</li>
-                        <li>• {t.useTheCounterToTrackYourProgress}</li>
-                        <li>• {t.readAtTheRecommendedTimesMorningEvening}</li>
-                    </ul>
-                </div> */}
+                {/* Sweet Alert Modal */}
+                <Dialog open={showCongrats} onClose={handleCloseCongrats} className="relative z-50">
+                    <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+                    <div className="fixed inset-0 flex items-center justify-center p-4">
+                        <Dialog.Panel className="mx-auto max-w-md rounded-xl bg-white dark:bg-gray-900 p-8 shadow-2xl border border-green-200 dark:border-green-700">
+                            <Dialog.Title className="text-2xl font-bold text-green-700 dark:text-green-300 mb-2 text-center">
+                                {preferences.language === 'ar'
+                                    ? 'بَارَكَ اللّٰهُ فِيكَ'
+                                    : 'Bāraka Allāhu Fīk'}
+                            </Dialog.Title>
+                            <div className="text-lg text-gray-700 dark:text-gray-200 mb-4 text-center">
+                                {preferences.language === 'ar'
+                                    ? 'لقد أكملت جميع الأذكار في هذه الفئة. جزاك الله خيرًا وبارك فيك.'
+                                    : 'You have completed all adhkar in this category. May Allah reward you and bless you!'}
+                            </div>
+                            {randomDuaa && (
+                                <div className="mb-4 text-center">
+                                    <div className="text-xl font-semibold text-green-800 dark:text-green-200 mb-1">
+                                        {preferences.language === 'ar' ? 'دُعَاءٌ لَكَ:' : 'A Duʿāʾ for You:'}
+                                    </div>
+                                    <div className="text-lg text-gray-900 dark:text-white mb-1">
+                                        {preferences.language === 'ar' ? randomDuaa.ar : randomDuaa.en}
+                                    </div>
+                                </div>
+                            )}
+                            <div className="text-sm text-gray-600 dark:text-gray-400 text-center mb-4">
+                                {preferences.language === 'ar'
+                                    ? 'تذكّر أن تداوم على الذكر والشكر لله دائمًا.'
+                                    : 'Remember to keep remembering and thanking Allah always.'}
+                            </div>
+                            <button
+                                onClick={handleCloseCongrats}
+                                className="w-full mt-2 px-4 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200"
+                            >
+                                {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
+                            </button>
+                        </Dialog.Panel>
+                    </div>
+                </Dialog>
             </div>
         </div>
     );

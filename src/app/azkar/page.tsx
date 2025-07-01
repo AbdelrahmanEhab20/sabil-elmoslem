@@ -17,7 +17,14 @@ export default function AzkarPage() {
 
     // Memoize shouldHaveCounter function to prevent unnecessary re-renders
     const shouldHaveCounter = useCallback((category: string) => {
-        return ['Tasbeeh', 'تسابيح'].includes(category);
+        // Quranic duas and Prophets' duas don't need counters as they are supplications recited as needed
+        const categoriesWithoutCounters = [
+            'أدعية قرآنية',
+            'أدعية الأنبياء',
+            'Quranic Duas',
+            'Prophets\' Duas'
+        ];
+        return !categoriesWithoutCounters.includes(category);
     }, []);
 
     // Fetch azkar on mount and when language changes
@@ -160,9 +167,13 @@ export default function AzkarPage() {
                             {filteredAzkar.some(zikr => shouldHaveCounter(zikr.category)) && (
                                 <button
                                     onClick={resetAllCounters}
-                                    className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors duration-200"
+                                    className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-1.5 text-sm text-red-600 hover:text-white hover:bg-red-600 dark:text-red-400 dark:hover:bg-red-500 transition-all duration-200 rounded-lg border border-red-200 dark:border-red-800 hover:border-red-600"
+                                    title={preferences.language === 'ar' ? 'إعادة تعيين جميع العدادات في هذه الفئة' : 'Reset all counters in this category'}
                                 >
-                                    {preferences.language === 'ar' ? 'إعادة تعيين جميع العدادات' : 'Reset All Counters'}
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                    </svg>
+                                    <span>{preferences.language === 'ar' ? 'إعادة تعيين الكل' : 'Reset All'}</span>
                                 </button>
                             )}
                         </div>
@@ -185,7 +196,7 @@ export default function AzkarPage() {
                                 className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-200 ${isComplete ? 'ring-2 ring-green-500' : ''
                                     }`}
                             >
-                                {/* Counter Section - Only show for Azkar and Tasbeeh */}
+                                {/* Counter Section - Show for all azkar */}
                                 {hasCounter && (
                                     <div className="flex justify-between items-center mb-4">
                                         <div className="flex items-center space-x-4 rtl:space-x-reverse">
@@ -197,12 +208,14 @@ export default function AzkarPage() {
                                                     {preferences.language === 'ar' ? 'من' : 'of'} {zikr.count}
                                                 </div>
                                             </div>
-                                            <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-green-500 transition-all duration-300"
-                                                    style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
-                                                ></div>
-                                            </div>
+                                            {targetCount > 1 && (
+                                                <div className="w-16 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                    <div
+                                                        className="h-full bg-green-500 transition-all duration-300"
+                                                        style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
+                                                    ></div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <div className="flex space-x-2 rtl:space-x-reverse">
@@ -218,9 +231,12 @@ export default function AzkarPage() {
                                             </button>
                                             <button
                                                 onClick={() => resetCounter(zikr.id!)}
-                                                className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200"
+                                                className="px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-200 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500"
+                                                title={preferences.language === 'ar' ? 'إعادة تعيين هذا الذكر' : 'Reset this dhikr'}
                                             >
-                                                {preferences.language === 'ar' ? 'إعادة تعيين' : 'Reset'}
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                </svg>
                                             </button>
                                         </div>
                                     </div>

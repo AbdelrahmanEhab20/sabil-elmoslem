@@ -4,22 +4,22 @@ import HomePageClient from '@/app/HomePageClient';
 
 export const metadata: Metadata = {
   title: 'الرئيسية | Home',
-  description: 'مرحباً بكم في الموقع الإسلامي - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | Welcome to Islamic Site - Your comprehensive platform for prayer times, daily azkar, and Quran reading. Free and user-friendly.',
+  description: 'مرحباً بكم في سبيل المسلم - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | Welcome to Sabil Elmoslem - Your comprehensive platform for prayer times, daily azkar, and Quran reading. Free and user-friendly.',
   keywords: [
-    'الموقع الإسلامي', 'islamic site', 'أوقات الصلاة', 'prayer times', 'أذكار', 'azkar',
+    'سبيل المسلم', 'sabil elmoslem', 'أوقات الصلاة', 'prayer times', 'أذكار', 'azkar',
     'قرآن', 'quran', 'إسلامي', 'islamic', 'مسلم', 'muslim', 'صلاة', 'salah'
   ],
   openGraph: {
-    title: 'الرئيسية | Home - الموقع الإسلامي | Islamic Site',
-    description: 'مرحباً بكم في الموقع الإسلامي - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. | Welcome to Islamic Site - Your comprehensive platform for prayer times, daily azkar, and Quran reading.',
+    title: 'الرئيسية | Home - سبيل المسلم | Sabil Elmoslem',
+    description: 'مرحباً بكم في سبيل المسلم - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. | Welcome to Sabil Elmoslem - Your comprehensive platform for prayer times, daily azkar, and Quran reading.',
     url: 'https://islamic-site.com',
-    siteName: 'الموقع الإسلامي | Islamic Site',
+    siteName: 'سبيل المسلم | Sabil Elmoslem',
     images: [
       {
         url: '/images/logo.png',
         width: 1200,
         height: 630,
-        alt: 'الموقع الإسلامي | Islamic Site',
+        alt: 'سبيل المسلم | Sabil Elmoslem',
       },
     ],
     locale: 'ar_SA',
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'الرئيسية | Home - الموقع الإسلامي | Islamic Site',
-    description: 'مرحباً بكم في الموقع الإسلامي - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. | Welcome to Islamic Site - Your comprehensive platform for prayer times, daily azkar, and Quran reading.',
+    title: 'الرئيسية | Home - سبيل المسلم | Sabil Elmoslem',
+    description: 'مرحباً بكم في سبيل المسلم - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. | Welcome to Sabil Elmoslem - Your comprehensive platform for prayer times, daily azkar, and Quran reading.',
     images: ['/images/logo.png'],
   },
   alternates: {

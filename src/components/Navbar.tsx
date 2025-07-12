@@ -35,7 +35,7 @@ const Navbar: React.FC = () => {
                     {/* Logo */}
                     <div className="flex items-center">
                         <Link href="/" className="flex items-center space-x-2 rtl:space-x-reverse">
-                            <Image src="/images/logo.png" alt="Islamic Site" width={32} height={32} />
+                            <Image src="/images/logo.png" alt="Sabil Elmoslem" width={32} height={32} />
                             <span className="text-xl font-bold text-gray-900 dark:text-white">
                                 {t.islamicSite}
                             </span>

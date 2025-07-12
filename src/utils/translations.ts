@@ -104,7 +104,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         prayerTimes: 'Prayer Times',
         azkar: 'Azkar',
         quran: 'Quran',
-        islamicSite: 'Islamic Site',
+        islamicSite: 'Sabil Elmoslem',
 
         // Theme
         lightMode: 'Light Mode',
@@ -115,7 +115,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         arabic: 'العربية',
 
         // Home Page
-        welcome: 'Welcome to Islamic Site',
+        welcome: 'Welcome to Sabil Elmoslem',
         welcomeSubtitle: 'Your comprehensive Islamic platform for prayer times, daily azkar, and Quran reading. May Allah guide us all.',
         bismillah: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
         bismillahTranslation: 'In the name of Allah, the Most Gracious, the Most Merciful',
@@ -202,7 +202,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         prayerTimes: 'أوقات الصلاة',
         azkar: 'الأذكار',
         quran: 'القرآن',
-        islamicSite: 'الموقع الإسلامي',
+        islamicSite: 'سبيل المسلم',
 
         // Theme
         lightMode: 'الوضع النهاري',
@@ -213,7 +213,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         arabic: 'العربية',
 
         // Home Page
-        welcome: 'مرحباً بكم في الموقع الإسلامي',
+        welcome: 'مرحباً بكم في سبيل المسلم',
         welcomeSubtitle: 'منصتكم الإسلامية الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن. نسأل الله أن يهدينا جميعاً.',
         bismillah: 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
         bismillahTranslation: 'باسم الله الرحمن الرحيم',

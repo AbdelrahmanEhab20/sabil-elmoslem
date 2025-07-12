@@ -40,7 +40,8 @@ export default function HomePageClient() {
             <section className="bg-gradient-to-br from-green-600 to-green-800 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <div className="mb-8">
-                        <div className="text-6xl mb-4">☪</div>
+                        {/* Replace text logo with image logo */}
+                        <img src="/images/logo.png" alt="Sabil Elmoslem Logo" className="w-20 h-20 mx-auto mb-4" />
                         <h1 className="text-4xl md:text-6xl font-bold mb-6">
                             {t.welcome}
                         </h1>

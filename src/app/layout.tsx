@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran",
-    template: "%s | الموقع الإسلامي | Islamic Site"
+    default: "سبيل المسلم - أوقات الصلاة والأذكار والقرآن | Sabil Elmoslem - Prayer Times, Azkar & Quran",
+    template: "%s | سبيل المسلم | Sabil Elmoslem"
   },
   description: "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.",
   keywords: [
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
     "تسابيح", "tasbeeh", "أدعية قرآنية", "quranic duas", "أدعية الأنبياء", "prophets duas",
     "موقع إسلامي", "islamic website", "تطبيق إسلامي", "islamic app", "أوقات الصلاة دقيقة", "accurate prayer times"
   ],
-  authors: [{ name: "Islamic Site", url: "https://islamic-site.com" }],
-  creator: "Islamic Site",
-  publisher: "Islamic Site",
+  authors: [{ name: "Sabil Elmoslem", url: "https://islamic-site.com" }],
+  creator: "Sabil Elmoslem",
+  publisher: "Sabil Elmoslem",
   formatDetection: {
     email: false,
     address: false,
@@ -52,24 +52,24 @@ export const metadata: Metadata = {
     locale: 'ar_SA',
     alternateLocale: 'en_US',
     url: 'https://islamic-site.com',
-    siteName: 'الموقع الإسلامي | Islamic Site',
-    title: 'الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran',
+    siteName: 'سبيل المسلم | Sabil Elmoslem',
+    title: 'سبيل المسلم - أوقات الصلاة والأذكار والقرآن | Sabil Elmoslem - Prayer Times, Azkar & Quran',
     description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',
     images: [
       {
         url: '/images/logo.png',
         width: 1200,
         height: 630,
-        alt: 'الموقع الإسلامي | Islamic Site',
+        alt: 'سبيل المسلم | Sabil Elmoslem',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'الموقع الإسلامي - أوقات الصلاة والأذكار والقرآن | Islamic Site - Prayer Times, Azkar & Quran',
+    title: 'سبيل المسلم - أوقات الصلاة والأذكار والقرآن | Sabil Elmoslem - Prayer Times, Azkar & Quran',
     description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',
     images: ['/images/logo.png'],
-    creator: '@islamicsite',
+    creator: '@sabilelmoslem',
   },
   robots: {
     index: true,
@@ -133,10 +133,10 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
         <link rel="apple-touch-icon" href="/images/logo.png" />
         <link rel="manifest" href="/site.webmanifest" />
-        <meta name="application-name" content="الموقع الإسلامي | Islamic Site" />
+        <meta name="application-name" content="سبيل المسلم | Sabil Elmoslem" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="الموقع الإسلامي | Islamic Site" />
+        <meta name="apple-mobile-web-app-title" content="سبيل المسلم | Sabil Elmoslem" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
@@ -144,15 +144,15 @@ export default function RootLayout({
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="theme-color" content="#16a34a" />
 
-        {/* Structured Data for Islamic Site */}
+        {/* Structured Data for Sabil Elmoslem */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              "name": "الموقع الإسلامي | Islamic Site",
-              "alternateName": ["Islamic Site", "الموقع الإسلامي"],
+              "name": "سبيل المسلم | Sabil Elmoslem",
+              "alternateName": ["Sabil Elmoslem", "سبيل المسلم"],
               "url": "https://islamic-site.com",
               "description": {
                 "@type": "Text",
@@ -167,7 +167,7 @@ export default function RootLayout({
               },
               "publisher": {
                 "@type": "Organization",
-                "name": "Islamic Site",
+                "name": "Sabil Elmoslem",
                 "url": "https://islamic-site.com"
               }
             })

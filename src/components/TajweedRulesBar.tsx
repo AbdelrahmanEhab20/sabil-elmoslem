@@ -18,12 +18,12 @@ export default function TajweedRulesBar({ rules, className = '' }: TajweedRulesB
     const isArabic = preferences.language === 'ar';
 
     return (
-        <div className={`fixed top-0 left-0 w-full z-[1100] tajweed-rules-bar bg-white dark:bg-gray-900 ${className} px-1 sm:px-2`} style={{ boxShadow: '0 2px 16px 0 rgba(0,0,0,0.10)' }}>
+        <div className={`fixed top-0 left-0 w-full z-[1100] tajweed-rules-bar ${className} px-1 sm:px-2`} style={{ boxShadow: '0 2px 16px 0 rgba(0,0,0,0.10)' }}>
             {/* Header */}
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div className="flex items-center justify-between py-3">
                     <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                        <h3 className="text-lg font-bold text-white dark:text-white">
                             {isArabic ? 'قواعد التجويد' : 'Tajweed Rules'}
                         </h3>
                     </div>

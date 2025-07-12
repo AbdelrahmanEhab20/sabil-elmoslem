@@ -10,6 +10,7 @@ export default function PrayerTimesCard() {
     const { location, setLocation, prayerTimes, setPrayerTimes, loading, setLoading, preferences } = useUser();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [nextPrayer, setNextPrayer] = useState<string | null>(null);
+    const [timeUntilNext, setTimeUntilNext] = useState<string>('');
     const t = useTranslations(preferences.language);
     const toast = useToast();
 
@@ -56,7 +57,7 @@ export default function PrayerTimesCard() {
         getPrayerTimes();
     }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
-    // Calculate next prayer
+    // Calculate next prayer and time until
     useEffect(() => {
         if (prayerTimes) {
             const prayers = [
@@ -81,6 +82,22 @@ export default function PrayerTimesCard() {
             }
 
             setNextPrayer(next.name);
+
+            // Calculate time until next prayer
+            const [nextHours, nextMinutes] = next.time.split(':').map(Number);
+            const nextPrayerTime = new Date();
+            nextPrayerTime.setHours(nextHours, nextMinutes, 0, 0);
+
+            if (nextPrayerTime <= now) {
+                nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
+            }
+
+            const diff = nextPrayerTime.getTime() - now.getTime();
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            setTimeUntilNext(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
         }
     }, [prayerTimes, currentTime]);
 
@@ -88,11 +105,27 @@ export default function PrayerTimesCard() {
         const [hours, minutes] = timeString.split(':');
         const date = new Date();
         date.setHours(parseInt(hours), parseInt(minutes), 0);
-        return date.toLocaleTimeString(preferences.language === 'ar' ? 'ar-SA' : 'en-US', {
+        // Always use hour12 and show AM/PM marker
+        const locale = preferences.language === 'ar' ? 'ar-EG' : 'en-US';
+        const formatted = date.toLocaleTimeString(locale, {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true
         });
+        // For Arabic, ensure ص/م is separated for styling
+        if (preferences.language === 'ar') {
+            // Split time and marker
+            const match = formatted.match(/^(.*?)(\s*[صم])$/);
+            if (match) {
+                return (
+                    <span className="inline-flex items-baseline gap-1">
+                        <span>{match[1].trim()}</span>
+                        <span className="text-xs font-bold text-gray-400 align-baseline">{match[2].trim()}</span>
+                    </span>
+                );
+            }
+        }
+        return formatted;
     };
 
     const getPrayerName = (name: string) => {
@@ -165,9 +198,15 @@ export default function PrayerTimesCard() {
             </div>
 
             {nextPrayer && (
-                <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                    <p className="text-sm text-green-800 dark:text-green-200">
+                <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 text-center">
+                    <p className="text-sm text-green-800 dark:text-green-200 mb-1">
                         {t.nextPrayer}: <span className="font-semibold">{getNextPrayerName(nextPrayer)}</span>
+                    </p>
+                    <div className="text-2xl font-mono font-bold text-green-700 dark:text-green-200">
+                        {timeUntilNext}
+                    </div>
+                    <p className="text-xs text-green-700 dark:text-green-200 mt-1">
+                        {t.timeRemaining || 'الوقت المتبقي'}
                     </p>
                 </div>
             )}
@@ -195,7 +234,7 @@ export default function PrayerTimesCard() {
                                 ? 'text-green-800 dark:text-green-200'
                                 : 'text-gray-600 dark:text-gray-400'
                                 }`}>
-                                {formatTime(prayer.time)}
+                                <span className="inline-block w-full text-center">{formatTime(prayer.time)}</span>
                             </span>
                         </div>
                     </div>

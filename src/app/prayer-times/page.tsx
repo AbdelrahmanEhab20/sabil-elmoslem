@@ -139,11 +139,27 @@ export default function PrayerTimesPage() {
         const [hours, minutes] = timeString.split(':');
         const date = new Date();
         date.setHours(parseInt(hours), parseInt(minutes), 0);
-        return date.toLocaleTimeString(preferences.language === 'ar' ? 'ar-SA' : 'en-US', {
+        // Always use hour12 and show AM/PM marker
+        const locale = preferences.language === 'ar' ? 'ar-EG' : 'en-US';
+        const formatted = date.toLocaleTimeString(locale, {
             hour: 'numeric',
             minute: '2-digit',
             hour12: true
         });
+        // For Arabic, ensure ص/م is separated for styling
+        if (preferences.language === 'ar') {
+            // Split time and marker
+            const match = formatted.match(/^(.*?)(\s*[صم])$/);
+            if (match) {
+                return (
+                    <span className="inline-flex items-baseline gap-1">
+                        <span>{match[1].trim()}</span>
+                        <span className="text-xs font-bold text-gray-400 align-baseline">{match[2].trim()}</span>
+                    </span>
+                );
+            }
+        }
+        return formatted;
     };
 
     const getPrayerName = (name: string) => {
@@ -343,7 +359,7 @@ export default function PrayerTimesPage() {
                                             ? 'text-green-800 dark:text-green-200'
                                             : 'text-gray-600 dark:text-gray-400'
                                             }`}>
-                                            {prayer.time ? formatTime(prayer.time) : '--:--'}
+                                            <span className="inline-block w-full text-center">{prayer.time ? formatTime(prayer.time) : '--:--'}</span>
                                         </p>
                                     </div>
                                 </div>

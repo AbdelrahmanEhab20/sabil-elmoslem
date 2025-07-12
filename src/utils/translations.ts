@@ -42,6 +42,15 @@ export interface Translations {
     dailyAzkarDesc: string;
     quranReader: string;
     quranReaderDesc: string;
+    tajweedRules: string;
+    showTajweed: string;
+    hideTajweed: string;
+    tajweedRulesUsed: string;
+    tajweedDescription: string;
+    tajweedToggle: string;
+    tajweedLegend: string;
+    tajweedExamples: string;
+    tajweedColorCode: string;
 
     // Prayer Times
     fajr: string;
@@ -142,6 +151,15 @@ export const translations: Record<'en' | 'ar', Translations> = {
         dailyAzkarDesc: 'Access morning and evening supplications with translations and references.',
         quranReader: 'Quran Reader',
         quranReaderDesc: 'Read the complete Quran with Tajweed markings and multiple translations.',
+        tajweedRules: 'Tajweed Rules',
+        showTajweed: 'Show Tajweed',
+        hideTajweed: 'Hide Tajweed',
+        tajweedRulesUsed: 'Tajweed rules used:',
+        tajweedDescription: 'Read and reflect upon the words of Allah with Tajweed rules',
+        tajweedToggle: 'Toggle Tajweed Display',
+        tajweedLegend: 'Tajweed Legend',
+        tajweedExamples: 'Examples',
+        tajweedColorCode: 'Color Code',
 
         // Prayer Times
         fajr: 'Fajr',
@@ -240,6 +258,15 @@ export const translations: Record<'en' | 'ar', Translations> = {
         dailyAzkarDesc: 'الوصول إلى أذكار الصباح والمساء مع الترجمات والمراجع.',
         quranReader: 'قارئ القرآن',
         quranReaderDesc: 'اقرأ القرآن الكريم كاملاً مع علامات التجويد وترجمات متعددة.',
+        tajweedRules: 'قواعد التجويد',
+        showTajweed: 'إظهار التجويد',
+        hideTajweed: 'إخفاء التجويد',
+        tajweedRulesUsed: 'قواعد التجويد المستخدمة:',
+        tajweedDescription: 'اقرأ وتأمل في كلام الله مع قواعد التجويد',
+        tajweedToggle: 'تبديل عرض التجويد',
+        tajweedLegend: 'دليل التجويد',
+        tajweedExamples: 'أمثلة',
+        tajweedColorCode: 'رمز اللون',
 
         // Prayer Times
         fajr: 'الفجر',

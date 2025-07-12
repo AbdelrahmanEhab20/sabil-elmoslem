@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import PrayerTimesCard from '@/components/PrayerTimesCard';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
@@ -41,7 +42,7 @@ export default function HomePageClient() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <div className="mb-8">
                         {/* Replace text logo with image logo */}
-                        <img src="/images/logo.png" alt="Sabil Elmoslem Logo" className="w-20 h-20 mx-auto mb-4" />
+                        <Image src="/images/logo.png" alt="Sabil Elmoslem Logo" width={80} height={80} className="mx-auto mb-4" />
                         <h1 className="text-4xl md:text-6xl font-bold mb-6">
                             {t.welcome}
                         </h1>

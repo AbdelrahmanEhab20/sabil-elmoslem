@@ -1,0 +1,225 @@
+{
+    "rules": [
+        {
+            "id": "hamza-wasl",
+            "name": "Hamzat ul Wasl",
+            "arabicName": "همزة الوصل",
+            "description": "Hamzat ul Wasl",
+            "arabicDescription": "همزة الوصل",
+            "color": "#AAAAAA",
+            "examples": [
+                "اِقْرَأْ",
+                "اُدْخُلُوا",
+                "اِسْتَعِينُوا"
+            ]
+        },
+        {
+            "id": "silent",
+            "name": "Silent",
+            "arabicName": "ساكن",
+            "description": "Silent",
+            "arabicDescription": "ساكن",
+            "color": "#AAAAAA",
+            "examples": [
+                "مِنْ",
+                "عَنْ",
+                "فِي"
+            ]
+        },
+        {
+            "id": "laam-shamsiyah",
+            "name": "Lam Shamsiyyah",
+            "arabicName": "لام شمسية",
+            "description": "Lam Shamsiyyah",
+            "arabicDescription": "لام شمسية",
+            "color": "#AAAAAA",
+            "examples": [
+                "الشَّمْسِ",
+                "الرَّحْمَٰنِ",
+                "الضَّالِّينَ"
+            ]
+        },
+        {
+            "id": "madda-normal",
+            "name": "Normal Prolongation",
+            "arabicName": "مد طبيعي",
+            "description": "Normal Prolongation: 2 Vowels",
+            "arabicDescription": "مد طبيعي: حركتان",
+            "color": "#537FFF",
+            "examples": [
+                "اللَّهُ",
+                "الرَّحْمَٰنِ",
+                "الرَّحِيمِ"
+            ]
+        },
+        {
+            "id": "madda-permissible",
+            "name": "Permissible Prolongation",
+            "arabicName": "مد جائز",
+            "description": "Permissible Prolongation: 2, 4, 6 Vowels",
+            "arabicDescription": "مد جائز: حركتان أو أربع أو ست",
+            "color": "#4050FF",
+            "examples": [
+                "آمَنُوا",
+                "آتَيْنَاهُمْ",
+                "آمَنَّا"
+            ]
+        },
+        {
+            "id": "madda-necessary",
+            "name": "Necessary Prolongation",
+            "arabicName": "مد لازم",
+            "description": "Necessary Prolongation: 6 Vowels",
+            "arabicDescription": "مد لازم: ست حركات",
+            "color": "#000EBC",
+            "examples": [
+                "الضَّالِّينَ",
+                "الطَّامَّةُ",
+                "الْحَاقَّةُ"
+            ]
+        },
+        {
+            "id": "qalaqah",
+            "name": "Qalaqah",
+            "arabicName": "القلقلة",
+            "description": "Qalaqah",
+            "arabicDescription": "القلقلة",
+            "color": "#DD0008",
+            "examples": [
+                "أَحَدْ",
+                "مِن قَبْلِ",
+                "مِن طَيِّبَاتِ"
+            ]
+        },
+        {
+            "id": "madda-obligatory",
+            "name": "Obligatory Prolongation",
+            "arabicName": "مد واجب",
+            "description": "Obligatory Prolongation: 4-5 Vowels",
+            "arabicDescription": "مد واجب: أربع أو خمس حركات",
+            "color": "#2144C1",
+            "examples": [
+                "آمَنُوا",
+                "آتَيْنَاهُمْ",
+                "آمَنَّا"
+            ]
+        },
+        {
+            "id": "ikhfa-shafawi",
+            "name": "Ikhafa' Shafawi",
+            "arabicName": "إخفاء شفوي",
+            "description": "Ikhafa' Shafawi - With Meem",
+            "arabicDescription": "إخفاء شفوي - مع الميم",
+            "color": "#D500B7",
+            "examples": [
+                "مِن مَّاءٍ",
+                "مِن مَّعِينٍ",
+                "مِن مَّرْقَدِنَا"
+            ]
+        },
+        {
+            "id": "ikhfa",
+            "name": "Ikhafa'",
+            "arabicName": "الإخفاء",
+            "description": "Ikhafa'",
+            "arabicDescription": "الإخفاء",
+            "color": "#9400A8",
+            "examples": [
+                "مِن فَضْلِهِ",
+                "مِن كُلِّ",
+                "مِن طَيِّبَاتِ"
+            ]
+        },
+        {
+            "id": "idgham-shafawi",
+            "name": "Idgham Shafawi",
+            "arabicName": "إدغام شفوي",
+            "description": "Idgham Shafawi - With Meem",
+            "arabicDescription": "إدغام شفوي - مع الميم",
+            "color": "#58B800",
+            "examples": [
+                "مِن مَّاءٍ",
+                "مِن مَّعِينٍ",
+                "مِن مَّرْقَدِنَا"
+            ]
+        },
+        {
+            "id": "iqlab",
+            "name": "Iqlab",
+            "arabicName": "الإقلاب",
+            "description": "Iqlab",
+            "arabicDescription": "الإقلاب",
+            "color": "#26BFFD",
+            "examples": [
+                "مِن بَعْدِ",
+                "مِن بَيْنِ",
+                "مِن بَطْنِ"
+            ]
+        },
+        {
+            "id": "idgham-with-ghunnah",
+            "name": "Idgham with Ghunnah",
+            "arabicName": "إدغام بغنة",
+            "description": "Idgham - With Ghunnah",
+            "arabicDescription": "إدغام - مع الغنة",
+            "color": "#169777",
+            "examples": [
+                "مِن نُّطْفَةٍ",
+                "مِن وَّاحِدَةٍ",
+                "مِن يَّوْمِ"
+            ]
+        },
+        {
+            "id": "idgham-without-ghunnah",
+            "name": "Idgham without Ghunnah",
+            "arabicName": "إدغام بلا غنة",
+            "description": "Idgham - Without Ghunnah",
+            "arabicDescription": "إدغام - بلا غنة",
+            "color": "#169200",
+            "examples": [
+                "مِن لَّدُنْ",
+                "مِن رَّحِيمٍ",
+                "مِن لَّعْنَةِ"
+            ]
+        },
+        {
+            "id": "idgham-mutajanisayn",
+            "name": "Idgham Mutajanisayn",
+            "arabicName": "إدغام متجانسين",
+            "description": "Idgham - Mutajanisayn",
+            "arabicDescription": "إدغام - متجانسين",
+            "color": "#A1A1A1",
+            "examples": [
+                "مِن نُّطْفَةٍ",
+                "مِن مَّاءٍ",
+                "مِن بَيْنِ"
+            ]
+        },
+        {
+            "id": "idgham-mutaqaribayn",
+            "name": "Idgham Mutaqaribayn",
+            "arabicName": "إدغام متقاربين",
+            "description": "Idgham - Mutaqaribayn",
+            "arabicDescription": "إدغام - متقاربين",
+            "color": "#A1A1A1",
+            "examples": [
+                "مِن لَّدُنْ",
+                "مِن رَّحِيمٍ",
+                "مِن قَبْلِ"
+            ]
+        },
+        {
+            "id": "ghunnah",
+            "name": "Ghunnah",
+            "arabicName": "الغنة",
+            "description": "Ghunnah: 2 Vowels",
+            "arabicDescription": "الغنة: حركتان",
+            "color": "#FF7E1E",
+            "examples": [
+                "إِنَّ",
+                "أَمَّا",
+                "مِنَّا"
+            ]
+        }
+    ]
+}

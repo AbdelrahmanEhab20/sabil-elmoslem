@@ -170,3 +170,155 @@ body {
 .toast-exit {
   animation: slide-out-right 0.3s ease-in;
 }
+
+/* Tajweed color classes - Essential only */
+.tajweed-ghunnah {
+  color: #3b82f6;
+  font-weight: 600;
+  text-shadow: 0 0 1px #3b82f640;
+}
+
+.tajweed-idgham {
+  color: #8b5cf6;
+  font-weight: 600;
+  text-shadow: 0 0 1px #8b5cf640;
+}
+
+.tajweed-ikhfa {
+  color: #06b6d4;
+  font-weight: 600;
+  text-shadow: 0 0 1px #06b6d440;
+}
+
+.tajweed-qalqalah {
+  color: #f59e0b;
+  font-weight: 600;
+  text-shadow: 0 0 1px #f59e0b40;
+}
+
+.tajweed-madd {
+  color: #10b981;
+  font-weight: 600;
+  text-shadow: 0 0 1px #10b98140;
+}
+
+.tajweed-hamza-wasl {
+  color: #ef4444;
+  font-weight: 600;
+  text-shadow: 0 0 1px #ef444440;
+}
+
+.tajweed-silent {
+  color: #6b7280;
+  font-weight: 600;
+  text-shadow: 0 0 1px #6b728040;
+}
+
+.tajweed-laam-shamsiyah {
+  color: #ec4899;
+  font-weight: 600;
+  text-shadow: 0 0 1px #ec489940;
+}
+
+.tajweed-madda-normal {
+  color: #10b981;
+  font-weight: 600;
+  text-shadow: 0 0 1px #10b98140;
+}
+
+.tajweed-madda-permissible {
+  color: #059669;
+  font-weight: 600;
+  text-shadow: 0 0 1px #05966940;
+}
+
+.tajweed-madda-necessary {
+  color: #047857;
+  font-weight: 600;
+  text-shadow: 0 0 1px #04785740;
+}
+
+.tajweed-madda-obligatory {
+  color: #065f46;
+  font-weight: 600;
+  text-shadow: 0 0 1px #065f4640;
+}
+
+.tajweed-qalaqah {
+  color: #f59e0b;
+  font-weight: 600;
+  text-shadow: 0 0 1px #f59e0b40;
+}
+
+.tajweed-ikhfa-shafawi {
+  color: #06b6d4;
+  font-weight: 600;
+  text-shadow: 0 0 1px #06b6d440;
+}
+
+.tajweed-idgham-shafawi {
+  color: #8b5cf6;
+  font-weight: 600;
+  text-shadow: 0 0 1px #8b5cf640;
+}
+
+.tajweed-iqlab {
+  color: #f97316;
+  font-weight: 600;
+  text-shadow: 0 0 1px #f9731640;
+}
+
+.tajweed-idgham-with-ghunnah {
+  color: #8b5cf6;
+  font-weight: 600;
+  text-shadow: 0 0 1px #8b5cf640;
+}
+
+.tajweed-idgham-without-ghunnah {
+  color: #7c3aed;
+  font-weight: 600;
+  text-shadow: 0 0 1px #7c3aed40;
+}
+
+.tajweed-idgham-mutajanisayn {
+  color: #6d28d9;
+  font-weight: 600;
+  text-shadow: 0 0 1px #6d28d940;
+}
+
+.tajweed-idgham-mutaqaribayn {
+  color: #5b21b6;
+  font-weight: 600;
+  text-shadow: 0 0 1px #5b21b640;
+}
+
+/* Hover effects for Tajweed text */
+.tajweed-text span:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Tajweed rules bar styling */
+.tajweed-rules-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #e5e7eb;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.dark .tajweed-rules-bar {
+  background: rgba(17, 24, 39, 0.95);
+  border-bottom-color: #374151;
+}
+
+/* Responsive improvements for Tajweed */
+@media (max-width: 640px) {
+  .tajweed-rules-bar {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+}

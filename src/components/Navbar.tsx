@@ -10,8 +10,35 @@ import Image from 'next/image';
 const Navbar: React.FC = () => {
     const { preferences, toggleLanguage } = useUser();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    // const [isDark, setIsDark] = useState(false);
     const pathname = usePathname();
     const t = useTranslations(preferences.language);
+
+    // Dark mode effect
+    // useEffect(() => {
+    //     // Check localStorage or system preference
+    //     const saved = typeof window !== 'undefined' ? localStorage.getItem('theme') : null;
+    //     if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    //         document.documentElement.classList.add('dark');
+    //         setIsDark(true);
+    //     } else {
+    //         document.documentElement.classList.remove('dark');
+    //         setIsDark(false);
+    //     }
+    // }, []);
+
+    // const toggleDarkMode = () => {
+    //     if (typeof window === 'undefined') return;
+    //     if (document.documentElement.classList.contains('dark')) {
+    //         document.documentElement.classList.remove('dark');
+    //         localStorage.setItem('theme', 'light');
+    //         // setIsDark(false);
+    //     } else {
+    //         document.documentElement.classList.add('dark');
+    //         localStorage.setItem('theme', 'dark');
+    //         // setIsDark(true);
+    //     }
+    // };
 
     const navItems = [
         { href: '/', label: t.home, icon: '🏠' },
@@ -62,7 +89,7 @@ const Navbar: React.FC = () => {
                         })}
                     </div>
 
-                    {/* Language Toggle & Mobile Menu Button */}
+                    {/* Language Toggle, Dark Mode Toggle & Mobile Menu Button */}
                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                         {/* Language Toggle */}
                         <div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
@@ -87,7 +114,20 @@ const Navbar: React.FC = () => {
                                 العربية
                             </button>
                         </div>
-
+                        {/* Dark/Light Mode Toggle */}
+                        {/* <button
+                            onClick={toggleDarkMode}
+                            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
+                            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                        >
+                            {isDark ? (
+                                // Moon icon
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" /></svg>
+                            ) : (
+                                // Sun icon
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71" /></svg>
+                            )}
+                        </button> */}
                         {/* Mobile menu button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}

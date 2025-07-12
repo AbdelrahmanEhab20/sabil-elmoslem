@@ -1,4 +1,4 @@
-import { PrayerTimes, Location, Azkar, QuranSurah, QuranAyah, HijriDate } from '@/types';
+import { PrayerTimes, Location, Azkar, QuranSurah, QuranAyah, TajweedAyah, HijriDate } from '@/types';
 import { ApiError, NetworkError, LocationError, ValidationError, retry, withErrorHandling } from './errorHandling';
 
 // API Configuration
@@ -193,36 +193,66 @@ export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Pr
     return ayahs;
 }, 'fetchQuranAyahs');
 
-// Fetch Quran ayahs with tajweed coloring and English translation from Quran.com API
-// export const fetchQuranAyahsWithTajweed = withErrorHandling(async (surahNumber: number) => {
-//     // Quran.com API endpoints
-//     const tajweedUrl = `https://api.quran.com/api/v4/quran/verses/uthmani_tajweed?chapter_number=${surahNumber}`;
-//     const translationUrl = `https://api.quran.com/api/v4/quran/translations/131?chapter_number=${surahNumber}`; // 131 = Sahih International
+// Fetch Quran ayahs with Tajweed processing
+export const fetchQuranAyahsWithTajweed = withErrorHandling(async (surahNumber: number): Promise<TajweedAyah[]> => {
+    const cacheKey = `quran-tajweed-ayahs-${surahNumber}`;
 
-//     // Fetch both in parallel
-//     const [tajweedRes, translationRes] = await Promise.all([
-//         fetch(tajweedUrl),
-//         fetch(translationUrl)
-//     ]);
+    const cached = getCachedData<TajweedAyah[]>(cacheKey);
+    if (cached) {
+        return cached;
+    }
 
-//     const tajweedData = await tajweedRes.json();
-//     const translationData = await translationRes.json();
+    // Fetch Arabic text and English translation
+    const [arabicResponse, englishResponse] = await Promise.all([
+        apiFetch(`${API_CONFIG.ALQURAN_BASE_URL}/surah/${surahNumber}`),
+        apiFetch(`${API_CONFIG.ALQURAN_BASE_URL}/surah/${surahNumber}/en.sahih`)
+    ]);
 
-//     if (!tajweedData.verses || !Array.isArray(tajweedData.verses)) {
-//         throw new ApiError('Invalid tajweed Quran data received', 422);
-//     }
-//     if (!translationData.translations || !Array.isArray(translationData.translations)) {
-//         throw new ApiError('Invalid Quran translation data received', 422);
-//     }
+    const [arabicData, englishData] = await Promise.all([
+        arabicResponse.json(),
+        englishResponse.json()
+    ]);
 
-//     // Combine Arabic (tajweed HTML) and English translation
-//     const ayahs = tajweedData.verses.map((ayah: any, idx: number) => ({
-//         arabic: ayah.text_uthmani_tajweed,
-//         translation: translationData.translations[idx]?.text || ''
-//     }));
+    if (!arabicData.data?.ayahs || !Array.isArray(arabicData.data.ayahs)) {
+        throw new ApiError('Invalid Quran ayahs data received', 422);
+    }
 
-//     return ayahs;
-// }, 'fetchQuranAyahsWithTajweed');
+    if (!englishData.data?.ayahs || !Array.isArray(englishData.data.ayahs)) {
+        throw new ApiError('Invalid Quran translation data received', 422);
+    }
+
+    // Create Tajweed processor
+    const { createTajweedProcessor } = await import('./tajweedProcessor');
+    const processor = await createTajweedProcessor();
+
+    // Process each ayah with Tajweed
+    const tajweedAyahs: TajweedAyah[] = arabicData.data.ayahs.map((ayah: Record<string, unknown>, index: number) => {
+        const ayahText = ayah.text as string;
+        const words = processor.processText(ayahText);
+
+        // Create HTML with colored spans
+        const tajweedText = words.map(word => {
+            if (word.tajweedRules.length === 0) {
+                return word.text;
+            }
+            const color = word.tajweedRules[0].color;
+            return `<span style="color: ${color}; font-weight: 600; text-shadow: 0 0 1px ${color}40;">${word.text}</span>`;
+        }).join(' ');
+
+        return {
+            ...ayah,
+            translation: englishData.data.ayahs[index]?.text || '',
+            words,
+            tajweedText,
+            tajweedRules: Array.from(new Set(words.flatMap(word => word.tajweedRules)))
+        } as TajweedAyah;
+    });
+
+    // Cache for 24 hours
+    setCachedData(cacheKey, tajweedAyahs, 24 * 60 * 60 * 1000);
+
+    return tajweedAyahs;
+}, 'fetchQuranAyahsWithTajweed');
 
 // Azkar data with enhanced error handling
 export const fetchAzkar = withErrorHandling(async (language: 'en' | 'ar' = 'en'): Promise<Azkar[]> => {

@@ -20,7 +20,7 @@ export default function AzkarPage() {
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
 
     // Add a list of general duaas for congratulation (move up)
-    const generalDuaas = [
+    const generalDuaas = useMemo(() => [
         {
             ar: 'اللهم اجعل هذا اليوم مباركًا لنا، واغفر لنا ذنوبنا، وارزقنا السعادة في الدنيا والآخرة.',
             en: 'O Allah, make this day blessed for us, forgive our sins, and grant us happiness in this life and the Hereafter.'
@@ -41,7 +41,7 @@ export default function AzkarPage() {
             ar: 'اللهم اجعل القرآن ربيع قلوبنا ونور صدورنا وجلاء أحزاننا.',
             en: 'O Allah, make the Quran the spring of our hearts, the light of our chests, and the remover of our sorrows.'
         }
-    ];
+    ], []);
 
     // Memoize shouldHaveCounter function to prevent unnecessary re-renders
     const shouldHaveCounter = useCallback((category: string) => {

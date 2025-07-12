@@ -23,8 +23,14 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 - **Progress indicators** and completion tracking
 - **Bilingual support** (Arabic and English)
 
-### 📖 Quran Reader
+### 📖 Quran Reader with Tajweed
 - **Complete Quran** with all 114 surahs
+- **Advanced Tajweed support** with colored text highlighting
+- **Sticky Tajweed rules bar** for easy reference while reading
+- **12 major Tajweed rules** with detailed explanations and examples
+- **Interactive rule display** with expandable details and modals
+- **Toggle Tajweed display** on/off for different reading preferences
+- **Font size controls** for better readability
 - **Search functionality** by name, translation, or number
 - **Ayah-by-ayah display** with proper Arabic formatting
 - **Sajda verse indicators** and detailed metadata
@@ -93,6 +99,12 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 ### Azkar
 - **Static Data**: Curated collection of authentic supplications
 - **Categories**: Morning Adhkar, Evening Adhkar, Post-Prayer Azkar, Tasbeeh, Azkar Before Sleep, Azkar Upon Waking, Quranic Duas, Prophets' Duas
+
+### Tajweed Rules
+- **12 Major Rules**: Ghunnah, Idgham, Ikhfa, Qalqalah, Madd, Wajib Madd, Jaez Madd, Lam Shamsiyah, Lam Qamariyah, Hamzat Wasl, Hamzat Qat, Saktah, Waqf
+- **Color-coded Text**: Each rule has a unique color for easy identification
+- **Detailed Explanations**: Arabic and English descriptions with examples
+- **Interactive Learning**: Click on rules to see detailed information and examples
 
 ## 📁 Project Structure
 

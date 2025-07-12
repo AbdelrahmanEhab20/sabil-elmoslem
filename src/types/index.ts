@@ -53,6 +53,41 @@ export interface QuranAyah {
     sajda: boolean;
 }
 
+// New Tajweed-related types
+export interface TajweedRule {
+    id: string;
+    name: string;
+    arabicName: string;
+    description: string;
+    arabicDescription: string;
+    color: string;
+    examples: string[];
+}
+
+export interface TajweedLetter {
+    char: string;
+    tajweedRules: TajweedRule[];
+    index: number;
+}
+
+export interface TajweedWord {
+    text: string;
+    tajweedRules: TajweedRule[];
+    startIndex: number;
+    endIndex: number;
+    letters: TajweedLetter[]; // NEW: per-letter Tajweed info
+}
+
+export interface TajweedAyah extends QuranAyah {
+    tajweedText: string; // HTML with colored spans
+    words: TajweedWord[];
+    tajweedRules: TajweedRule[];
+}
+
+export interface TajweedSurah extends QuranSurah {
+    tajweedAyahs: TajweedAyah[];
+}
+
 export interface UserPreferences {
     calculationMethod: number;
     madhab: number;

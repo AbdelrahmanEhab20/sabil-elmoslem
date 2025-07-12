@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "تسابيح", "tasbeeh", "أدعية قرآنية", "quranic duas", "أدعية الأنبياء", "prophets duas",
     "موقع إسلامي", "islamic website", "تطبيق إسلامي", "islamic app", "أوقات الصلاة دقيقة", "accurate prayer times"
   ],
-  authors: [{ name: "Sabil Elmoslem", url: "https://islamic-site.com" }],
+  authors: [{ name: "Sabil Elmoslem", url: "https://sabil-elmoslem.vercel.app" }],
   creator: "Sabil Elmoslem",
   publisher: "Sabil Elmoslem",
   formatDetection: {
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://islamic-site.com'),
+  metadataBase: new URL('https://sabil-elmoslem.vercel.app/'),
   alternates: {
     canonical: '/',
     languages: {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ar_SA',
     alternateLocale: 'en_US',
-    url: 'https://islamic-site.com',
+    url: 'https://sabil-elmoslem.vercel.app/',
     siteName: 'سبيل المسلم | Sabil Elmoslem',
     title: 'سبيل المسلم - أوقات الصلاة والأذكار والقرآن | Sabil Elmoslem - Prayer Times, Azkar & Quran',
     description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',

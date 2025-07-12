@@ -1,5 +1,7 @@
 {
-  "name": "islamic-site",
+  "name": "sabil-elmoslem",
+  "description": "Sabil Elmoslem - سبيل المسلم: Prayer Times, Azkar, and Quran platform.",
+  "homepage": "https://sabil-elmoslem.vercel.app/",
   "version": "0.1.0",
   "private": true,
   "scripts": {

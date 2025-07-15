@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { fetchQuranSurahs, fetchQuranAyahsWithTajweed } from '@/utils/api';
-import { QuranSurah, TajweedAyah, TajweedRule } from '@/types';
+import { fetchQuranSurahs, fetchQuranAyahs } from '@/utils/api';
+import { QuranSurah, QuranAyah } from '@/types';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
-import TajweedRulesBar from '@/components/TajweedRulesBar';
-import TajweedText from '@/components/TajweedText';
+// import TajweedRulesBar from '@/components/TajweedRulesBar';
+// import TajweedText from '@/components/TajweedText';
 
 export default function QuranPage() {
     const { preferences } = useUser();
@@ -15,28 +15,28 @@ export default function QuranPage() {
     const toast = useToast();
     const [surahs, setSurahs] = useState<QuranSurah[]>([]);
     const [selectedSurah, setSelectedSurah] = useState<QuranSurah | null>(null);
-    const [tajweedAyahs, setTajweedAyahs] = useState<TajweedAyah[]>([]);
-    const [tajweedRules, setTajweedRules] = useState<TajweedRule[]>([]);
+    const [ayahs, setAyahs] = useState<QuranAyah[]>([]);
+    // const [tajweedRules, setTajweedRules] = useState<TajweedRule[]>([]);
     const [loading, setLoading] = useState(true);
     const [surahLoading, setSurahLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [view, setView] = useState<'surah-list' | 'ayah-view'>('surah-list');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [showTajweed, setShowTajweed] = useState(true);
+    // const [showTajweed, setShowTajweed] = useState(true);
     const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>('2xl');
 
-    // Load Tajweed rules
-    useEffect(() => {
-        const loadTajweedRules = async () => {
-            try {
-                const rulesData = await import('@/data/tajweed-rules.json');
-                setTajweedRules(rulesData.rules);
-            } catch (error) {
-                console.error('Failed to load Tajweed rules:', error);
-            }
-        };
-        loadTajweedRules();
-    }, []);
+    // Load Tajweed rules - HASHED FOR NOW
+    // useEffect(() => {
+    //     const loadTajweedRules = async () => {
+    //         try {
+    //             const rulesData = await import('@/data/tajweed-rules.json');
+    //             setTajweedRules(rulesData.rules);
+    //         } catch (error) {
+    //             console.error('Failed to load Tajweed rules:', error);
+    //         }
+    //     };
+    //     loadTajweedRules();
+    // }, []);
 
     // Fetch surahs on mount
     useEffect(() => {
@@ -56,21 +56,14 @@ export default function QuranPage() {
         loadSurahs();
     }, [t.errorLoadingQuran, toast]);
 
-    // Fetch ayahs with Tajweed when selectedSurah changes
+    // Fetch ayahs when selectedSurah changes - SIMPLIFIED VERSION
     useEffect(() => {
         const loadAyahs = async () => {
             if (selectedSurah) {
                 try {
                     setSurahLoading(true);
-                    const ayahsData = await fetchQuranAyahsWithTajweed(selectedSurah.number);
-                    // Use local TajweedProcessor to process all ayat
-                    const rulesData = await import('@/data/tajweed-rules.json');
-                    const processor = new (await import('@/utils/tajweedProcessor')).TajweedProcessor(rulesData.rules);
-                    const processedAyahs = ayahsData.map(ayah => ({
-                        ...ayah,
-                        words: processor.processText(ayah.text)
-                    }));
-                    setTajweedAyahs(processedAyahs);
+                    const ayahsData = await fetchQuranAyahs(selectedSurah.number);
+                    setAyahs(ayahsData);
                 } catch (error: unknown) {
                     const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
                     toast.showToast({ type: 'error', message: errorMessage });
@@ -96,7 +89,7 @@ export default function QuranPage() {
 
     const handleBackToList = () => {
         setSelectedSurah(null);
-        setTajweedAyahs([]);
+        setAyahs([]);
         setView('surah-list');
     };
 
@@ -123,13 +116,13 @@ export default function QuranPage() {
 
     return (
         <div className="min-h-screen relative bg-gray-50 dark:bg-gray-900">
-            {/* Tajweed Rules Bar - Sticky at top */}
-            {view === 'ayah-view' && showTajweed && (
+            {/* Tajweed Rules Bar - HASHED FOR NOW */}
+            {/* {view === 'ayah-view' && showTajweed && (
                 <TajweedRulesBar rules={tajweedRules} className="tajweed-rules-bar" />
-            )}
+            )} */}
 
-            {/* Floating Toggle Button for Tajweed Bar */}
-            <button
+            {/* Floating Toggle Button for Tajweed Bar - HASHED FOR NOW */}
+            {/* <button
                 className={`fixed z-[1200] bottom-6 right-6 rtl:right-auto rtl:left-6 bg-green-600 text-white shadow-lg rounded-full p-4 flex items-center justify-center transition-colors duration-200 hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 ${view !== 'ayah-view' ? 'hidden' : ''}`}
                 style={{ display: view === 'ayah-view' ? 'flex' : 'none' }}
                 onClick={() => setShowTajweed((prev) => !prev)}
@@ -140,10 +133,10 @@ export default function QuranPage() {
                 ) : (
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
                 )}
-            </button>
+            </button> */}
 
-            {/* Add top padding to offset sticky bar */}
-            <div className="pt-24 md:pt-28 py-8 flex">
+            {/* Add top padding to offset sticky bar - REMOVED SINCE NO TAJWEED BAR */}
+            <div className="py-8 flex">
                 {/* Sidebar Toggle Button for Mobile */}
                 <button
                     className="md:hidden fixed top-20 left-4 z-50 bg-green-600 text-white p-2 rounded-full shadow-lg focus:outline-none rtl:left-auto rtl:right-4"
@@ -213,7 +206,7 @@ export default function QuranPage() {
                                 {preferences.language === 'ar' ? 'القرآن الكريم' : 'The Holy Quran'}
                             </h1>
                             <p className="text-lg text-gray-600 dark:text-gray-400">
-                                {preferences.language === 'ar' ? 'اقرأ وتأمل في كلام الله مع قواعد التجويد' : 'Read and reflect upon the words of Allah with Tajweed rules'}
+                                {preferences.language === 'ar' ? 'اقرأ وتأمل في كلام الله' : 'Read and reflect upon the words of Allah'}
                             </p>
                         </div>
 
@@ -314,63 +307,44 @@ export default function QuranPage() {
                                         </div>
                                     </div>
 
-                                    {/* Clean Modern Controls Section */}
+                                    {/* Font Size Control - SIMPLIFIED VERSION */}
                                     <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
                                         <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 shadow-sm border border-green-100 dark:border-green-800">
-                                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                                                {/* Tajweed Toggle - Clean, Right-aligned */}
-                                                <div className="flex-1 flex items-center justify-end rtl:justify-start">
-                                                    <span className="text-lg font-semibold text-gray-900 dark:text-white mr-3 rtl:mr-0 rtl:ml-3">
-                                                        {preferences.language === 'ar' ? 'قواعد التجويد' : 'Tajweed Rules'}
-                                                    </span>
-                                                    <label className="relative inline-flex items-center cursor-pointer">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={showTajweed}
-                                                            onChange={(e) => setShowTajweed(e.target.checked)}
-                                                            className="sr-only peer"
-                                                        />
-                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 dark:peer-focus:ring-green-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
-                                                    </label>
-                                                </div>
-
-                                                {/* Font Size Control - Clean Row */}
-                                                <div className="flex-1 flex items-center justify-end rtl:justify-start">
-                                                    <span className="text-lg font-semibold text-gray-900 dark:text-white mr-3 rtl:mr-0 rtl:ml-3">
-                                                        {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
-                                                    </span>
-                                                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                                        <button
-                                                            onClick={() => setFontSize('lg')}
-                                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === 'lg' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-                                                        >
-                                                            S
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setFontSize('xl')}
-                                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === 'xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-                                                        >
-                                                            M
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setFontSize('2xl')}
-                                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '2xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-                                                        >
-                                                            L
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setFontSize('3xl')}
-                                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '3xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-                                                        >
-                                                            XL
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setFontSize('4xl')}
-                                                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '4xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
-                                                        >
-                                                            XXL
-                                                        </button>
-                                                    </div>
+                                            <div className="flex items-center justify-end rtl:justify-start">
+                                                <span className="text-lg font-semibold text-gray-900 dark:text-white mr-3 rtl:mr-0 rtl:ml-3">
+                                                    {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
+                                                </span>
+                                                <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                                                    <button
+                                                        onClick={() => setFontSize('lg')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === 'lg' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                                                    >
+                                                        S
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setFontSize('xl')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === 'xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                                                    >
+                                                        M
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setFontSize('2xl')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '2xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                                                    >
+                                                        L
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setFontSize('3xl')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '3xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                                                    >
+                                                        XL
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setFontSize('4xl')}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${fontSize === '4xl' ? 'bg-blue-600 text-white shadow-md' : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'}`}
+                                                    >
+                                                        XXL
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -382,14 +356,14 @@ export default function QuranPage() {
                                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6">
                                         <div className="text-center">
                                             <div className="text-3xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-4">
-                                                بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
+                                                بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
                                             </div>
                                             <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
                                         </div>
                                     </div>
                                 )}
 
-                                {/* Ayahs */}
+                                {/* Ayahs - SIMPLIFIED VERSION */}
                                 {surahLoading ? (
                                     <div className="animate-pulse space-y-4">
                                         {[1, 2, 3, 4, 5].map((i) => (
@@ -402,35 +376,26 @@ export default function QuranPage() {
                                     </div>
                                 ) : (
                                     <div className="space-y-6">
-                                        {tajweedAyahs.map((ayah) => {
-                                            const BISMILLAH = 'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ';
-                                            const BISMILLAH_WORDS = ['بِسۡمِ', 'ٱللَّهِ', 'ٱلرَّحۡمَـٰنِ', 'ٱلرَّحِیمِ'];
+                                        {ayahs.map((ayah) => {
                                             let ayahText = ayah.text;
-                                            let ayahWords = ayah.words;
-                                            // Surah 9 (At-Tawba): do not show or remove Bismillah
-                                            if (selectedSurah && selectedSurah.number === 9) {
-                                                // Do nothing: no Bismillah logic for At-Tawba
-                                            } else if (selectedSurah && selectedSurah.number === 1) {
-                                                // Al-Fatiha: show Bismillah as ayah 1 (default)
+
+                                            // Handle Bismillah logic:
+                                            // 1. Al-Fatiha (Surah 1): Keep Bismillah as first ayah
+                                            // 2. At-Tawba (Surah 9): No Bismillah at all
+                                            // 3. All other surahs: Remove Bismillah from first ayah
+                                            if (selectedSurah && selectedSurah.number === 1) {
+                                                // Al-Fatiha: Keep Bismillah as is (first ayah)
+                                            } else if (selectedSurah && selectedSurah.number === 9) {
+                                                // At-Tawba: No Bismillah logic needed
                                             } else if (selectedSurah && ayah.numberInSurah === 1) {
-                                                // Remove Bismillah from plain text
-                                                if (ayahText.startsWith(BISMILLAH)) {
-                                                    ayahText = ayahText.slice(BISMILLAH.length).trimStart();
-                                                }
-                                                // Remove Bismillah from Tajweed words
-                                                if (
-                                                    ayahWords.length >= 4 &&
-                                                    ayahWords[0].text === BISMILLAH_WORDS[0] &&
-                                                    ayahWords[1].text === BISMILLAH_WORDS[1] &&
-                                                    ayahWords[2].text === BISMILLAH_WORDS[2] &&
-                                                    ayahWords[3].text === BISMILLAH_WORDS[3]
-                                                ) {
-                                                    ayahWords = ayahWords.slice(4);
+                                                // All other surahs: Remove Bismillah from first ayah
+                                                if (ayahText.startsWith("بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ")) {
+                                                    ayahText = ayahText.split("بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ").join('');
                                                 }
                                             }
-                                            // For Al-Fatiha, show Bismillah as the first ayah
-                                            // For other surahs, do not show Bismillah as a separate ayah
-                                            if (selectedSurah && selectedSurah.number !== 1 && ayah.numberInSurah === 1 && ayah.text.includes('بِسۡمِ ٱللَّهِ')) {
+
+                                            // Skip rendering if this is a Bismillah-only ayah (shouldn't happen with current logic)
+                                            if (selectedSurah && selectedSurah.number !== 1 && ayah.numberInSurah === 1 && ayahText.trim() === '') {
                                                 return null;
                                             }
 
@@ -452,19 +417,11 @@ export default function QuranPage() {
                                                         </div>
                                                     </div>
 
-                                                    {/* Arabic Text with Tajweed */}
+                                                    {/* Arabic Text - SIMPLIFIED VERSION */}
                                                     <div className="mb-4">
-                                                        {showTajweed ? (
-                                                            <TajweedText
-                                                                words={ayahWords}
-                                                                fontSize={fontSize}
-                                                                className="tajweed-text"
-                                                            />
-                                                        ) : (
-                                                            <div className={`font-arabic text-right ${fontSize === 'lg' ? 'text-lg' : fontSize === 'xl' ? 'text-xl' : fontSize === '2xl' ? 'text-2xl' : fontSize === '3xl' ? 'text-3xl' : 'text-4xl'} leading-relaxed text-gray-900 dark:text-white`}>
-                                                                {ayahText}
-                                                            </div>
-                                                        )}
+                                                        <div className={`font-arabic text-right ${fontSize === 'lg' ? 'text-lg' : fontSize === 'xl' ? 'text-xl' : fontSize === '2xl' ? 'text-2xl' : fontSize === '3xl' ? 'text-3xl' : 'text-4xl'} leading-relaxed text-gray-900 dark:text-white`}>
+                                                            {ayahText}
+                                                        </div>
                                                     </div>
 
                                                     {/* Translation */}

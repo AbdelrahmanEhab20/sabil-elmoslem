@@ -14,6 +14,7 @@ export default function PrayerTimesPage() {
     const [timeUntilNext, setTimeUntilNext] = useState<string>('');
     const [searchLoading, setSearchLoading] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
+    const [isDSTActive, setIsDSTActive] = useState(false);
     const t = useTranslations(preferences.language);
     const toast = useToast();
 
@@ -24,6 +25,19 @@ export default function PrayerTimesPage() {
         }, 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // Calculate DST status for Egypt
+    useEffect(() => {
+        if (location && location.latitude >= 22 && location.latitude <= 32 &&
+            location.longitude >= 25 && location.longitude <= 37) {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1;
+            const isSummerTime = currentMonth >= 4 && currentMonth <= 10;
+            setIsDSTActive(isSummerTime);
+        } else {
+            setIsDSTActive(false);
+        }
+    }, [location]);
 
     // Get location on mount if not available
     useEffect(() => {
@@ -194,6 +208,14 @@ export default function PrayerTimesPage() {
                     <p className="text-lg text-gray-600 dark:text-gray-400">
                         {t.prayerTimesDescription}
                     </p>
+                    {isDSTActive && (
+                        <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                            {preferences.language === 'ar'
+                                ? '⏰ التوقيت الصيفي مفعل - تم تعديل أوقات الصلاة'
+                                : '⏰ Summer Time Active - Prayer times adjusted'
+                            }
+                        </p>
+                    )}
                 </div>
 
                 {/* Location Settings */}

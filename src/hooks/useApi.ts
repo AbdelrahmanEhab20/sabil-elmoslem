@@ -191,6 +191,20 @@ export function useQuranAyahs() {
     );
 }
 
+// Tajweed-related hooks - HASHED FOR NOW
+// export function useQuranAyahsWithTajweed() {
+//     return useApi(
+//         async (...args: unknown[]) => {
+//             const { fetchQuranAyahsWithTajweed } = await import('@/utils/api');
+//             const surahNumber = args[0] as number;
+//             return fetchQuranAyahsWithTajweed(surahNumber);
+//         },
+//         {
+//             showToast: false
+//         }
+//     );
+// }
+
 export function useLocation() {
     const { preferences } = useUser();
     const t = useTranslations(preferences.language);

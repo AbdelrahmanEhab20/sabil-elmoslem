@@ -97,6 +97,19 @@ export default function QuranPage() {
         return type === 'Meccan' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200';
     };
 
+    // Prevent background scroll when sidebar is open on mobile
+    useEffect(() => {
+        if (sidebarOpen) {
+            document.body.classList.add('overflow-hidden');
+        } else {
+            document.body.classList.remove('overflow-hidden');
+        }
+        // Clean up on unmount
+        return () => {
+            document.body.classList.remove('overflow-hidden');
+        };
+    }, [sidebarOpen]);
+
     if (loading) {
         return (
             <div className="min-h-screen py-8">
@@ -136,7 +149,7 @@ export default function QuranPage() {
             </button> */}
 
             {/* Add top padding to offset sticky bar - REMOVED SINCE NO TAJWEED BAR */}
-            <div className="py-8 flex">
+            <div className="py-8 flex w-full">
                 {/* Sidebar Toggle Button for Mobile */}
                 <button
                     className="md:hidden fixed top-20 left-4 z-50 bg-green-600 text-white p-2 rounded-full shadow-lg focus:outline-none rtl:left-auto rtl:right-4"
@@ -198,7 +211,7 @@ export default function QuranPage() {
                 )}
 
                 {/* Main Content */}
-                <div className="flex-1">
+                <div className="flex-1 w-full">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                         {/* Header */}
                         <div className="text-center mb-8">

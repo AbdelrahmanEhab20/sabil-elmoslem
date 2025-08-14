@@ -16,7 +16,7 @@ import userEvent from '@testing-library/user-event'
 import AzkarPage from '@/app/azkar/page'
 
 // Mock the UserContext
-jest.mock('@/contexts/UserContext', () => ({
+jest.mock('../../src/contexts/UserContext', () => ({
     useUser: () => ({
         preferences: {
             language: 'en',
@@ -26,7 +26,7 @@ jest.mock('@/contexts/UserContext', () => ({
 }))
 
 // Mock the ToastProvider
-jest.mock('@/components/ToastProvider', () => ({
+jest.mock('../../src/components/ToastProvider', () => ({
     useToast: () => ({
         showToast: jest.fn()
     })

@@ -15,7 +15,7 @@ import userEvent from '@testing-library/user-event'
 import PrayerTimesPage from '@/app/prayer-times/page'
 
 // Mock the UserContext
-jest.mock('@/contexts/UserContext', () => ({
+jest.mock('../../src/contexts/UserContext', () => ({
     useUser: () => ({
         location: { latitude: 30.0444, longitude: 31.2357, city: 'Cairo', country: 'Egypt' },
         setLocation: jest.fn(),
@@ -40,7 +40,7 @@ jest.mock('@/contexts/UserContext', () => ({
 }))
 
 // Mock the ToastProvider
-jest.mock('@/components/ToastProvider', () => ({
+jest.mock('../../src/components/ToastProvider', () => ({
     useToast: () => ({
         showToast: jest.fn()
     })

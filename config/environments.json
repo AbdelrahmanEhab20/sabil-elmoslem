@@ -1,0 +1,99 @@
+{
+    "environments": {
+        "development": {
+            "name": "Development",
+            "description": "Development environment for testing new features",
+            "protection_rules": {
+                "required_reviewers": 1,
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": false
+            },
+            "variables": {
+                "NODE_ENV": "development",
+                "API_BASE_URL": "https://dev-api.aladhan.com",
+                "ENABLE_DEBUG": true,
+                "LOG_LEVEL": "debug"
+            }
+        },
+        "staging": {
+            "name": "Staging",
+            "description": "Pre-production environment for final testing",
+            "protection_rules": {
+                "required_reviewers": 2,
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": true
+            },
+            "variables": {
+                "NODE_ENV": "staging",
+                "API_BASE_URL": "https://staging-api.aladhan.com",
+                "ENABLE_DEBUG": false,
+                "LOG_LEVEL": "info"
+            }
+        },
+        "production": {
+            "name": "Production",
+            "description": "Live production environment",
+            "protection_rules": {
+                "required_reviewers": 3,
+                "dismiss_stale_reviews": true,
+                "require_code_owner_reviews": true,
+                "required_status_checks": [
+                    "quality-gate",
+                    "security-tests",
+                    "performance-tests"
+                ]
+            },
+            "variables": {
+                "NODE_ENV": "production",
+                "API_BASE_URL": "https://api.aladhan.com",
+                "ENABLE_DEBUG": false,
+                "LOG_LEVEL": "error"
+            }
+        }
+    },
+    "test_config": {
+        "unit_tests": {
+            "timeout": 10,
+            "coverage_threshold": 70,
+            "parallel_jobs": 4
+        },
+        "integration_tests": {
+            "timeout": 15,
+            "retry_attempts": 2
+        },
+        "security_tests": {
+            "timeout": 10,
+            "scan_level": "high",
+            "tools": [
+                "npm_audit",
+                "snyk",
+                "owasp_zap"
+            ]
+        },
+        "performance_tests": {
+            "timeout": 20,
+            "lighthouse_thresholds": {
+                "performance": 85,
+                "accessibility": 95,
+                "best_practices": 90,
+                "seo": 90
+            }
+        },
+        "load_tests": {
+            "timeout": 30,
+            "scenarios": {
+                "normal_traffic": 50,
+                "peak_traffic": 100,
+                "stress_test": 200
+            }
+        },
+        "e2e_tests": {
+            "timeout": 25,
+            "browsers": [
+                "chrome",
+                "firefox",
+                "safari"
+            ]
+        }
+    }
+}

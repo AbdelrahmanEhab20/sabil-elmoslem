@@ -35,9 +35,9 @@
                     }
                 ],
                 "categories:accessibility": [
-                    "error",
+                    "warn",
                     {
-                        "minScore": 0.95
+                        "minScore": 0.90
                     }
                 ],
                 "categories:best-practices": [

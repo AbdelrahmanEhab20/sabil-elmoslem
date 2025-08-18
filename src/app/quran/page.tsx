@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { fetchQuranSurahs, fetchQuranAyahs } from '@/utils/api';
 import { QuranSurah, QuranAyah } from '@/types';
 import { useUser } from '@/contexts/UserContext';
@@ -215,18 +216,18 @@ export default function QuranPage() {
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
                         {/* Header */}
                         <div className="text-center mb-8">
-                            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                            <motion.h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
                                 {preferences.language === 'ar' ? 'القرآن الكريم' : 'The Holy Quran'}
-                            </h1>
-                            <p className="text-lg text-gray-600 dark:text-gray-400">
+                            </motion.h1>
+                            <motion.p className="text-lg text-gray-600 dark:text-gray-400" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                                 {preferences.language === 'ar' ? 'اقرأ وتأمل في كلام الله' : 'Read and reflect upon the words of Allah'}
-                            </p>
+                            </motion.p>
                         </div>
 
                         {view === 'surah-list' ? (
                             <>
                                 {/* Search Bar */}
-                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
                                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                                         <div className="flex-1">
                                             <input
@@ -241,15 +242,17 @@ export default function QuranPage() {
                                             {filteredSurahs.length} {preferences.language === 'ar' ? 'من' : 'of'} {surahs.length} {preferences.language === 'ar' ? 'سورة' : 'surahs'}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* Surah Grid */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {filteredSurahs.map((surah) => (
-                                        <button
+                                        <motion.button
                                             key={surah.number}
                                             onClick={() => handleSurahSelect(surah)}
                                             className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-left hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1"
+                                            whileHover={{ scale: 1.01 }}
+                                            whileTap={{ scale: 0.99 }}
                                         >
                                             <div className="flex items-start justify-between mb-3">
                                                 <div className="w-12 h-12 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
@@ -272,7 +275,7 @@ export default function QuranPage() {
                                                 <span>{surah.numberOfAyahs} {preferences.language === 'ar' ? 'آية' : 'verses'}</span>
                                                 <span>Juz {Math.ceil(surah.number / 10)}</span>
                                             </div>
-                                        </button>
+                                        </motion.button>
                                     ))}
                                 </div>
 
@@ -292,7 +295,7 @@ export default function QuranPage() {
                         ) : (
                             <>
                                 {/* Ayah View Header */}
-                                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border-b border-gray-200 dark:border-gray-700">
+                                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8 border-b border-gray-200 dark:border-gray-700" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center space-x-4 rtl:space-x-reverse">
                                             <button
@@ -362,18 +365,18 @@ export default function QuranPage() {
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
 
                                 {/* Bismillah Header for non-Fatiha surahs */}
                                 {selectedSurah && selectedSurah.number !== 1 && selectedSurah.number !== 9 && (
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6">
+                                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-6" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}>
                                         <div className="text-center">
                                             <div className="text-3xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-4">
                                                 بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
                                             </div>
                                             <div className="w-16 h-1 bg-green-500 mx-auto rounded-full"></div>
                                         </div>
-                                    </div>
+                                    </motion.div>
                                 )}
 
                                 {/* Ayahs - SIMPLIFIED VERSION */}
@@ -413,7 +416,7 @@ export default function QuranPage() {
                                             }
 
                                             return (
-                                                <div key={ayah.number} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                                                <motion.div key={ayah.number} className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.25 }}>
                                                     <div className="flex items-center justify-between mb-4">
                                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                                             <div className="w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
@@ -452,7 +455,7 @@ export default function QuranPage() {
                                                             </p>
                                                         </div>
                                                     )}
-                                                </div>
+                                                </motion.div>
                                             );
                                         })}
                                     </div>

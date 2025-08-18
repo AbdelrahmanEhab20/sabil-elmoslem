@@ -6,6 +6,7 @@ import Image from 'next/image';
 import PrayerTimesCard from '@/components/PrayerTimesCard';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
+import { motion } from 'framer-motion';
 
 export default function HomePageClient() {
     const { preferences } = useUser();
@@ -40,7 +41,7 @@ export default function HomePageClient() {
             {/* Hero Section */}
             <section className="bg-gradient-to-br from-green-600 to-green-800 text-white py-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <div className="mb-8">
+                    <motion.div className="mb-8" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
                         {/* Replace text logo with image logo */}
                         <Image src="/images/logo.png" alt="Sabil Elmoslem Logo" width={80} height={80} className="mx-auto mb-4" />
                         <h1 className="text-4xl md:text-6xl font-bold mb-6">
@@ -49,12 +50,12 @@ export default function HomePageClient() {
                         <p className="text-xl md:text-2xl text-green-100 max-w-3xl mx-auto leading-relaxed">
                             {t.welcomeSubtitle}
                         </p>
-                    </div>
+                    </motion.div>
 
-                    <div className="text-lg text-green-200">
+                    <motion.div className="text-lg text-green-200" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                         <p className="mb-2 font-arabic text-2xl">{t.bismillah}</p>
                         {preferences.language === 'en' && <p>{t.bismillahTranslation}</p>}
-                    </div>
+                    </motion.div>
                 </div>
             </section>
 
@@ -63,9 +64,9 @@ export default function HomePageClient() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Prayer Times Card */}
-                        <div className="lg:col-span-2">
+                        <motion.div className="lg:col-span-2" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
                             <PrayerTimesCard />
-                        </div>
+                        </motion.div>
 
                         {/* Quick Features */}
                         <div className="space-y-6">
@@ -73,28 +74,30 @@ export default function HomePageClient() {
                                 {t.quickAccess}
                             </h2>
 
-                            {features.map((feature) => (
-                                <Link
-                                    key={feature.href}
-                                    href={feature.href}
-                                    className="block group"
-                                >
-                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                                        <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                            <div className={`w-12 h-12 ${feature.color} rounded-lg flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-200`}>
-                                                {feature.icon}
-                                            </div>
-                                            <div>
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">
-                                                    {feature.title}
-                                                </h3>
-                                                <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                                    {feature.description}
-                                                </p>
+                            {features.map((feature, idx) => (
+                                <motion.div key={feature.href} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
+                                    <Link
+                                        key={feature.href}
+                                        href={feature.href}
+                                        className="block group"
+                                    >
+                                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                                                <div className={`w-12 h-12 ${feature.color} rounded-lg flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-200`}>
+                                                    {feature.icon}
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">
+                                                        {feature.title}
+                                                    </h3>
+                                                    <p className="text-gray-600 dark:text-gray-400 text-sm">
+                                                        {feature.description}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </Link>
+                                    </Link>
+                                </motion.div>
                             ))}
                         </div>
                     </div>
@@ -104,17 +107,17 @@ export default function HomePageClient() {
             {/* Features Section */}
             <section className="py-16 bg-white dark:bg-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="text-center mb-12">
+                    <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
                         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                             {t.whatWeOffer}
                         </h2>
                         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
                             {t.whatWeOfferSubtitle}
                         </p>
-                    </div>
+                    </motion.div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="text-center">
+                        <motion.div className="text-center" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: 0.05 }}>
                             <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span className="text-2xl">🕐</span>
                             </div>
@@ -124,9 +127,9 @@ export default function HomePageClient() {
                             <p className="text-gray-600 dark:text-gray-400">
                                 {t.accuratePrayerTimesDesc}
                             </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="text-center">
+                        <motion.div className="text-center" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: 0.1 }}>
                             <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span className="text-2xl">🙏</span>
                             </div>
@@ -136,9 +139,9 @@ export default function HomePageClient() {
                             <p className="text-gray-600 dark:text-gray-400">
                                 {t.dailyAzkarDesc}
                             </p>
-                        </div>
+                        </motion.div>
 
-                        <div className="text-center">
+                        <motion.div className="text-center" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: 0.15 }}>
                             <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span className="text-2xl">📚</span>
                             </div>
@@ -148,7 +151,7 @@ export default function HomePageClient() {
                             <p className="text-gray-600 dark:text-gray-400">
                                 {t.quranReaderDesc}
                             </p>
-                        </div>
+                        </motion.div>
                     </div>
                 </div>
             </section>
@@ -156,12 +159,12 @@ export default function HomePageClient() {
             {/* Call to Action */}
             <section className="py-16 bg-gradient-to-r from-green-600 to-green-700 text-white">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 className="text-3xl font-bold mb-4">
+                    <motion.h2 className="text-3xl font-bold mb-4" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
                         {t.startJourney}
-                    </h2>
-                    <p className="text-xl text-green-100 mb-8">
+                    </motion.h2>
+                    <motion.p className="text-xl text-green-100 mb-8" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.1 }}>
                         {t.startJourneySubtitle}
-                    </p>
+                    </motion.p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/prayer-times"

@@ -144,7 +144,7 @@ export function usePrayerTimes() {
     return useApi(
         async (location: unknown) => {
             const { fetchPrayerTimes } = await import('@/utils/api');
-            return fetchPrayerTimes(location as { latitude: number; longitude: number }, preferences.calculationMethod, preferences.madhab);
+            return fetchPrayerTimes(location as { latitude: number; longitude: number }, preferences.calculationMethod, preferences.madhab, true);
         },
         {
             showToast: false

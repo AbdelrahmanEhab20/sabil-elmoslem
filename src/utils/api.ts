@@ -100,10 +100,11 @@ const adjustTimeForDST = (timeString: string, location: Location): string => {
 export const fetchPrayerTimes = withErrorHandling(async (
     location: Location,
     method: number = 1,
-    madhab: number = 1
+    madhab: number = 1,
+    applyEgyptDST: boolean = false
 ): Promise<PrayerTimes> => {
     const date = new Date().toLocaleDateString('en-CA');
-    const cacheKey = `prayer-times-${location.latitude}-${location.longitude}-${method}-${madhab}-${date}`;
+    const cacheKey = `prayer-times-${location.latitude}-${location.longitude}-${method}-${madhab}-${date}-dst-${applyEgyptDST ? 'on' : 'off'}`;
 
     // Check cache first
     const cached = getCachedData<PrayerTimes>(cacheKey);
@@ -123,19 +124,32 @@ export const fetchPrayerTimes = withErrorHandling(async (
 
         const prayerTimes = data.data.timings;
 
-        // Apply DST adjustment for Egypt
-        const adjustedPrayerTimes: PrayerTimes = {
-            Fajr: adjustTimeForDST(prayerTimes.Fajr, location),
-            Sunrise: adjustTimeForDST(prayerTimes.Sunrise, location),
-            Dhuhr: adjustTimeForDST(prayerTimes.Dhuhr, location),
-            Asr: adjustTimeForDST(prayerTimes.Asr, location),
-            Maghrib: adjustTimeForDST(prayerTimes.Maghrib, location),
-            Isha: adjustTimeForDST(prayerTimes.Isha, location),
-            Imsak: adjustTimeForDST(prayerTimes.Imsak, location),
-            Midnight: adjustTimeForDST(prayerTimes.Midnight, location),
-            Firstthird: adjustTimeForDST(prayerTimes.Firstthird, location),
-            Lastthird: adjustTimeForDST(prayerTimes.Lastthird, location),
-        };
+        // Optionally apply Egypt DST adjustment
+        const adjustedPrayerTimes: PrayerTimes = applyEgyptDST
+            ? {
+                Fajr: adjustTimeForDST(prayerTimes.Fajr, location),
+                Sunrise: adjustTimeForDST(prayerTimes.Sunrise, location),
+                Dhuhr: adjustTimeForDST(prayerTimes.Dhuhr, location),
+                Asr: adjustTimeForDST(prayerTimes.Asr, location),
+                Maghrib: adjustTimeForDST(prayerTimes.Maghrib, location),
+                Isha: adjustTimeForDST(prayerTimes.Isha, location),
+                Imsak: adjustTimeForDST(prayerTimes.Imsak, location),
+                Midnight: adjustTimeForDST(prayerTimes.Midnight, location),
+                Firstthird: adjustTimeForDST(prayerTimes.Firstthird, location),
+                Lastthird: adjustTimeForDST(prayerTimes.Lastthird, location),
+            }
+            : {
+                Fajr: prayerTimes.Fajr,
+                Sunrise: prayerTimes.Sunrise,
+                Dhuhr: prayerTimes.Dhuhr,
+                Asr: prayerTimes.Asr,
+                Maghrib: prayerTimes.Maghrib,
+                Isha: prayerTimes.Isha,
+                Imsak: prayerTimes.Imsak,
+                Midnight: prayerTimes.Midnight,
+                Firstthird: prayerTimes.Firstthird,
+                Lastthird: prayerTimes.Lastthird,
+            };
 
         // Cache the result for 5 minutes
         setCachedData(cacheKey, adjustedPrayerTimes, 5 * 60 * 1000);

@@ -44,7 +44,7 @@ export default function PrayerTimesCard() {
             if (location) {
                 try {
                     setLoading(true);
-                    const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab);
+                    const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab, true);
                     setPrayerTimes(times);
                 } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });

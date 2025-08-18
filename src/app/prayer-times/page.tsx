@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation, searchCityCoordinates } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
@@ -16,6 +17,7 @@ export default function PrayerTimesPage() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [isDSTActive, setIsDSTActive] = useState(false);
     const t = useTranslations(preferences.language);
+    const [applyEgyptDST, setApplyEgyptDST] = useState<boolean>(false);
     const toast = useToast();
 
     // Update current time every second
@@ -64,7 +66,7 @@ export default function PrayerTimesPage() {
             if (location) {
                 try {
                     setLoading(true);
-                    const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab);
+                    const times = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab, applyEgyptDST);
                     setPrayerTimes(times);
                 } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
@@ -75,7 +77,7 @@ export default function PrayerTimesPage() {
         };
 
         getPrayerTimes();
-    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
+    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, applyEgyptDST, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer and time until
     useEffect(() => {
@@ -202,24 +204,24 @@ export default function PrayerTimesPage() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    <motion.h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
                         {t.prayerTimes}
-                    </h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-400">
+                    </motion.h1>
+                    <motion.p className="text-lg text-gray-600 dark:text-gray-400" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                         {t.prayerTimesDescription}
-                    </p>
-                    {isDSTActive && (
-                        <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                    </motion.p>
+                    {applyEgyptDST && isDSTActive && (
+                        <motion.p className="text-sm text-green-600 dark:text-green-400 mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                             {preferences.language === 'ar'
                                 ? '⏰ التوقيت الصيفي مفعل - تم تعديل أوقات الصلاة'
                                 : '⏰ Summer Time Active - Prayer times adjusted'
                             }
-                        </p>
+                        </motion.p>
                     )}
                 </div>
 
                 {/* Location Settings */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                         {t.location}
                     </h2>
@@ -267,6 +269,24 @@ export default function PrayerTimesPage() {
                         </div>
 
                         <div className="space-y-4">
+                            {/* Egypt Summer Time Toggle */}
+                            <div>
+                                <label className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <input
+                                        type="checkbox"
+                                        checked={applyEgyptDST}
+                                        onChange={(e) => setApplyEgyptDST(e.target.checked)}
+                                        className="h-4 w-4 accent-green-600"
+                                    />
+                                    <span>{preferences.language === 'ar' ? 'تطبيق التوقيت الصيفي' : 'Apply Egypt summer time (DST) only'}</span>
+                                </label>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                    {preferences.language === 'ar'
+                                        ? 'عند التفعيل: زيادة ساعة لأوقات الصلاة  خلال أشهر الصيف. لا يؤثر على باقي الدول.'
+                                        : 'When enabled: adds +1 hour to Egypt prayer times during summer months. Does not affect other countries.'}
+                                </p>
+                            </div>
+
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                                     {preferences.language === 'ar' ? 'البحث عن مدينة' : 'Search City'}
@@ -324,11 +344,11 @@ export default function PrayerTimesPage() {
                             </button>
                         </div>
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Next Prayer Countdown */}
                 {nextPrayer && (
-                    <div className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg shadow-lg p-6 mb-8">
+                    <motion.div className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                         <div className="text-center">
                             <h2 className="text-2xl font-bold mb-2">
                                 {t.nextPrayer}: {getPrayerName(nextPrayer)}
@@ -340,12 +360,12 @@ export default function PrayerTimesPage() {
                                 {t.timeRemaining}
                             </p>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Prayer Times Grid */}
                 {loading ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
                         <div className="animate-pulse">
                             <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-4"></div>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -354,9 +374,9 @@ export default function PrayerTimesPage() {
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ) : prayerTimes ? (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
                             {t.prayerTimes}
                         </h2>
@@ -387,9 +407,9 @@ export default function PrayerTimesPage() {
                                 </div>
                             ))}
                         </div>
-                    </div>
+                    </motion.div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center">
+                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 text-center" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
                         <div className="text-6xl mb-4">🕌</div>
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                             {preferences.language === 'ar' ? 'أوقات الصلاة' : 'Prayer Times'}
@@ -400,7 +420,7 @@ export default function PrayerTimesPage() {
                                 : 'Set your location to view prayer times'
                             }
                         </p>
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>

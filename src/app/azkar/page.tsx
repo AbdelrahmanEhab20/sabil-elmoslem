@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
@@ -219,16 +220,16 @@ export default function AzkarPage() {
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    <motion.h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
                         {t.azkar}
-                    </h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-400">
+                    </motion.h1>
+                    <motion.p className="text-lg text-gray-600 dark:text-gray-400" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                         {t.azkarDescription}
-                    </p>
+                    </motion.p>
                 </div>
 
                 {/* Category Filter */}
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
+                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
                     <div className="flex flex-wrap gap-2">
                         {categories.map((category) => (
                             <button
@@ -263,7 +264,7 @@ export default function AzkarPage() {
                             )}
                         </div>
                     )}
-                </div>
+                </motion.div>
 
                 {/* Azkar List */}
                 <div className="space-y-6">
@@ -276,10 +277,14 @@ export default function AzkarPage() {
                         const isComplete = hasCounter ? (currentCount >= targetCount) : false;
 
                         return (
-                            <div
+                            <motion.div
                                 key={zikr.id}
                                 className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-200 ${isComplete ? 'ring-2 ring-green-500' : ''
                                     }`}
+                                initial={{ opacity: 0, y: 8 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 0.25 }}
                             >
                                 {/* Counter Section - Show for all azkar */}
                                 {hasCounter && (
@@ -358,7 +363,7 @@ export default function AzkarPage() {
                                         </div>
                                     </div>
                                 )}
-                            </div>
+                            </motion.div>
                         );
                     })}
                 </div>

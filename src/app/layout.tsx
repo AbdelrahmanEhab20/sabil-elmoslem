@@ -4,9 +4,12 @@ import "./globals.css";
 import { UserProvider } from "@/contexts/UserContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageTransition from "@/components/PageTransition";
 import { ToastProvider } from "@/components/ToastProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import ScrollToTopButton from "@/components/ScrollToTopButton";
+import { MotionConfig } from "framer-motion";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -180,14 +183,19 @@ export default function RootLayout({
         <ErrorBoundary>
           <ToastProvider>
             <UserProvider>
-              <div className="flex flex-col min-h-screen">
-                <Navbar />
-                <main className="flex-grow">
-                  {children}
-                  <SpeedInsights />
-                </main>
-                <Footer />
-              </div>
+              <MotionConfig reducedMotion="user">
+                <div className="flex flex-col min-h-screen">
+                  <Navbar />
+                  <main className="flex-grow">
+                    <PageTransition>
+                      {children}
+                    </PageTransition>
+                    <SpeedInsights />
+                    <ScrollToTopButton />
+                  </main>
+                  <Footer />
+                </div>
+              </MotionConfig>
             </UserProvider>
           </ToastProvider>
         </ErrorBoundary>

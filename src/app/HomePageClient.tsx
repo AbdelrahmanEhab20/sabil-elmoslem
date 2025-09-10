@@ -60,45 +60,46 @@ export default function HomePageClient() {
             </section>
 
             {/* Main Content */}
-            <section className="py-16">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <section className="py-8 sm:py-12 md:py-16">
+                <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
                         {/* Prayer Times Card */}
                         <motion.div className="lg:col-span-2" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35 }}>
                             <PrayerTimesCard />
                         </motion.div>
 
                         {/* Quick Features */}
-                        <div className="space-y-6">
-                            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+                        <div>
+                            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4">
                                 {t.quickAccess}
                             </h2>
 
-                            {features.map((feature, idx) => (
-                                <motion.div key={feature.href} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
-                                    <Link
-                                        key={feature.href}
-                                        href={feature.href}
-                                        className="block group"
-                                    >
-                                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
-                                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                                <div className={`w-12 h-12 ${feature.color} rounded-lg flex items-center justify-center text-white text-xl group-hover:scale-110 transition-transform duration-200`}>
-                                                    {feature.icon}
-                                                </div>
-                                                <div>
-                                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200">
-                                                        {feature.title}
-                                                    </h3>
-                                                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                                        {feature.description}
-                                                    </p>
+                            <div className="grid grid-cols-1 gap-3">
+                                {features.map((feature, idx) => (
+                                    <motion.div key={feature.href} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3, delay: idx * 0.05 }}>
+                                        <Link
+                                            href={feature.href}
+                                            className="block group"
+                                        >
+                                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                                                <div className="flex items-center space-x-3 rtl:space-x-reverse gap-3">
+                                                    <div className={`w-10 h-10 ${feature.color} rounded-lg flex items-center justify-center text-white text-lg group-hover:scale-110 transition-transform duration-200 flex-shrink-0`}>
+                                                        {feature.icon}
+                                                    </div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <h3 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 truncate">
+                                                            {feature.title}
+                                                        </h3>
+                                                        <p className="text-gray-600 dark:text-gray-400 text-sm leading-tight mt-1">
+                                                            {feature.description}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </Link>
-                                </motion.div>
-                            ))}
+                                        </Link>
+                                    </motion.div>
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </div>

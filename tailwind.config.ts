@@ -9,6 +9,9 @@ const config: Config = {
     darkMode: 'class',
     theme: {
         extend: {
+            screens: {
+                'xs': '475px',
+            },
             fontFamily: {
                 'arabic': ['Noto Sans Arabic', 'Arial', 'sans-serif'],
                 'sans': ['var(--font-geist-sans)', 'Noto Sans Arabic', 'Arial', 'sans-serif'],

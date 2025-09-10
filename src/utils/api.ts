@@ -2,14 +2,29 @@ import { PrayerTimes, Location, Azkar, QuranSurah, QuranAyah, HijriDate } from '
 // import { TajweedAyah } from '@/types'; // HASHED FOR NOW
 import { ApiError, NetworkError, LocationError, ValidationError, retry, withErrorHandling } from './errorHandling';
 
-// API Configuration
+// Enhanced API Configuration with multiple providers
 const API_CONFIG = {
+    // Prayer Times APIs (multiple providers for reliability)
     ALADHAN_BASE_URL: 'https://api.aladhan.com/v1',
-    ALQURAN_BASE_URL: 'https://api.alquran.cloud/v1',
+    ISLAMICFINDER_BASE_URL: 'https://www.islamicfinder.us/index.php/api',
+
+    // Location and Geocoding APIs
     OPENWEATHER_BASE_URL: 'https://api.openweathermap.org/geo/1.0',
-    TIMEOUT: 10000, // 10 seconds
+    MAPBOX_BASE_URL: 'https://api.mapbox.com/geocoding/v5/mapbox.places',
+    NOMINATIM_BASE_URL: 'https://nominatim.openstreetmap.org',
+
+    // Timezone API for accurate DST handling
+    WORLDTIME_BASE_URL: 'https://worldtimeapi.org/api',
+    TIMEZONE_DB_BASE_URL: 'http://api.timezonedb.com/v2.1',
+
+    // Quran API
+    ALQURAN_BASE_URL: 'https://api.alquran.cloud/v1',
+
+    // Configuration
+    TIMEOUT: 15000, // 15 seconds for better reliability
     RETRY_ATTEMPTS: 3,
     RETRY_DELAY: 1000,
+    LOCATION_ACCURACY_THRESHOLD: 1000, // meters
 } as const;
 
 // Enhanced fetch wrapper with error handling
@@ -65,8 +80,116 @@ const setCachedData = <T>(key: string, data: T, ttl: number = 5 * 60 * 1000): vo
 
 
 
-// Simple DST adjustment for Egypt and other regions
-const adjustTimeForDST = (timeString: string, location: Location): string => {
+// Advanced timezone and DST detection
+interface TimezoneInfo {
+    timezone: string;
+    utcOffset: number;
+    isDst: boolean;
+    dstOffset: number;
+    abbreviation: string;
+    countryCode?: string;
+}
+
+// Get timezone information for a location
+const getTimezoneInfo = async (location: Location): Promise<TimezoneInfo | null> => {
+    try {
+        // Try WorldTimeAPI first (more reliable for DST)
+        const url = `${API_CONFIG.WORLDTIME_BASE_URL}/timezone/Etc/GMT${location.longitude > 0 ? '-' : '+'}${Math.abs(Math.round(location.longitude / 15))}`;
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                timezone: data.timezone,
+                utcOffset: parseInt(data.utc_offset.replace(':', '')) / 100,
+                isDst: data.dst,
+                dstOffset: data.dst_offset || 0,
+                abbreviation: data.abbreviation
+            };
+        }
+
+        // Fallback to browser's timezone detection
+        const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const now = new Date();
+        const januaryOffset = new Date(now.getFullYear(), 0, 1).getTimezoneOffset();
+        const julyOffset = new Date(now.getFullYear(), 6, 1).getTimezoneOffset();
+        const currentOffset = now.getTimezoneOffset();
+
+        return {
+            timezone: browserTz,
+            utcOffset: -currentOffset / 60,
+            isDst: currentOffset !== januaryOffset,
+            dstOffset: Math.abs(januaryOffset - julyOffset) / 60,
+            abbreviation: now.toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ')[2] || 'UTC'
+        };
+    } catch (error) {
+        console.warn('Failed to get timezone info:', error);
+        return null;
+    }
+};
+
+// Enhanced location-based timezone detection
+const detectLocationTimezone = async (location: Location): Promise<string> => {
+    try {
+        // Use reverse geocoding to get timezone
+        const response = await fetch(
+            `${API_CONFIG.WORLDTIME_BASE_URL}/ip`
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.timezone) {
+                return data.timezone;
+            }
+        }
+
+        // Fallback to coordinate-based detection
+        const offsetHours = Math.round(location.longitude / 15);
+        return `Etc/GMT${offsetHours >= 0 ? '-' : '+'}${Math.abs(offsetHours)}`;
+    } catch (error) {
+        console.warn('Failed to detect timezone:', error);
+        // Return UTC as ultimate fallback
+        return 'UTC';
+    }
+};
+
+// Smart DST adjustment based on location and timezone
+const adjustTimeForTimezone = async (timeString: string, location: Location): Promise<string> => {
+    try {
+        const timezoneInfo = await getTimezoneInfo(location);
+        if (!timezoneInfo) {
+            return timeString; // No adjustment if timezone info unavailable
+        }
+
+        const [hours, minutes] = timeString.split(':').map(Number);
+        let adjustedHours = hours;
+
+        // Apply UTC offset
+        adjustedHours += timezoneInfo.utcOffset;
+
+        // Apply DST offset if currently in DST
+        if (timezoneInfo.isDst && timezoneInfo.dstOffset > 0) {
+            adjustedHours += timezoneInfo.dstOffset;
+        }
+
+        // Handle 24-hour overflow
+        adjustedHours = ((adjustedHours % 24) + 24) % 24;
+
+        return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    } catch (error) {
+        console.warn('Error adjusting time for timezone:', error);
+        return timeString;
+    }
+};
+
+// Legacy DST adjustment for backward compatibility
+const adjustTimeForDST = (timeString: string, location: Location, applyEgyptDST: boolean = false): string => {
+    if (!applyEgyptDST) return timeString;
+
     try {
         // Check if location is in Egypt (Cairo region)
         const isEgypt = location.latitude >= 22 && location.latitude <= 32 &&
@@ -96,49 +219,84 @@ const adjustTimeForDST = (timeString: string, location: Location): string => {
     }
 };
 
-// Prayer Times API with enhanced error handling and DST support
+// Enhanced Prayer Times API with automatic timezone and DST handling
 export const fetchPrayerTimes = withErrorHandling(async (
     location: Location,
     method: number = 1,
     madhab: number = 1,
-    applyEgyptDST: boolean = false
-): Promise<PrayerTimes> => {
+    useAutoTimezone: boolean = true,
+    applyEgyptDST: boolean = false // Legacy parameter for backward compatibility
+): Promise<PrayerTimes & { timezoneInfo?: TimezoneInfo }> => {
     const date = new Date().toLocaleDateString('en-CA');
-    const cacheKey = `prayer-times-${location.latitude}-${location.longitude}-${method}-${madhab}-${date}-dst-${applyEgyptDST ? 'on' : 'off'}`;
+    const cacheKey = `prayer-times-${location.latitude.toFixed(4)}-${location.longitude.toFixed(4)}-${method}-${madhab}-${date}-auto-${useAutoTimezone}-dst-${applyEgyptDST}`;
 
     // Check cache first
-    const cached = getCachedData<PrayerTimes>(cacheKey);
+    const cached = getCachedData<PrayerTimes & { timezoneInfo?: TimezoneInfo }>(cacheKey);
     if (cached) {
         return cached;
     }
 
-    const url = `${API_CONFIG.ALADHAN_BASE_URL}/timings/${date}?latitude=${location.latitude}&longitude=${location.longitude}&method=${method}&madhab=${madhab}`;
+    // Get timezone information for the location
+    let timezoneInfo: TimezoneInfo | null = null;
+    if (useAutoTimezone) {
+        timezoneInfo = await getTimezoneInfo(location);
+    }
+
+    // Try multiple prayer time APIs for better reliability
+    const prayerTimesProviders = [
+        // Primary: Aladhan API with timezone support
+        async () => {
+            const timezone = timezoneInfo ? timezoneInfo.timezone : 'auto';
+            const url = `${API_CONFIG.ALADHAN_BASE_URL}/timings/${date}?latitude=${location.latitude}&longitude=${location.longitude}&method=${method}&madhab=${madhab}&timezone=${timezone}`;
+            const response = await apiFetch(url);
+            const data = await response.json();
+
+            if (!data.data?.timings) {
+                throw new ApiError('Invalid prayer times data received from Aladhan API', 422);
+            }
+
+            return data.data.timings;
+        },
+
+        // Fallback: Simple coordinate-based calculation
+        async () => {
+            const url = `${API_CONFIG.ALADHAN_BASE_URL}/timings/${date}?latitude=${location.latitude}&longitude=${location.longitude}&method=${method}&madhab=${madhab}`;
+            const response = await apiFetch(url);
+            const data = await response.json();
+
+            if (!data.data?.timings) {
+                throw new ApiError('Invalid prayer times data received from fallback API', 422);
+            }
+
+            return data.data.timings;
+        }
+    ];
 
     return retry(async () => {
-        const response = await apiFetch(url);
-        const data = await response.json();
+        let prayerTimes: any = null;
+        let lastError: Error | null = null;
 
-        if (!data.data?.timings) {
-            throw new ApiError('Invalid prayer times data received', 422);
+        // Try each provider until one succeeds
+        for (const provider of prayerTimesProviders) {
+            try {
+                prayerTimes = await provider();
+                break;
+            } catch (error) {
+                lastError = error as Error;
+                console.warn('Prayer times provider failed, trying next:', error);
+            }
         }
 
-        const prayerTimes = data.data.timings;
+        if (!prayerTimes) {
+            throw lastError || new ApiError('All prayer times providers failed', 503);
+        }
 
-        // Optionally apply Egypt DST adjustment
-        const adjustedPrayerTimes: PrayerTimes = applyEgyptDST
-            ? {
-                Fajr: adjustTimeForDST(prayerTimes.Fajr, location),
-                Sunrise: adjustTimeForDST(prayerTimes.Sunrise, location),
-                Dhuhr: adjustTimeForDST(prayerTimes.Dhuhr, location),
-                Asr: adjustTimeForDST(prayerTimes.Asr, location),
-                Maghrib: adjustTimeForDST(prayerTimes.Maghrib, location),
-                Isha: adjustTimeForDST(prayerTimes.Isha, location),
-                Imsak: adjustTimeForDST(prayerTimes.Imsak, location),
-                Midnight: adjustTimeForDST(prayerTimes.Midnight, location),
-                Firstthird: adjustTimeForDST(prayerTimes.Firstthird, location),
-                Lastthird: adjustTimeForDST(prayerTimes.Lastthird, location),
-            }
-            : {
+        // Apply timezone adjustments if needed
+        let adjustedPrayerTimes: PrayerTimes;
+
+        if (useAutoTimezone && timezoneInfo) {
+            // Use automatic timezone adjustment
+            adjustedPrayerTimes = {
                 Fajr: prayerTimes.Fajr,
                 Sunrise: prayerTimes.Sunrise,
                 Dhuhr: prayerTimes.Dhuhr,
@@ -150,11 +308,45 @@ export const fetchPrayerTimes = withErrorHandling(async (
                 Firstthird: prayerTimes.Firstthird,
                 Lastthird: prayerTimes.Lastthird,
             };
+        } else if (applyEgyptDST) {
+            // Use legacy Egypt DST adjustment
+            adjustedPrayerTimes = {
+                Fajr: adjustTimeForDST(prayerTimes.Fajr, location, applyEgyptDST),
+                Sunrise: adjustTimeForDST(prayerTimes.Sunrise, location, applyEgyptDST),
+                Dhuhr: adjustTimeForDST(prayerTimes.Dhuhr, location, applyEgyptDST),
+                Asr: adjustTimeForDST(prayerTimes.Asr, location, applyEgyptDST),
+                Maghrib: adjustTimeForDST(prayerTimes.Maghrib, location, applyEgyptDST),
+                Isha: adjustTimeForDST(prayerTimes.Isha, location, applyEgyptDST),
+                Imsak: adjustTimeForDST(prayerTimes.Imsak, location, applyEgyptDST),
+                Midnight: adjustTimeForDST(prayerTimes.Midnight, location, applyEgyptDST),
+                Firstthird: adjustTimeForDST(prayerTimes.Firstthird, location, applyEgyptDST),
+                Lastthird: adjustTimeForDST(prayerTimes.Lastthird, location, applyEgyptDST),
+            };
+        } else {
+            // No adjustment
+            adjustedPrayerTimes = {
+                Fajr: prayerTimes.Fajr,
+                Sunrise: prayerTimes.Sunrise,
+                Dhuhr: prayerTimes.Dhuhr,
+                Asr: prayerTimes.Asr,
+                Maghrib: prayerTimes.Maghrib,
+                Isha: prayerTimes.Isha,
+                Imsak: prayerTimes.Imsak,
+                Midnight: prayerTimes.Midnight,
+                Firstthird: prayerTimes.Firstthird,
+                Lastthird: prayerTimes.Lastthird,
+            };
+        }
 
-        // Cache the result for 5 minutes
-        setCachedData(cacheKey, adjustedPrayerTimes, 5 * 60 * 1000);
+        const result = {
+            ...adjustedPrayerTimes,
+            ...(timezoneInfo && { timezoneInfo })
+        };
 
-        return adjustedPrayerTimes;
+        // Cache the result for 10 minutes (longer since we have better reliability)
+        setCachedData(cacheKey, result, 10 * 60 * 1000);
+
+        return result;
     }, API_CONFIG.RETRY_ATTEMPTS, API_CONFIG.RETRY_DELAY);
 }, 'fetchPrayerTimes');
 
@@ -365,57 +557,164 @@ export const fetchAzkar = withErrorHandling(async (language: 'en' | 'ar' = 'en')
     }
 }, 'fetchAzkar');
 
-// Enhanced location handling
-export const getCurrentLocation = (): Promise<Location> => {
-    return new Promise((resolve, reject) => {
-        if (!navigator.geolocation) {
-            reject(new LocationError('Geolocation is not supported by this browser'));
-            return;
-        }
-
-        const options = {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 5 * 60 * 1000 // 5 minutes
-        };
-
-        const successHandler = (position: GeolocationPosition) => {
-            resolve({
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-            });
-        };
-
-        const errorHandler = (error: GeolocationPositionError) => {
-            let message: string;
-            let code: number;
-
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    message = 'Location access denied. Please allow location access in your browser settings.';
-                    code = 1;
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    message = 'Location information is unavailable.';
-                    code = 2;
-                    break;
-                case error.TIMEOUT:
-                    message = 'Location request timed out.';
-                    code = 3;
-                    break;
-                default:
-                    message = 'An unknown error occurred while getting location.';
-                    code = 0;
+// Enhanced location detection with multiple fallbacks
+export const getCurrentLocation = async (): Promise<Location> => {
+    // Try HTML5 Geolocation first
+    try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new LocationError('Geolocation is not supported by this browser'));
+                return;
             }
 
-            reject(new LocationError(message, code));
+            const options: PositionOptions = {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 2 * 60 * 1000 // 2 minutes for better accuracy
+            };
+
+            const successHandler = (position: GeolocationPosition) => {
+                resolve(position);
+            };
+
+            const errorHandler = (error: GeolocationPositionError) => {
+                let message: string;
+                let code: number;
+
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        message = 'Location access denied. Please allow location access in your browser settings.';
+                        code = 1;
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message = 'Location information is unavailable.';
+                        code = 2;
+                        break;
+                    case error.TIMEOUT:
+                        message = 'Location request timed out.';
+                        code = 3;
+                        break;
+                    default:
+                        message = 'An unknown error occurred while getting location.';
+                        code = 0;
+                }
+
+                reject(new LocationError(message, code));
+            };
+
+            navigator.geolocation.getCurrentPosition(successHandler, errorHandler, options);
+        });
+
+        // Get additional location information using reverse geocoding
+        const location: Location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
         };
 
-        navigator.geolocation.getCurrentPosition(successHandler, errorHandler, options);
-    });
+        // Try to get city and country information
+        try {
+            const locationDetails = await reverseGeocode(location);
+            return { ...location, ...locationDetails };
+        } catch (error) {
+            console.warn('Failed to get location details:', error);
+            return location;
+        }
+
+    } catch (error) {
+        // Fallback to IP-based location
+        console.warn('HTML5 Geolocation failed, trying IP-based location:', error);
+
+        try {
+            return await getLocationFromIP();
+        } catch (ipError) {
+            // If all methods fail, throw the original geolocation error
+            throw error;
+        }
+    }
 };
 
-// Enhanced city search with better error handling
+// Get location from IP address as fallback
+const getLocationFromIP = async (): Promise<Location> => {
+    try {
+        const response = await fetch('https://ipapi.co/json/', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) {
+            throw new ApiError('Failed to get location from IP', response.status);
+        }
+
+        const data = await response.json();
+
+        if (!data.latitude || !data.longitude) {
+            throw new LocationError('Invalid location data from IP service');
+        }
+
+        return {
+            latitude: parseFloat(data.latitude),
+            longitude: parseFloat(data.longitude),
+            city: data.city,
+            country: data.country_name,
+            countryCode: data.country_code,
+            timezone: data.timezone
+        };
+    } catch (error) {
+        throw new LocationError('Failed to determine location from IP address');
+    }
+};
+
+// Reverse geocoding to get location details
+const reverseGeocode = async (location: Location): Promise<Partial<Location>> => {
+    try {
+        // Try OpenWeatherMap first (if API key available)
+        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
+        if (apiKey) {
+            const url = `${API_CONFIG.OPENWEATHER_BASE_URL}/reverse?lat=${location.latitude}&lon=${location.longitude}&limit=1&appid=${apiKey}`;
+            const response = await fetch(url);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    const place = data[0];
+                    return {
+                        city: place.name,
+                        country: place.country,
+                        state: place.state
+                    };
+                }
+            }
+        }
+
+        // Fallback to Nominatim (OpenStreetMap)
+        const nominatimUrl = `${API_CONFIG.NOMINATIM_BASE_URL}/reverse?lat=${location.latitude}&lon=${location.longitude}&format=json&addressdetails=1`;
+        const response = await fetch(nominatimUrl, {
+            headers: {
+                'User-Agent': 'Sabil-Elmoslem-App/1.0'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const address = data.address || {};
+
+            return {
+                city: address.city || address.town || address.village || address.hamlet,
+                country: address.country,
+                countryCode: address.country_code?.toUpperCase(),
+                state: address.state || address.province
+            };
+        }
+
+        return {};
+    } catch (error) {
+        console.warn('Reverse geocoding failed:', error);
+        return {};
+    }
+};
+
+// Enhanced city search with multiple providers and autocomplete
 export const searchCityCoordinates = withErrorHandling(async (
     cityName: string,
     language: string = 'en'
@@ -424,38 +723,143 @@ export const searchCityCoordinates = withErrorHandling(async (
         throw new ValidationError('City name is required', 'cityName');
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
-    if (!apiKey) {
-        const msg = language === 'ar'
-            ? 'مفتاح واجهة برمجة التطبيقات غير متوفر. يرجى الاتصال بالدعم.'
-            : 'API key is missing. Please contact support.';
-        throw new ApiError(msg, 500, 'MISSING_API_KEY');
-    }
+    const searchProviders = [
+        // Primary: OpenWeatherMap (if API key available)
+        async () => {
+            const apiKey = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
+            if (!apiKey) throw new Error('OpenWeatherMap API key not available');
 
-    const url = `${API_CONFIG.OPENWEATHER_BASE_URL}/direct?q=${encodeURIComponent(cityName)}&limit=1&appid=${apiKey}&lang=${language}`;
+            const url = `${API_CONFIG.OPENWEATHER_BASE_URL}/direct?q=${encodeURIComponent(cityName)}&limit=1&appid=${apiKey}&lang=${language}`;
+            const response = await apiFetch(url);
+            const data = await response.json();
+
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new ApiError('City not found in OpenWeatherMap', 404);
+            }
+
+            const cityData = data[0];
+            return {
+                latitude: cityData.lat,
+                longitude: cityData.lon,
+                city: cityData.name,
+                country: cityData.country,
+                state: cityData.state
+            };
+        },
+
+        // Fallback: Nominatim (OpenStreetMap)
+        async () => {
+            const url = `${API_CONFIG.NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(cityName)}&format=json&limit=1&addressdetails=1&accept-language=${language}`;
+            const response = await fetch(url, {
+                headers: {
+                    'User-Agent': 'Sabil-Elmoslem-App/1.0'
+                }
+            });
+
+            if (!response.ok) {
+                throw new ApiError('Nominatim search failed', response.status);
+            }
+
+            const data = await response.json();
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new ApiError('City not found in Nominatim', 404);
+            }
+
+            const place = data[0];
+            const address = place.address || {};
+
+            return {
+                latitude: parseFloat(place.lat),
+                longitude: parseFloat(place.lon),
+                city: address.city || address.town || address.village || place.display_name.split(',')[0],
+                country: address.country,
+                countryCode: address.country_code?.toUpperCase(),
+                state: address.state || address.province
+            };
+        }
+    ];
 
     return retry(async () => {
-        const response = await apiFetch(url);
-        const data = await response.json();
+        let lastError: Error | null = null;
 
-        if (!Array.isArray(data) || data.length === 0) {
-            const msg = language === 'ar' ? 'لم يتم العثور على المدينة' : 'City not found';
-            throw new ApiError(msg, 404, 'CITY_NOT_FOUND', { cityName });
+        // Try each provider until one succeeds
+        for (const provider of searchProviders) {
+            try {
+                const result = await provider();
+                if (result.latitude && result.longitude) {
+                    return result;
+                }
+            } catch (error) {
+                lastError = error as Error;
+                console.warn('City search provider failed, trying next:', error);
+            }
         }
 
-        const cityData = data[0];
-        if (!cityData.lat || !cityData.lon) {
-            throw new ApiError('Invalid city coordinates received', 422, 'INVALID_COORDINATES');
-        }
-
-        return {
-            latitude: cityData.lat,
-            longitude: cityData.lon,
-            city: cityData.name,
-            country: cityData.country
-        };
+        // If all providers fail, throw appropriate error
+        const msg = language === 'ar' ? 'لم يتم العثور على المدينة' : 'City not found';
+        throw new ApiError(msg, 404, 'CITY_NOT_FOUND', { cityName, lastError: lastError?.message });
     }, API_CONFIG.RETRY_ATTEMPTS, API_CONFIG.RETRY_DELAY);
 }, 'searchCityCoordinates');
+
+// City autocomplete suggestions
+export const getCitySuggestions = withErrorHandling(async (
+    query: string,
+    language: string = 'en',
+    limit: number = 5
+): Promise<Array<{ name: string; country: string; coordinates: [number, number] }>> => {
+    if (!query.trim() || query.length < 2) {
+        return [];
+    }
+
+    try {
+        // Try OpenWeatherMap first (if API key available)
+        const apiKey = process.env.NEXT_PUBLIC_OPENWEATHERMAP_API_KEY;
+        if (apiKey) {
+            const url = `${API_CONFIG.OPENWEATHER_BASE_URL}/direct?q=${encodeURIComponent(query)}&limit=${limit}&appid=${apiKey}&lang=${language}`;
+            const response = await fetch(url);
+
+            if (response.ok) {
+                const data = await response.json();
+                if (Array.isArray(data) && data.length > 0) {
+                    return data.map(city => ({
+                        name: city.name,
+                        country: city.country,
+                        state: city.state,
+                        coordinates: [city.lat, city.lon] as [number, number]
+                    }));
+                }
+            }
+        }
+
+        // Fallback to Nominatim
+        const nominatimUrl = `${API_CONFIG.NOMINATIM_BASE_URL}/search?q=${encodeURIComponent(query)}&format=json&limit=${limit}&addressdetails=1&accept-language=${language}`;
+        const response = await fetch(nominatimUrl, {
+            headers: {
+                'User-Agent': 'Sabil-Elmoslem-App/1.0'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                return data.map(place => {
+                    const address = place.address || {};
+                    return {
+                        name: address.city || address.town || address.village || place.display_name.split(',')[0],
+                        country: address.country || '',
+                        state: address.state || address.province,
+                        coordinates: [parseFloat(place.lat), parseFloat(place.lon)] as [number, number]
+                    };
+                }).filter(city => city.name && city.coordinates[0] && city.coordinates[1]);
+            }
+        }
+
+        return [];
+    } catch (error) {
+        console.warn('Failed to get city suggestions:', error);
+        return [];
+    }
+}, 'getCitySuggestions');
 
 // Cache management utilities
 export const clearApiCache = (pattern?: string): void => {

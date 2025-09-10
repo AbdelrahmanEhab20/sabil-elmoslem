@@ -16,6 +16,10 @@ export interface Location {
     longitude: number;
     city?: string;
     country?: string;
+    countryCode?: string;
+    state?: string;
+    timezone?: string;
+    accuracy?: number; // Geolocation accuracy in meters
 }
 
 export interface Azkar {

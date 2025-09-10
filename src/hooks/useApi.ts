@@ -142,9 +142,15 @@ export function usePrayerTimes() {
     const { preferences } = useUser();
 
     return useApi(
-        async (location: unknown) => {
+        async (location: unknown, useAutoTimezone: boolean = true, applyEgyptDST: boolean = false) => {
             const { fetchPrayerTimes } = await import('@/utils/api');
-            return fetchPrayerTimes(location as { latitude: number; longitude: number }, preferences.calculationMethod, preferences.madhab, true);
+            return fetchPrayerTimes(
+                location as { latitude: number; longitude: number },
+                preferences.calculationMethod,
+                preferences.madhab,
+                useAutoTimezone,
+                applyEgyptDST
+            );
         },
         {
             showToast: false
@@ -229,6 +235,21 @@ export function useCitySearch() {
             const { searchCityCoordinates } = await import('@/utils/api');
             const cityName = args[0] as string;
             return searchCityCoordinates(cityName, preferences.language);
+        },
+        {
+            showToast: false
+        }
+    );
+}
+
+export function useCitySuggestions() {
+    const { preferences } = useUser();
+
+    return useApi(
+        async (...args: unknown[]) => {
+            const { getCitySuggestions } = await import('@/utils/api');
+            const [query, limit] = args as [string, number?];
+            return getCitySuggestions(query, preferences.language, limit);
         },
         {
             showToast: false

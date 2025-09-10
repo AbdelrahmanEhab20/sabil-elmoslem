@@ -18,10 +18,16 @@ export default function PrayerTimesPage() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [isDSTActive, setIsDSTActive] = useState(false);
     const [useAutoTimezone, setUseAutoTimezone] = useState<boolean>(true);
-    const [applyEgyptDST, setApplyEgyptDST] = useState<boolean>(false);
+    const [applyEgyptDST] = useState<boolean>(false);
     const [citySuggestions, setCitySuggestions] = useState<Array<{ name: string; country: string; coordinates: [number, number] }>>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
-    const [timezoneInfo, setTimezoneInfo] = useState<any>(null);
+    const [timezoneInfo, setTimezoneInfo] = useState<{
+        timezone?: string;
+        abbreviation?: string;
+        isDst?: boolean;
+        utcOffset?: number;
+        dstOffset?: number;
+    } | null>(null);
     const t = useTranslations(preferences.language);
     const toast = useToast();
 
@@ -82,7 +88,7 @@ export default function PrayerTimesPage() {
                     // Extract timezone info if available
                     const { timezoneInfo: tz, ...times } = result;
                     setPrayerTimes(times as PrayerTimes);
-                    setTimezoneInfo(tz);
+                    setTimezoneInfo(tz || null);
 
                 } catch (error) {
                     console.error('Failed to fetch prayer times:', error);

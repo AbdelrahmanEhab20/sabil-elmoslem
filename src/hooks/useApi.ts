@@ -142,14 +142,15 @@ export function usePrayerTimes() {
     const { preferences } = useUser();
 
     return useApi(
-        async (location: unknown, useAutoTimezone: boolean = true, applyEgyptDST: boolean = false) => {
+        async (...args: unknown[]) => {
+            const [location, useAutoTimezone = true, applyEgyptDST = false] = args;
             const { fetchPrayerTimes } = await import('@/utils/api');
             return fetchPrayerTimes(
                 location as { latitude: number; longitude: number },
                 preferences.calculationMethod,
                 preferences.madhab,
-                useAutoTimezone,
-                applyEgyptDST
+                useAutoTimezone as boolean,
+                applyEgyptDST as boolean
             );
         },
         {

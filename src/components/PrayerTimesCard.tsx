@@ -46,7 +46,7 @@ export default function PrayerTimesCard() {
                     setLoading(true);
                     const result = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab, true, false);
                     // Extract timezone info if available
-                    const { timezoneInfo, ...times } = result;
+                    const { ...times } = result;
                     setPrayerTimes(times);
                 } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });

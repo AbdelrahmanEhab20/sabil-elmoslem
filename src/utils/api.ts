@@ -132,59 +132,7 @@ const getTimezoneInfo = async (location: Location): Promise<TimezoneInfo | null>
     }
 };
 
-// Enhanced location-based timezone detection
-const detectLocationTimezone = async (location: Location): Promise<string> => {
-    try {
-        // Use reverse geocoding to get timezone
-        const response = await fetch(
-            `${API_CONFIG.WORLDTIME_BASE_URL}/ip`
-        );
 
-        if (response.ok) {
-            const data = await response.json();
-            if (data.timezone) {
-                return data.timezone;
-            }
-        }
-
-        // Fallback to coordinate-based detection
-        const offsetHours = Math.round(location.longitude / 15);
-        return `Etc/GMT${offsetHours >= 0 ? '-' : '+'}${Math.abs(offsetHours)}`;
-    } catch (error) {
-        console.warn('Failed to detect timezone:', error);
-        // Return UTC as ultimate fallback
-        return 'UTC';
-    }
-};
-
-// Smart DST adjustment based on location and timezone
-const adjustTimeForTimezone = async (timeString: string, location: Location): Promise<string> => {
-    try {
-        const timezoneInfo = await getTimezoneInfo(location);
-        if (!timezoneInfo) {
-            return timeString; // No adjustment if timezone info unavailable
-        }
-
-        const [hours, minutes] = timeString.split(':').map(Number);
-        let adjustedHours = hours;
-
-        // Apply UTC offset
-        adjustedHours += timezoneInfo.utcOffset;
-
-        // Apply DST offset if currently in DST
-        if (timezoneInfo.isDst && timezoneInfo.dstOffset > 0) {
-            adjustedHours += timezoneInfo.dstOffset;
-        }
-
-        // Handle 24-hour overflow
-        adjustedHours = ((adjustedHours % 24) + 24) % 24;
-
-        return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    } catch (error) {
-        console.warn('Error adjusting time for timezone:', error);
-        return timeString;
-    }
-};
 
 // Legacy DST adjustment for backward compatibility
 const adjustTimeForDST = (timeString: string, location: Location, applyEgyptDST: boolean = false): string => {
@@ -273,7 +221,7 @@ export const fetchPrayerTimes = withErrorHandling(async (
     ];
 
     return retry(async () => {
-        let prayerTimes: any = null;
+        let prayerTimes: PrayerTimes | null = null;
         let lastError: Error | null = null;
 
         // Try each provider until one succeeds
@@ -627,7 +575,7 @@ export const getCurrentLocation = async (): Promise<Location> => {
 
         try {
             return await getLocationFromIP();
-        } catch (ipError) {
+        } catch {
             // If all methods fail, throw the original geolocation error
             throw error;
         }
@@ -660,7 +608,7 @@ const getLocationFromIP = async (): Promise<Location> => {
             countryCode: data.country_code,
             timezone: data.timezone
         };
-    } catch (error) {
+    } catch {
         throw new LocationError('Failed to determine location from IP address');
     }
 };

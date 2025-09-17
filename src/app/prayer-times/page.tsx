@@ -6,6 +6,9 @@ import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation, searchCityCoordinates, getCitySuggestions } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
+import { shouldApplyEgyptDST, calculateTimeDifference, formatTimeDifference, getCurrentTimeString } from '@/utils/dateTime';
+import { findNextPrayer, getPrayerNameTranslated } from '@/utils/prayerHelpers';
+import { ANIMATION_DURATIONS } from '@/utils/constants';
 import { PrayerTimes, Location } from '@/types';
 
 export default function PrayerTimesPage() {
@@ -41,12 +44,8 @@ export default function PrayerTimesPage() {
 
     // Calculate DST status for Egypt
     useEffect(() => {
-        if (location && location.latitude >= 22 && location.latitude <= 32 &&
-            location.longitude >= 25 && location.longitude <= 37) {
-            const now = new Date();
-            const currentMonth = now.getMonth() + 1;
-            const isSummerTime = currentMonth >= 4 && currentMonth <= 10;
-            setIsDSTActive(isSummerTime);
+        if (location) {
+            setIsDSTActive(shouldApplyEgyptDST(location));
         } else {
             setIsDSTActive(false);
         }
@@ -77,12 +76,16 @@ export default function PrayerTimesPage() {
             if (location) {
                 try {
                     setLoading(true);
+                    
+                    // Check if Egypt DST should be applied
+                    const shouldApplyDST = shouldApplyEgyptDST(location);
+                    
                     const result = await fetchPrayerTimes(
                         location,
                         preferences.calculationMethod,
                         preferences.madhab,
-                        useAutoTimezone,
-                        applyEgyptDST
+                        false, // Disable auto timezone for Egypt to use manual DST
+                        shouldApplyDST
                     );
 
                     // Extract timezone info if available
@@ -100,49 +103,20 @@ export default function PrayerTimesPage() {
         };
 
         getPrayerTimes();
-    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, useAutoTimezone, applyEgyptDST, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
+    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, useAutoTimezone, applyEgyptDST, isDSTActive, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer and time until
     useEffect(() => {
         if (prayerTimes) {
-            const prayers = [
-                { name: 'Fajr', time: prayerTimes.Fajr },
-                { name: 'Sunrise', time: prayerTimes.Sunrise },
-                { name: 'Dhuhr', time: prayerTimes.Dhuhr },
-                { name: 'Asr', time: prayerTimes.Asr },
-                { name: 'Maghrib', time: prayerTimes.Maghrib },
-                { name: 'Isha', time: prayerTimes.Isha }
-            ];
-
-            const now = currentTime;
-            const currentTimeString = now.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            let next = prayers.find(prayer => prayer.time > currentTimeString);
-            if (!next) {
-                next = prayers[0]; // If no prayer found, next is tomorrow's Fajr
+            const nextPrayerInfo = findNextPrayer(prayerTimes, getCurrentTimeString());
+            
+            if (nextPrayerInfo) {
+                setNextPrayer(nextPrayerInfo.name);
+                
+                // Calculate time until next prayer
+                const timeDiff = calculateTimeDifference(nextPrayerInfo.time, currentTime);
+                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds));
             }
-
-            setNextPrayer(next.name);
-
-            // Calculate time until next prayer
-            const [nextHours, nextMinutes] = next.time.split(':').map(Number);
-            const nextPrayerTime = new Date();
-            nextPrayerTime.setHours(nextHours, nextMinutes, 0, 0);
-
-            if (nextPrayerTime <= now) {
-                nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
-            }
-
-            const diff = nextPrayerTime.getTime() - now.getTime();
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            setTimeUntilNext(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
         }
     }, [prayerTimes, currentTime]);
 
@@ -238,15 +212,7 @@ export default function PrayerTimesPage() {
     };
 
     const getPrayerName = (name: string) => {
-        switch (name) {
-            case 'Fajr': return t.fajr;
-            case 'Sunrise': return t.sunrise;
-            case 'Dhuhr': return t.dhuhr;
-            case 'Asr': return t.asr;
-            case 'Maghrib': return t.maghrib;
-            case 'Isha': return t.isha;
-            default: return name;
-        }
+        return getPrayerNameTranslated(name, t);
     };
 
     // Simple prayer times with clean icons
@@ -337,11 +303,11 @@ export default function PrayerTimesPage() {
                     <motion.p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                         {t.prayerTimesDescription}
                     </motion.p>
-                    {applyEgyptDST && isDSTActive && (
+                    {location && shouldApplyEgyptDST(location) && (
                         <motion.p className="text-sm text-green-600 dark:text-green-400 mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                             {preferences.language === 'ar'
-                                ? '⏰ التوقيت الصيفي مفعل - تم تعديل أوقات الصلاة'
-                                : '⏰ Summer Time Active - Prayer times adjusted'
+                                ? '⏰ التوقيت الصيفي مصر مفعل - تم تعديل أوقات الصلاة (+1 ساعة)'
+                                : '⏰ Egypt Summer Time Active - Prayer times adjusted (+1 hour)'
                             }
                         </motion.p>
                     )}
@@ -587,7 +553,7 @@ export default function PrayerTimesPage() {
                                     key={prayer.name}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                                    transition={{ duration: ANIMATION_DURATIONS.SLOW, delay: index * 0.1 }}
                                     className={`p-4 rounded-lg border transition-all duration-200 hover:shadow-md ${nextPrayer === prayer.name
                                         ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
                                         : 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'

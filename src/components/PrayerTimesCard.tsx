@@ -5,6 +5,8 @@ import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
+import { shouldApplyEgyptDST, calculateTimeDifference, formatTimeDifference, getCurrentTimeString, getLocalizedDateString } from '@/utils/dateTime';
+import { findNextPrayer, getPrayerNameTranslated } from '@/utils/prayerHelpers';
 
 export default function PrayerTimesCard() {
     const { location, setLocation, prayerTimes, setPrayerTimes, loading, setLoading, preferences } = useUser();
@@ -44,7 +46,17 @@ export default function PrayerTimesCard() {
             if (location) {
                 try {
                     setLoading(true);
-                    const result = await fetchPrayerTimes(location, preferences.calculationMethod, preferences.madhab, true, false);
+                    
+                    // Check if Egypt DST should be applied
+                    const shouldApplyDST = shouldApplyEgyptDST(location);
+                    
+                    const result = await fetchPrayerTimes(
+                        location, 
+                        preferences.calculationMethod, 
+                        preferences.madhab, 
+                        false, // Disable auto timezone for Egypt to use manual DST
+                        shouldApplyDST
+                    );
                     // Extract timezone info if available
                     const { ...times } = result;
                     setPrayerTimes(times);
@@ -62,44 +74,15 @@ export default function PrayerTimesCard() {
     // Calculate next prayer and time until
     useEffect(() => {
         if (prayerTimes) {
-            const prayers = [
-                { name: 'Fajr', time: prayerTimes.Fajr },
-                { name: 'Sunrise', time: prayerTimes.Sunrise },
-                { name: 'Dhuhr', time: prayerTimes.Dhuhr },
-                { name: 'Asr', time: prayerTimes.Asr },
-                { name: 'Maghrib', time: prayerTimes.Maghrib },
-                { name: 'Isha', time: prayerTimes.Isha }
-            ];
-
-            const now = currentTime;
-            const currentTimeString = now.toLocaleTimeString('en-US', {
-                hour12: false,
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-
-            let next = prayers.find(prayer => prayer.time > currentTimeString);
-            if (!next) {
-                next = prayers[0]; // If no prayer found, next is tomorrow's Fajr
+            const nextPrayerInfo = findNextPrayer(prayerTimes, getCurrentTimeString());
+            
+            if (nextPrayerInfo) {
+                setNextPrayer(nextPrayerInfo.name);
+                
+                // Calculate time until next prayer
+                const timeDiff = calculateTimeDifference(nextPrayerInfo.time, currentTime);
+                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds));
             }
-
-            setNextPrayer(next.name);
-
-            // Calculate time until next prayer
-            const [nextHours, nextMinutes] = next.time.split(':').map(Number);
-            const nextPrayerTime = new Date();
-            nextPrayerTime.setHours(nextHours, nextMinutes, 0, 0);
-
-            if (nextPrayerTime <= now) {
-                nextPrayerTime.setDate(nextPrayerTime.getDate() + 1);
-            }
-
-            const diff = nextPrayerTime.getTime() - now.getTime();
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            setTimeUntilNext(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
         }
     }, [prayerTimes, currentTime]);
 
@@ -131,19 +114,11 @@ export default function PrayerTimesCard() {
     };
 
     const getPrayerName = (name: string) => {
-        switch (name) {
-            case 'Fajr': return t.fajr;
-            case 'Sunrise': return t.sunrise;
-            case 'Dhuhr': return t.dhuhr;
-            case 'Asr': return t.asr;
-            case 'Maghrib': return t.maghrib;
-            case 'Isha': return t.isha;
-            default: return name;
-        }
+        return getPrayerNameTranslated(name, t);
     };
 
     const getNextPrayerName = (name: string) => {
-        return getPrayerName(name);
+        return getPrayerNameTranslated(name, t);
     };
 
     if (loading) {
@@ -253,12 +228,7 @@ export default function PrayerTimesCard() {
                     {t.prayerTimes}
                 </h3>
                 <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    {currentTime.toLocaleDateString(preferences.language === 'ar' ? 'ar-SA' : 'en-US', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })}
+                    {getLocalizedDateString(currentTime, preferences.language)}
                 </div>
             </div>
 

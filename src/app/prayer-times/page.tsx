@@ -76,10 +76,10 @@ export default function PrayerTimesPage() {
             if (location) {
                 try {
                     setLoading(true);
-                    
+
                     // Check if Egypt DST should be applied
                     const shouldApplyDST = shouldApplyEgyptDST(location);
-                    
+
                     const result = await fetchPrayerTimes(
                         location,
                         preferences.calculationMethod,
@@ -109,10 +109,10 @@ export default function PrayerTimesPage() {
     useEffect(() => {
         if (prayerTimes) {
             const nextPrayerInfo = findNextPrayer(prayerTimes, getCurrentTimeString());
-            
+
             if (nextPrayerInfo) {
                 setNextPrayer(nextPrayerInfo.name);
-                
+
                 // Calculate time until next prayer
                 const timeDiff = calculateTimeDifference(nextPrayerInfo.time, currentTime);
                 setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds));

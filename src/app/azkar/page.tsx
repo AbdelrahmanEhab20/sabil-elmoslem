@@ -21,7 +21,6 @@ export default function AzkarPage() {
     const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [showCompletedOnly, setShowCompletedOnly] = useState(false);
 
     // Add a list of general duaas for congratulation
     const generalDuaas = useMemo(() => [
@@ -163,18 +162,8 @@ export default function AzkarPage() {
             );
         }
 
-        // Apply completion filter
-        if (showCompletedOnly) {
-            filtered = filtered.filter(zikr => {
-                if (!zikr.id || !shouldHaveCounter(zikr.category)) return false;
-                const currentCount = counters[zikr.id] || 0;
-                const targetCount = parseInt(zikr.count) || 1;
-                return currentCount >= targetCount;
-            });
-        }
-
         return filtered;
-    }, [azkar, selectedCategory, searchQuery, showCompletedOnly, counters, shouldHaveCounter]);
+    }, [azkar, selectedCategory, searchQuery]);
 
     // Helper to check if category is complete
     const isCategoryComplete = useMemo(() => {
@@ -210,18 +199,7 @@ export default function AzkarPage() {
         setShowCongrats(false);
     };
 
-    // Reset all counters
-    const resetAllCounters = () => {
-        const resetCounters: { [key: number]: number } = {};
-        azkar.forEach(zikr => {
-            if (zikr.id && shouldHaveCounter(zikr.category)) {
-                resetCounters[zikr.id] = 0;
-            }
-        });
-        setCounters(resetCounters);
-        setHasShownCongrats(false);
-        setRandomDuaa(null);
-    };
+    //
 
     // Handle counter reset
     const resetCounter = (id: number) => {

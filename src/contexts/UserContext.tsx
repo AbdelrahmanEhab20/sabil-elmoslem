@@ -29,22 +29,6 @@ const defaultPreferences: UserPreferences = {
     language: 'ar'
 };
 
-const defaultContextValue: UserContextType = {
-    location: null,
-    setLocation: () => { },
-    prayerTimes: null,
-    setPrayerTimes: () => { },
-    preferences: defaultPreferences,
-    setPreferences: () => { },
-    loading: false,
-    setLoading: () => { },
-    toggleTheme: () => { },
-    toggleLanguage: () => { },
-    isInitialized: false,
-    clearUserData: () => { },
-    updateCalculationMethod: () => { },
-    updateMadhab: () => { }
-};
 
 const UserContext = createContext<UserContextType | null>(null);
 

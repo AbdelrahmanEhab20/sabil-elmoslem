@@ -7,6 +7,7 @@ import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
 import CustomModal from '@/components/CustomModal';
+import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered } from 'lucide-react';
 
 export default function AzkarPage() {
     const { preferences } = useUser();
@@ -333,9 +334,7 @@ export default function AzkarPage() {
                                 placeholder={preferences.language === 'ar' ? 'ابحث في الأذكار...' : 'Search azkar...'}
                                 className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             />
-                            <svg className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                            <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
 
                         {/* Category Filter */}
@@ -382,33 +381,6 @@ export default function AzkarPage() {
                                                 {getCategoryProgress.percentage}%
                                             </span>
                                         </div>
-                                    )}
-                                </div>
-
-                                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                                    <label className="flex items-center space-x-2 rtl:space-x-reverse text-sm">
-                                        <input
-                                            type="checkbox"
-                                            checked={showCompletedOnly}
-                                            onChange={(e) => setShowCompletedOnly(e.target.checked)}
-                                            className="rounded border-gray-300 text-green-600 focus:ring-green-500"
-                                        />
-                                        {/* <span className="text-gray-700 dark:text-gray-300">
-                                            {preferences.language === 'ar' ? 'المكتملة فقط' : 'Completed only'}
-                                        </span> */}
-                                    </label>
-
-                                    {filteredAzkar.some(zikr => shouldHaveCounter(zikr.category)) && (
-                                        <button
-                                            onClick={resetAllCounters}
-                                            className="flex items-center space-x-2 rtl:space-x-reverse px-3 py-1.5 text-sm text-red-600 hover:text-white hover:bg-red-600 dark:text-red-400 dark:hover:bg-red-500 transition-all duration-200 rounded-lg border border-red-200 dark:border-red-800 hover:border-red-600"
-                                            title={preferences.language === 'ar' ? 'إعادة تعيين جميع العدادات' : 'Reset all counters'}
-                                        >
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                            </svg>
-                                            <span>{preferences.language === 'ar' ? 'إعادة تعيين الكل' : 'Reset All'}</span>
-                                        </button>
                                     )}
                                 </div>
                             </div>
@@ -465,23 +437,19 @@ export default function AzkarPage() {
                                             <button
                                                 onClick={() => incrementCounter(zikr.id!)}
                                                 disabled={isComplete}
-                                                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg ${isComplete
+                                                className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${isComplete
                                                     ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 dark:from-green-900/30 dark:to-green-800/30 dark:text-green-200 cursor-not-allowed'
                                                     : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-green-500/25'
                                                     }`}
                                             >
                                                 {isComplete ? (
                                                     <>
-                                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                                        </svg>
+                                                        <Check className="w-6 h-6" aria-hidden="true" />
                                                         <span>{preferences.language === 'ar' ? 'مكتمل' : 'Complete'}</span>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                        </svg>
+                                                        <Plus className="w-6 h-6" aria-hidden="true" />
                                                         <span>{preferences.language === 'ar' ? 'عد' : 'Count'}</span>
                                                     </>
                                                 )}
@@ -489,12 +457,10 @@ export default function AzkarPage() {
 
                                             <button
                                                 onClick={() => resetCounter(zikr.id!)}
-                                                className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 dark:from-gray-700 dark:to-gray-600 dark:text-gray-200 hover:from-red-100 hover:to-red-200 hover:text-red-700 dark:hover:from-red-900/30 dark:hover:to-red-800/30 dark:hover:text-red-200 border-2 border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500"
+                                                className="flex items-center justify-center gap-2 px-4 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 dark:from-gray-700 dark:to-gray-600 dark:text-gray-200 hover:from-red-100 hover:to-red-200 hover:text-red-700 dark:hover:from-red-900/30 dark:hover:to-red-800/30 dark:hover:text-red-200 border-2 border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500"
                                                 title={preferences.language === 'ar' ? 'إعادة تعيين هذا الذكر' : 'Reset this dhikr'}
                                             >
-                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                </svg>
+                                                <RotateCcw className="w-6 h-6" aria-hidden="true" />
                                                 <span className="hidden sm:inline">{preferences.language === 'ar' ? 'إعادة تعيين' : 'Reset'}</span>
                                             </button>
                                         </div>
@@ -522,17 +488,13 @@ export default function AzkarPage() {
                                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                                         {zikr.reference && (
                                             <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
+                                                <BadgeCheck className="w-4 h-4" aria-hidden="true" />
                                                 <span>{zikr.reference}</span>
                                             </span>
                                         )}
                                         {hasCounter && parseInt(zikr.count) > 1 && (
                                             <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" />
-                                                </svg>
+                                                <ListOrdered className="w-4 h-4" aria-hidden="true" />
                                                 <span>
                                                     {preferences.language === 'ar'
                                                         ? `${zikr.count} مرات`

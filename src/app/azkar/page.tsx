@@ -466,7 +466,7 @@ export default function AzkarPage() {
                                     <div className="flex items-center space-x-4 rtl:space-x-reverse">
                                         {zikr.reference && (
                                             <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <BadgeCheck className="w-4 h-4" aria-hidden="true" />
+                                                <BadgeCheck className="w-5 h-5 p-0.5" aria-hidden="true" />
                                                 <span>{zikr.reference}</span>
                                             </span>
                                         )}

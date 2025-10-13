@@ -102,6 +102,11 @@ export default function HomePageClient() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Azkar Section */}
+                    {/* <motion.div className="mt-8 sm:mt-12" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: 0.1 }}>
+                        <AzkarCard />
+                    </motion.div> */}
                 </div>
             </section>
 

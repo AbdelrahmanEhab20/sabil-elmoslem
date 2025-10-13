@@ -46,11 +46,11 @@ const defaultContextValue: UserContextType = {
     updateMadhab: () => { }
 };
 
-const UserContext = createContext<UserContextType>(defaultContextValue);
+const UserContext = createContext<UserContextType | null>(null);
 
 export const useUser = () => {
     const context = useContext(UserContext);
-    if (context === defaultContextValue) {
+    if (!context) {
         throw new Error('useUser must be used within a UserProvider');
     }
     return context;

@@ -393,9 +393,9 @@ export default function AzkarPage() {
                                             onChange={(e) => setShowCompletedOnly(e.target.checked)}
                                             className="rounded border-gray-300 text-green-600 focus:ring-green-500"
                                         />
-                                        <span className="text-gray-700 dark:text-gray-300">
+                                        {/* <span className="text-gray-700 dark:text-gray-300">
                                             {preferences.language === 'ar' ? 'المكتملة فقط' : 'Completed only'}
-                                        </span>
+                                        </span> */}
                                     </label>
 
                                     {filteredAzkar.some(zikr => shouldHaveCounter(zikr.category)) && (

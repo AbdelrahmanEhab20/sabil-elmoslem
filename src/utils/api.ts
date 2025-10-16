@@ -19,6 +19,7 @@ const API_CONFIG = {
 
     // Quran API
     ALQURAN_BASE_URL: 'https://api.alquran.cloud/v1',
+    QURAN_COM_BASE_URL: 'https://api.quran.com/api/v4',
 
     // Configuration
     TIMEOUT: 15000, // 15 seconds for better reliability
@@ -336,17 +337,25 @@ export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]
         return cached;
     }
 
-    const url = `${API_CONFIG.ALQURAN_BASE_URL}/surah`;
+    // Use Quran.com API for reliable chapter metadata
+    const url = `${API_CONFIG.QURAN_COM_BASE_URL}/chapters?language=en`;
 
     return retry(async () => {
         const response = await apiFetch(url);
         const data = await response.json();
 
-        if (!Array.isArray(data.data)) {
+        if (!Array.isArray(data.chapters)) {
             throw new ApiError('Invalid Quran surahs data received', 422);
         }
 
-        const surahs = data.data;
+        const surahs: QuranSurah[] = data.chapters.map((chapter: Record<string, any>) => ({
+            number: chapter.id,
+            name: chapter.name_arabic || chapter.name_simple || '',
+            englishName: chapter.name_simple || '',
+            englishNameTranslation: chapter.translated_name?.name || '',
+            numberOfAyahs: chapter.verses_count || 0,
+            revelationType: (chapter.revelation_place || '').toLowerCase() === 'meccan' ? 'Meccan' : 'Medinan'
+        }));
 
         // Cache for 24 hours since Quran data rarely changes
         setCachedData(cacheKey, surahs, 24 * 60 * 60 * 1000);
@@ -364,35 +373,35 @@ export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Pr
         return cached;
     }
 
-    // Fetch both Arabic text and English translation
-    const [arabicResponse, englishResponse] = await Promise.all([
-        apiFetch(`${API_CONFIG.ALQURAN_BASE_URL}/surah/${surahNumber}`),
-        apiFetch(`${API_CONFIG.ALQURAN_BASE_URL}/surah/${surahNumber}/en.sahih`)
-    ]);
+    // Quran.com: Uthmani text + Sahih International translation (id 20)
+    const url = `${API_CONFIG.QURAN_COM_BASE_URL}/verses/by_chapter/${surahNumber}?language=en&fields=text_uthmani,juz_number,page_number,hizb_number,rub_el_hizb_number,manzil_number,ruku_number,sajdah_number&translations=20&per_page=all`;
 
-    const [arabicData, englishData] = await Promise.all([
-        arabicResponse.json(),
-        englishResponse.json()
-    ]);
+    return retry(async () => {
+        const response = await apiFetch(url);
+        const data = await response.json();
 
-    if (!arabicData.data?.ayahs || !Array.isArray(arabicData.data.ayahs)) {
-        throw new ApiError('Invalid Quran ayahs data received', 422);
-    }
+        if (!Array.isArray(data.verses)) {
+            throw new ApiError('Invalid Quran ayahs data received', 422);
+        }
 
-    if (!englishData.data?.ayahs || !Array.isArray(englishData.data.ayahs)) {
-        throw new ApiError('Invalid Quran translation data received', 422);
-    }
+        const ayahs: QuranAyah[] = data.verses.map((v: any) => ({
+            number: v.id,
+            text: v.text_uthmani || v.text_imlaei_simple || v.text_indopak || '',
+            translation: Array.isArray(v.translations) && v.translations[0] ? v.translations[0].text : '',
+            numberInSurah: v.verse_number || (typeof v.verse_key === 'string' ? parseInt(v.verse_key.split(':')[1], 10) : 0),
+            juz: v.juz_number || 0,
+            manzil: v.manzil_number || 0,
+            page: v.page_number || 0,
+            ruku: v.ruku_number || 0,
+            hizbQuarter: v.rub_el_hizb_number || v.hizb_number || 0,
+            sajda: Boolean(v.sajdah_number)
+        }));
 
-    // Combine Arabic text with English translations
-    const ayahs = arabicData.data.ayahs.map((ayah: Record<string, unknown>, index: number) => ({
-        ...ayah,
-        translation: englishData.data.ayahs[index]?.text || ''
-    }));
+        // Cache for 24 hours
+        setCachedData(cacheKey, ayahs, 24 * 60 * 60 * 1000);
 
-    // Cache for 24 hours
-    setCachedData(cacheKey, ayahs, 24 * 60 * 60 * 1000);
-
-    return ayahs;
+        return ayahs;
+    }, API_CONFIG.RETRY_ATTEMPTS, API_CONFIG.RETRY_DELAY);
 }, 'fetchQuranAyahs');
 
 // Fetch Quran ayahs with Tajweed processing - HASHED FOR NOW

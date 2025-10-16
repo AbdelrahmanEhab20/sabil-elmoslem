@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Scheherazade+New:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -30,7 +30,8 @@ body {
 
 /* Arabic text styling */
 .font-arabic {
-  font-family: "Noto Sans Arabic", Arial, sans-serif;
+  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
+    sans-serif;
   line-height: 2;
 }
 
@@ -91,7 +92,8 @@ body {
 
 /* Better Arabic text rendering */
 [lang="ar"] {
-  font-family: "Noto Sans Arabic", Arial, sans-serif;
+  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
+    sans-serif;
   line-height: 1.8;
 }
 
@@ -101,7 +103,8 @@ body {
 [lang="ar"] h4,
 [lang="ar"] h5,
 [lang="ar"] h6 {
-  font-family: "Noto Sans Arabic", Arial, sans-serif;
+  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
+    sans-serif;
   font-weight: 600;
 }
 

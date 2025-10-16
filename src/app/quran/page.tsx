@@ -94,6 +94,28 @@ export default function QuranPage() {
         setView('surah-list');
     };
 
+    // Normalize and strip possible Bismillah variants from ayah text
+    const stripBismillah = (text: string): string => {
+        // Common Bismillah variants in Uthmani/Indopak scripts
+        const variants = [
+            'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ',
+            'بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيمِ',
+            'بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ',
+            'بِسْمِ اللَّهِ الرَّحِيمِ الرَّحْمٰنِ',
+        ];
+        const trimmed = text.trim();
+        for (const v of variants) {
+            if (trimmed.startsWith(v)) {
+                return trimmed.slice(v.length).trim();
+            }
+        }
+        // Fallback heuristic: if begins with "بِس" and contains "ٱلل" within first 20 chars
+        if (/^\s*بِس/.test(trimmed) && trimmed.slice(0, 24).includes('ٱلل')) {
+            return trimmed.replace(/^\s*بِس[\s\S]*?الرَّحِيمِ\s*/u, '').trim();
+        }
+        return text;
+    };
+
     const getRevelationTypeColor = (type: string) => {
         return type === 'Meccan' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-200';
     };
@@ -404,10 +426,8 @@ export default function QuranPage() {
                                             } else if (selectedSurah && selectedSurah.number === 9) {
                                                 // At-Tawba: No Bismillah logic needed
                                             } else if (selectedSurah && ayah.numberInSurah === 1) {
-                                                // All other surahs: Remove Bismillah from first ayah
-                                                if (ayahText.startsWith("بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ")) {
-                                                    ayahText = ayahText.split("بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ").join('');
-                                                }
+                                                // All other surahs: Remove Bismillah from first ayah (robust for multiple variants)
+                                                ayahText = stripBismillah(ayahText);
                                             }
 
                                             // Skip rendering if this is a Bismillah-only ayah (shouldn't happen with current logic)

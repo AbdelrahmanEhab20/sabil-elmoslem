@@ -91,6 +91,33 @@ interface TimezoneInfo {
     countryCode?: string;
 }
 
+// Minimal shapes for Quran.com responses (to avoid `any`)
+interface QuranComChapter {
+    id: number;
+    name_arabic?: string;
+    name_simple?: string;
+    translated_name?: { name?: string };
+    verses_count?: number;
+    revelation_place?: string;
+}
+
+interface QuranComVerse {
+    id: number;
+    text_uthmani?: string;
+    text_imlaei_simple?: string;
+    text_indopak?: string;
+    translations?: Array<{ text: string }>;
+    verse_number?: number;
+    verse_key?: string;
+    juz_number?: number;
+    manzil_number?: number;
+    page_number?: number;
+    ruku_number?: number;
+    rub_el_hizb_number?: number;
+    hizb_number?: number;
+    sajdah_number?: number | null;
+}
+
 // Get timezone information for a location
 const getTimezoneInfo = async (location: Location): Promise<TimezoneInfo | null> => {
     try {
@@ -348,7 +375,7 @@ export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]
             throw new ApiError('Invalid Quran surahs data received', 422);
         }
 
-        const surahs: QuranSurah[] = data.chapters.map((chapter: Record<string, any>) => ({
+        const surahs: QuranSurah[] = data.chapters.map((chapter: QuranComChapter) => ({
             number: chapter.id,
             name: chapter.name_arabic || chapter.name_simple || '',
             englishName: chapter.name_simple || '',
@@ -384,7 +411,7 @@ export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Pr
             throw new ApiError('Invalid Quran ayahs data received', 422);
         }
 
-        const ayahs: QuranAyah[] = data.verses.map((v: any) => ({
+        const ayahs: QuranAyah[] = data.verses.map((v: QuranComVerse) => ({
             number: v.id,
             text: v.text_uthmani || v.text_imlaei_simple || v.text_indopak || '',
             translation: Array.isArray(v.translations) && v.translations[0] ? v.translations[0].text : '',

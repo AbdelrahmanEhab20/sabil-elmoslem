@@ -173,8 +173,8 @@ export const fetchPrayerTimes = withErrorHandling(async (
     location: Location,
     method: number = 1,
     madhab: number = 1,
-    useAutoTimezone: boolean = true,
-    applyEgyptDST: boolean = false // Legacy parameter for backward compatibility
+    useAutoTimezone: boolean = false,
+    applyEgyptDST: boolean = true // Legacy parameter for backward compatibility
 ): Promise<PrayerTimes & { timezoneInfo?: TimezoneInfo }> => {
     const date = new Date().toLocaleDateString('en-CA');
     const cacheKey = `prayer-times-${location.latitude.toFixed(4)}-${location.longitude.toFixed(4)}-${method}-${madhab}-${date}-auto-${useAutoTimezone}-dst-${applyEgyptDST}`;

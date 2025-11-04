@@ -3,7 +3,7 @@
  * Centralized location for all date/time related operations
  */
 
-import { EGYPT_BOUNDARIES, EGYPT_DST, TIME_FORMATS } from './constants';
+import { EGYPT_BOUNDARIES, TIME_FORMATS } from './constants';
 import type { Location } from '@/types';
 
 /**
@@ -19,20 +19,9 @@ export const isLocationInEgypt = (location: Location): boolean => {
 };
 
 /**
- * Check if current date falls within Egypt's DST period
+ * Note: Egypt DST functions have been removed as summer time is cancelled in Egypt.
+ * All timezone handling is now automatic via the API providers.
  */
-export const isEgyptDSTActive = (): boolean => {
-    const now = new Date();
-    const currentMonth = now.getMonth() + 1; // getMonth() returns 0-based month
-    return currentMonth >= EGYPT_DST.START_MONTH && currentMonth <= EGYPT_DST.END_MONTH;
-};
-
-/**
- * Determine if Egypt DST should be applied based on location and date
- */
-export const shouldApplyEgyptDST = (location: Location): boolean => {
-    return isLocationInEgypt(location) && isEgyptDSTActive();
-};
 
 /**
  * Format time string for display
@@ -96,14 +85,25 @@ export const calculateTimeDifference = (targetTime: string, currentTime?: Date):
 };
 
 /**
- * Format time difference as HH:MM:SS string
+ * Format time difference as HH:MM:SS string with locale-aware numerals
  */
 export const formatTimeDifference = (
     hours: number,
     minutes: number,
-    seconds: number
+    seconds: number,
+    locale: string = 'en'
 ): string => {
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    // Use locale-aware number formatting
+    const numberFormatter = new Intl.NumberFormat(locale === 'ar' ? 'ar-SA' : 'en-US', {
+        minimumIntegerDigits: 2,
+        useGrouping: false
+    });
+
+    const formattedHours = numberFormatter.format(hours);
+    const formattedMinutes = numberFormatter.format(minutes);
+    const formattedSeconds = numberFormatter.format(seconds);
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
 };
 
 /**

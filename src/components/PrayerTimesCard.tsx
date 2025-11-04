@@ -5,7 +5,7 @@ import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
-import { shouldApplyEgyptDST, calculateTimeDifference, formatTimeDifference, getCurrentTimeString, getLocalizedDateString } from '@/utils/dateTime';
+import { calculateTimeDifference, formatTimeDifference, getCurrentTimeString, getLocalizedDateString } from '@/utils/dateTime';
 import { findNextPrayer, getPrayerNameTranslated } from '@/utils/prayerHelpers';
 
 export default function PrayerTimesCard() {
@@ -47,18 +47,16 @@ export default function PrayerTimesCard() {
                 try {
                     setLoading(true);
                     
-                    // Check if Egypt DST should be applied
-                    const shouldApplyDST = shouldApplyEgyptDST(location);
-                    
+                    // Fetch prayer times with automatic timezone detection
                     const result = await fetchPrayerTimes(
                         location, 
                         preferences.calculationMethod, 
                         preferences.madhab, 
-                        false, // Disable auto timezone for Egypt to use manual DST
-                        shouldApplyDST
+                        true // Use automatic timezone detection
                     );
                     // Extract timezone info if available
-                    const { ...times } = result;
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    const { timezoneInfo, ...times } = result;
                     setPrayerTimes(times);
                 } catch {
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
@@ -81,10 +79,10 @@ export default function PrayerTimesCard() {
                 
                 // Calculate time until next prayer
                 const timeDiff = calculateTimeDifference(nextPrayerInfo.time, currentTime);
-                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds));
+                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds, preferences.language));
             }
         }
-    }, [prayerTimes, currentTime]);
+    }, [prayerTimes, currentTime, preferences.language]);
 
     const formatTime = (timeString: string) => {
         const [hours, minutes] = timeString.split(':');

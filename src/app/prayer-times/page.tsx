@@ -6,7 +6,7 @@ import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation, searchCityCoordinates, getCitySuggestions } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
-import { shouldApplyEgyptDST, calculateTimeDifference, formatTimeDifference, getCurrentTimeString } from '@/utils/dateTime';
+import { calculateTimeDifference, formatTimeDifference, getCurrentTimeString } from '@/utils/dateTime';
 import { findNextPrayer, getPrayerNameTranslated } from '@/utils/prayerHelpers';
 import { ANIMATION_DURATIONS } from '@/utils/constants';
 import { PrayerTimes, Location } from '@/types';
@@ -19,9 +19,7 @@ export default function PrayerTimesPage() {
     const [timeUntilNext, setTimeUntilNext] = useState<string>('');
     const [searchLoading, setSearchLoading] = useState(false);
     const [locationLoading, setLocationLoading] = useState(false);
-    const [isDSTActive, setIsDSTActive] = useState(false);
     const [useAutoTimezone, setUseAutoTimezone] = useState<boolean>(true);
-    const [applyEgyptDST] = useState<boolean>(false);
     const [citySuggestions, setCitySuggestions] = useState<Array<{ name: string; country: string; coordinates: [number, number] }>>([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [timezoneInfo, setTimezoneInfo] = useState<{
@@ -42,15 +40,6 @@ export default function PrayerTimesPage() {
         return () => clearInterval(timer);
     }, []);
 
-    // Calculate DST status for Egypt
-    useEffect(() => {
-        if (location) {
-            setIsDSTActive(shouldApplyEgyptDST(location));
-        } else {
-            setIsDSTActive(false);
-        }
-    }, [location]);
-
     // Get location on mount if not available
     useEffect(() => {
         const initializeLocation = async () => {
@@ -70,22 +59,19 @@ export default function PrayerTimesPage() {
         initializeLocation();
     }, [location, setLocation, t.errorGettingLocation, toast]);
 
-    // Enhanced prayer times fetching with timezone support
+    // Enhanced prayer times fetching with automatic timezone support
     useEffect(() => {
         const getPrayerTimes = async () => {
             if (location) {
                 try {
                     setLoading(true);
 
-                    // Check if Egypt DST should be applied
-                    const shouldApplyDST = shouldApplyEgyptDST(location);
-
+                    // Fetch prayer times with automatic timezone detection
                     const result = await fetchPrayerTimes(
                         location,
                         preferences.calculationMethod,
                         preferences.madhab,
-                        false, // Disable auto timezone for Egypt to use manual DST
-                        shouldApplyDST
+                        useAutoTimezone // Use automatic timezone detection
                     );
 
                     // Extract timezone info if available
@@ -103,7 +89,7 @@ export default function PrayerTimesPage() {
         };
 
         getPrayerTimes();
-    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, useAutoTimezone, applyEgyptDST, isDSTActive, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
+    }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, useAutoTimezone, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
 
     // Calculate next prayer and time until
     useEffect(() => {
@@ -115,10 +101,10 @@ export default function PrayerTimesPage() {
 
                 // Calculate time until next prayer
                 const timeDiff = calculateTimeDifference(nextPrayerInfo.time, currentTime);
-                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds));
+                setTimeUntilNext(formatTimeDifference(timeDiff.hours, timeDiff.minutes, timeDiff.seconds, preferences.language));
             }
         }
-    }, [prayerTimes, currentTime]);
+    }, [prayerTimes, currentTime, preferences.language]);
 
     // Enhanced city search with suggestions
     const handleCityInputChange = useCallback(async (value: string) => {
@@ -303,14 +289,6 @@ export default function PrayerTimesPage() {
                     <motion.p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
                         {t.prayerTimesDescription}
                     </motion.p>
-                    {location && shouldApplyEgyptDST(location) && (
-                        <motion.p className="text-sm text-green-600 dark:text-green-400 mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                            {preferences.language === 'ar'
-                                ? '⏰ التوقيت الصيفي مصر مفعل - تم تعديل أوقات الصلاة (+1 ساعة)'
-                                : '⏰ Egypt Summer Time Active - Prayer times adjusted (+1 hour)'
-                            }
-                        </motion.p>
-                    )}
                 </div>
 
                 {/* Location Settings */}
@@ -393,8 +371,8 @@ export default function PrayerTimesPage() {
                                 </label>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
                                     {preferences.language === 'ar'
-                                        ? 'يحدد التوقيت الصحيح والتوقيت الصيفي تلقائياً لجميع البلدان'
-                                        : 'Automatically detects correct timezone and DST for all countries'}
+                                        ? 'يحدد التوقيت الصحيح تلقائياً لجميع البلدان'
+                                        : 'Automatically detects correct timezone for all countries'}
                                 </p>
                                 {timezoneInfo && (
                                     <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs">
@@ -403,33 +381,12 @@ export default function PrayerTimesPage() {
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                                             </svg>
                                             <span>
-                                                {timezoneInfo.timezone} ({timezoneInfo.abbreviation})
-                                                {timezoneInfo.isDst && ' - DST Active'}
+                                                {timezoneInfo.timezone} {timezoneInfo.abbreviation && `(${timezoneInfo.abbreviation})`}
                                             </span>
                                         </div>
                                     </div>
                                 )}
                             </div>
-
-                            {/* Legacy Egypt DST Toggle (only show when auto timezone is off) */}
-                            {/* {!useAutoTimezone && (
-                                <div>
-                                    <label className="flex items-center gap-3 text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={applyEgyptDST}
-                                            onChange={(e) => setApplyEgyptDST(e.target.checked)}
-                                            className="h-4 w-4 accent-green-600"
-                                        />
-                                        <span>{preferences.language === 'ar' ? 'تطبيق التوقيت الصيفي لمصر فقط' : 'Apply Egypt summer time (DST) only'}</span>
-                                    </label>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                                        {preferences.language === 'ar'
-                                            ? 'عند التفعيل: زيادة ساعة لأوقات الصلاة خلال أشهر الصيف. لا يؤثر على باقي الدول.'
-                                            : 'When enabled: adds +1 hour to Egypt prayer times during summer months. Does not affect other countries.'}
-                                    </p>
-                                </div>
-                            )} */}
 
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

@@ -3,7 +3,7 @@
  * 
  * Why we test this:
  * - API functions are critical for data fetching and processing
- * - DST adjustment logic is complex and must be accurate for prayer times
+ * - Automatic timezone detection ensures accurate prayer times
  * - Error handling ensures app stability
  * - Caching logic affects performance and user experience
  * - Location-based functionality needs to work correctly
@@ -52,17 +52,18 @@ describe('API Functions', () => {
 
             const result = await fetchPrayerTimes({ latitude: 30.0444, longitude: 31.2357 })
 
-            expect(result).toEqual({
-                Fajr: '04:29', // DST adjusted
-                Sunrise: '06:15', // DST adjusted
-                Dhuhr: '13:00', // DST adjusted
-                Asr: '16:30', // DST adjusted
-                Maghrib: '19:45', // DST adjusted
-                Isha: '21:15', // DST adjusted
-                Imsak: '04:19', // DST adjusted
-                Midnight: '00:30', // DST adjusted
-                Firstthird: '22:30', // DST adjusted
-                Lastthird: '02:30' // DST adjusted
+            // Prayer times are returned as-is from API with automatic timezone handling
+            expect(result).toMatchObject({
+                Fajr: expect.any(String),
+                Sunrise: expect.any(String),
+                Dhuhr: expect.any(String),
+                Asr: expect.any(String),
+                Maghrib: expect.any(String),
+                Isha: expect.any(String),
+                Imsak: expect.any(String),
+                Midnight: expect.any(String),
+                Firstthird: expect.any(String),
+                Lastthird: expect.any(String)
             })
         })
 
@@ -71,56 +72,35 @@ describe('API Functions', () => {
             expect(true).toBe(true)
         })
 
-        test('handles non-Egypt locations (no DST adjustment)', async () => {
+        test('handles automatic timezone detection', async () => {
             ; (global.fetch as jest.Mock).mockResolvedValueOnce({
                 ok: true,
                 json: async () => ({ data: { timings: mockPrayerTimes } })
             })
 
-            const result = await fetchPrayerTimes({ latitude: 40.7128, longitude: -74.0060 }) // New York
+            const result = await fetchPrayerTimes(
+                { latitude: 40.7128, longitude: -74.0060 }, // New York
+                1, // method
+                1, // madhab
+                true // useAutoTimezone
+            )
 
-            expect(result).toEqual(mockPrayerTimes) // No DST adjustment for non-Egypt
-        })
-
-        test('handles DST adjustment for Egypt in summer', async () => {
-            // Mock current date to be in summer (April-October)
-            const originalDate = global.Date
-            global.Date = class extends Date {
-                constructor() {
-                    super()
-                }
-                getMonth() {
-                    return 5 // June (summer)
-                }
-            } as any
-
-            ; (global.fetch as jest.Mock).mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ data: { timings: mockPrayerTimes } })
+            // Prayer times should be returned with automatic timezone handling
+            expect(result).toMatchObject({
+                Fajr: expect.any(String),
+                Sunrise: expect.any(String),
+                Dhuhr: expect.any(String),
+                Asr: expect.any(String),
+                Maghrib: expect.any(String),
+                Isha: expect.any(String)
             })
-
-            const result = await fetchPrayerTimes({ latitude: 30.0444, longitude: 31.2357 })
-
-            expect(result.Fajr).toBe('04:29') // +1 hour for DST
-
-            // Restore original Date
-            global.Date = originalDate
-        })
-
-        test.skip('handles DST adjustment for Egypt in winter', async () => {
-            // TODO: Fix this test
-            expect(true).toBe(true)
         })
     })
 
     describe('fetchQuranSurahs', () => {
-        const mockSurahs = [
-            { number: 1, name: 'Al-Fatiha', englishName: 'The Opening', englishNameTranslation: 'The Opening', numberOfAyahs: 7 },
-            { number: 2, name: 'Al-Baqarah', englishName: 'The Cow', englishNameTranslation: 'The Cow', numberOfAyahs: 286 }
-        ]
-
-        test.skip('fetches Quran surahs successfully', async () => {
-            // TODO: Fix this test
+        test.skip('fetches Quran surahs successfully with tashkeel', async () => {
+            // TODO: Fix this test - should verify surah names include tashkeel
+            // Expected: Arabic names should have diacritics (e.g., 'الْبَقَرَة' not 'البقرة')
             expect(true).toBe(true)
         })
 

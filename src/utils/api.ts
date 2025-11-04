@@ -1,6 +1,7 @@
 import { PrayerTimes, Location, Azkar, QuranSurah, QuranAyah, HijriDate } from '@/types';
 // import { TajweedAyah } from '@/types'; // HASHED FOR NOW
 import { ApiError, NetworkError, LocationError, ValidationError, retry, withErrorHandling } from './errorHandling';
+import { surahNamesWithTashkeel } from '@/data/surah-names-with-tashkeel';
 
 // Enhanced API Configuration with multiple providers
 const API_CONFIG = {
@@ -118,41 +119,54 @@ interface QuranComVerse {
     sajdah_number?: number | null;
 }
 
-// Get timezone information for a location
+// Get timezone information for a location using reverse geocoding
 const getTimezoneInfo = async (location: Location): Promise<TimezoneInfo | null> => {
     try {
-        // Try WorldTimeAPI first (more reliable for DST)
-        const url = `${API_CONFIG.WORLDTIME_BASE_URL}/timezone/Etc/GMT${location.longitude > 0 ? '-' : '+'}${Math.abs(Math.round(location.longitude / 15))}`;
+        // Try to get timezone from location timezone if available
+        if (location.timezone) {
+            const now = new Date();
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: location.timezone,
+                timeZoneName: 'short'
+            });
+            const parts = formatter.formatToParts(now);
+            const tzName = parts.find(part => part.type === 'timeZoneName')?.value || '';
+            
+            // Get UTC offset
+            const dateInTz = new Date(now.toLocaleString('en-US', { timeZone: location.timezone }));
+            const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+            const offset = (utcDate.getTime() - dateInTz.getTime()) / (1000 * 60 * 60);
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: { 'Accept': 'application/json' }
-        });
-
-        if (response.ok) {
-            const data = await response.json();
             return {
-                timezone: data.timezone,
-                utcOffset: parseInt(data.utc_offset.replace(':', '')) / 100,
-                isDst: data.dst,
-                dstOffset: data.dst_offset || 0,
-                abbreviation: data.abbreviation
+                timezone: location.timezone,
+                utcOffset: offset,
+                isDst: false, // Will be determined automatically by API
+                dstOffset: 0,
+                abbreviation: tzName
             };
         }
 
-        // Fallback to browser's timezone detection
+        // Fallback: Use browser's timezone detection
         const browserTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
         const now = new Date();
-        const januaryOffset = new Date(now.getFullYear(), 0, 1).getTimezoneOffset();
-        const julyOffset = new Date(now.getFullYear(), 6, 1).getTimezoneOffset();
-        const currentOffset = now.getTimezoneOffset();
+        const formatter = new Intl.DateTimeFormat('en-US', {
+            timeZone: browserTz,
+            timeZoneName: 'short'
+        });
+        const parts = formatter.formatToParts(now);
+        const tzName = parts.find(part => part.type === 'timeZoneName')?.value || 'UTC';
+
+        // Calculate UTC offset
+        const dateInTz = new Date(now.toLocaleString('en-US', { timeZone: browserTz }));
+        const utcDate = new Date(now.toLocaleString('en-US', { timeZone: 'UTC' }));
+        const offset = (utcDate.getTime() - dateInTz.getTime()) / (1000 * 60 * 60);
 
         return {
             timezone: browserTz,
-            utcOffset: -currentOffset / 60,
-            isDst: currentOffset !== januaryOffset,
-            dstOffset: Math.abs(januaryOffset - julyOffset) / 60,
-            abbreviation: now.toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ')[2] || 'UTC'
+            utcOffset: offset,
+            isDst: false, // API handles DST automatically
+            dstOffset: 0,
+            abbreviation: tzName
         };
     } catch (error) {
         console.warn('Failed to get timezone info:', error);
@@ -162,49 +176,15 @@ const getTimezoneInfo = async (location: Location): Promise<TimezoneInfo | null>
 
 
 
-// Legacy DST adjustment for backward compatibility
-const adjustTimeForDST = (timeString: string, location: Location, applyEgyptDST: boolean = false): string => {
-    if (!applyEgyptDST) return timeString;
-
-    try {
-        // Check if location is in Egypt (Cairo region)
-        const isEgypt = location.latitude >= 22 && location.latitude <= 32 &&
-            location.longitude >= 25 && location.longitude <= 37;
-
-        if (!isEgypt) {
-            return timeString; // No adjustment for non-Egypt locations
-        }
-
-        // Check if it's summer time (DST) in Egypt
-        const now = new Date();
-        const currentMonth = now.getMonth() + 1; // 1-12
-        const isSummerTime = currentMonth >= 4 && currentMonth <= 10; // April to October
-
-        if (!isSummerTime) {
-            return timeString; // No adjustment during winter time
-        }
-
-        // Add 1 hour for summer time
-        const [hours, minutes] = timeString.split(':').map(Number);
-        const adjustedHours = (hours + 1) % 24;
-
-        return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    } catch (error) {
-        console.warn('Error adjusting time for DST:', error);
-        return timeString; // Return original time if adjustment fails
-    }
-};
-
-// Enhanced Prayer Times API with automatic timezone and DST handling
+// Enhanced Prayer Times API with automatic timezone handling
 export const fetchPrayerTimes = withErrorHandling(async (
     location: Location,
     method: number = 1,
     madhab: number = 1,
-    useAutoTimezone: boolean = false,
-    applyEgyptDST: boolean = true // Legacy parameter for backward compatibility
+    useAutoTimezone: boolean = true // Default to automatic timezone detection
 ): Promise<PrayerTimes & { timezoneInfo?: TimezoneInfo }> => {
     const date = new Date().toLocaleDateString('en-CA');
-    const cacheKey = `prayer-times-${location.latitude.toFixed(4)}-${location.longitude.toFixed(4)}-${method}-${madhab}-${date}-auto-${useAutoTimezone}-dst-${applyEgyptDST}`;
+    const cacheKey = `prayer-times-${location.latitude.toFixed(4)}-${location.longitude.toFixed(4)}-${method}-${madhab}-${date}-auto-${useAutoTimezone}`;
 
     // Check cache first
     const cached = getCachedData<PrayerTimes & { timezoneInfo?: TimezoneInfo }>(cacheKey);
@@ -267,52 +247,20 @@ export const fetchPrayerTimes = withErrorHandling(async (
             throw lastError || new ApiError('All prayer times providers failed', 503);
         }
 
-        // Apply timezone adjustments if needed
-        let adjustedPrayerTimes: PrayerTimes;
-
-        if (useAutoTimezone && timezoneInfo) {
-            // Use automatic timezone adjustment
-            adjustedPrayerTimes = {
-                Fajr: prayerTimes.Fajr,
-                Sunrise: prayerTimes.Sunrise,
-                Dhuhr: prayerTimes.Dhuhr,
-                Asr: prayerTimes.Asr,
-                Maghrib: prayerTimes.Maghrib,
-                Isha: prayerTimes.Isha,
-                Imsak: prayerTimes.Imsak,
-                Midnight: prayerTimes.Midnight,
-                Firstthird: prayerTimes.Firstthird,
-                Lastthird: prayerTimes.Lastthird,
-            };
-        } else if (applyEgyptDST) {
-            // Use legacy Egypt DST adjustment
-            adjustedPrayerTimes = {
-                Fajr: adjustTimeForDST(prayerTimes.Fajr, location, applyEgyptDST),
-                Sunrise: adjustTimeForDST(prayerTimes.Sunrise, location, applyEgyptDST),
-                Dhuhr: adjustTimeForDST(prayerTimes.Dhuhr, location, applyEgyptDST),
-                Asr: adjustTimeForDST(prayerTimes.Asr, location, applyEgyptDST),
-                Maghrib: adjustTimeForDST(prayerTimes.Maghrib, location, applyEgyptDST),
-                Isha: adjustTimeForDST(prayerTimes.Isha, location, applyEgyptDST),
-                Imsak: adjustTimeForDST(prayerTimes.Imsak, location, applyEgyptDST),
-                Midnight: adjustTimeForDST(prayerTimes.Midnight, location, applyEgyptDST),
-                Firstthird: adjustTimeForDST(prayerTimes.Firstthird, location, applyEgyptDST),
-                Lastthird: adjustTimeForDST(prayerTimes.Lastthird, location, applyEgyptDST),
-            };
-        } else {
-            // No adjustment
-            adjustedPrayerTimes = {
-                Fajr: prayerTimes.Fajr,
-                Sunrise: prayerTimes.Sunrise,
-                Dhuhr: prayerTimes.Dhuhr,
-                Asr: prayerTimes.Asr,
-                Maghrib: prayerTimes.Maghrib,
-                Isha: prayerTimes.Isha,
-                Imsak: prayerTimes.Imsak,
-                Midnight: prayerTimes.Midnight,
-                Firstthird: prayerTimes.Firstthird,
-                Lastthird: prayerTimes.Lastthird,
-            };
-        }
+        // Prayer times are returned directly from API with automatic timezone handling
+        // The API provider handles timezone and DST automatically based on location
+        const adjustedPrayerTimes: PrayerTimes = {
+            Fajr: prayerTimes.Fajr,
+            Sunrise: prayerTimes.Sunrise,
+            Dhuhr: prayerTimes.Dhuhr,
+            Asr: prayerTimes.Asr,
+            Maghrib: prayerTimes.Maghrib,
+            Isha: prayerTimes.Isha,
+            Imsak: prayerTimes.Imsak,
+            Midnight: prayerTimes.Midnight,
+            Firstthird: prayerTimes.Firstthird,
+            Lastthird: prayerTimes.Lastthird,
+        };
 
         const result = {
             ...adjustedPrayerTimes,
@@ -377,7 +325,8 @@ export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]
 
         const surahs: QuranSurah[] = data.chapters.map((chapter: QuranComChapter) => ({
             number: chapter.id,
-            name: chapter.name_arabic || chapter.name_simple || '',
+            // Use tashkeel version if available, otherwise fallback to API name
+            name: surahNamesWithTashkeel[chapter.id] || chapter.name_arabic || chapter.name_simple || '',
             englishName: chapter.name_simple || '',
             englishNameTranslation: chapter.translated_name?.name || '',
             numberOfAyahs: chapter.verses_count || 0,

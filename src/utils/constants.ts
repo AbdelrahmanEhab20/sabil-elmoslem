@@ -11,12 +11,7 @@ export const EGYPT_BOUNDARIES = {
     MAX_LONGITUDE: 37,
 } as const;
 
-// DST (Daylight Saving Time) configuration for Egypt
-export const EGYPT_DST = {
-    START_MONTH: 4, // April
-    END_MONTH: 10,  // October
-    HOUR_OFFSET: 1, // +1 hour during summer time
-} as const;
+// Note: Egypt DST has been cancelled. All timezone handling is now automatic.
 
 // Prayer names mapping
 export const PRAYER_NAMES = {
@@ -71,7 +66,6 @@ export const DEFAULTS = {
     MADHAB: 'Shafi',
     LANGUAGE: 'ar',
     USE_AUTO_TIMEZONE: true,
-    APPLY_EGYPT_DST: false,
 } as const;
 
 // API endpoints and configuration

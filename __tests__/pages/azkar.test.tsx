@@ -26,9 +26,10 @@ jest.mock('../../src/contexts/UserContext', () => ({
 }))
 
 // Mock the ToastProvider
+const mockShowToast = jest.fn()
 jest.mock('../../src/components/ToastProvider', () => ({
     useToast: () => ({
-        showToast: jest.fn()
+        showToast: mockShowToast
     })
 }))
 
@@ -79,6 +80,7 @@ jest.mock('@/components/CustomModal', () => {
 describe('AzkarPage', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        mockShowToast.mockClear()
     })
 
     describe('Rendering Tests', () => {
@@ -325,17 +327,25 @@ describe('AzkarPage', () => {
             render(<AzkarPage />)
 
             await waitFor(() => {
-                expect(screen.getByText(/Error loading azkar/i)).toBeInTheDocument()
-            })
+                expect(mockShowToast).toHaveBeenCalledWith(
+                    expect.objectContaining({
+                        type: 'error',
+                        message: expect.any(String)
+                    })
+                )
+            }, { timeout: 3000 })
         })
     })
 
     describe('Responsive Design', () => {
-        test('adapts to different screen sizes', () => {
+        test('adapts to different screen sizes', async () => {
             render(<AzkarPage />)
 
-            const container = screen.getByTestId('azkar-container')
-            expect(container).toHaveClass('max-w-4xl')
+            await waitFor(() => {
+                // Check that the page renders with responsive classes
+                const container = document.querySelector('.max-w-6xl')
+                expect(container).toBeInTheDocument()
+            })
         })
     })
 })

@@ -48,14 +48,69 @@ jest.mock('../../src/components/ToastProvider', () => ({
 
 // Mock the API functions
 jest.mock('@/utils/api', () => ({
-    fetchPrayerTimes: jest.fn(),
-    getCurrentLocation: jest.fn(),
-    searchCityCoordinates: jest.fn()
+    fetchPrayerTimes: jest.fn().mockResolvedValue({
+        Fajr: '04:29',
+        Sunrise: '06:15',
+        Dhuhr: '13:00',
+        Asr: '16:30',
+        Maghrib: '19:45',
+        Isha: '21:15',
+        Imsak: '04:19',
+        Midnight: '00:30',
+        Firstthird: '22:30',
+        Lastthird: '02:30',
+        timezoneInfo: {
+            timezone: 'Africa/Cairo',
+            utcOffset: 2,
+            isDst: false,
+            dstOffset: 0,
+            abbreviation: 'EET',
+            countryCode: 'EG'
+        }
+    }),
+    getCurrentLocation: jest.fn().mockResolvedValue({
+        latitude: 30.0444,
+        longitude: 31.2357
+    }),
+    searchCityCoordinates: jest.fn().mockResolvedValue([
+        {
+            name: 'Cairo',
+            country: 'EG',
+            lat: 30.0444,
+            lon: 31.2357
+        }
+    ])
 }))
 
 describe('PrayerTimesPage', () => {
     beforeEach(() => {
         jest.clearAllMocks()
+        // Reset mocks to default resolved values
+        const api = require('@/utils/api')
+        api.fetchPrayerTimes.mockResolvedValue({
+            Fajr: '04:29',
+            Sunrise: '06:15',
+            Dhuhr: '13:00',
+            Asr: '16:30',
+            Maghrib: '19:45',
+            Isha: '21:15',
+            Imsak: '04:19',
+            Midnight: '00:30',
+            Firstthird: '22:30',
+            Lastthird: '02:30',
+            timezoneInfo: {
+                timezone: 'Africa/Cairo',
+                utcOffset: 2,
+                isDst: false,
+                dstOffset: 0,
+                abbreviation: 'EET',
+                countryCode: 'EG'
+            }
+        })
+        api.getCurrentLocation.mockResolvedValue({
+            latitude: 30.0444,
+            longitude: 31.2357
+        })
     })
 
     describe('Rendering Tests', () => {

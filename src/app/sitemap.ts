@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://islamic-site.com'
+    const baseUrl = 'https://sabil-elmoslem.vercel.app'
 
     return [
         {

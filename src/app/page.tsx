@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'الرئيسية | Home - سبيل المسلم | Sabil Elmoslem',
     description: 'مرحباً بكم في سبيل المسلم - منصتكم الشاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. | Welcome to Sabil Elmoslem - Your comprehensive platform for prayer times, daily azkar, and Quran reading.',
-    url: 'https://islamic-site.com',
+    url: 'https://sabil-elmoslem.vercel.app',
     siteName: 'سبيل المسلم | Sabil Elmoslem',
     images: [
       {

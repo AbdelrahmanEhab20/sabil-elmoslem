@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useUser } from '@/contexts/UserContext';
 import { useToast } from '@/components/ToastProvider';
@@ -13,14 +13,50 @@ export default function AzkarPage() {
     const { preferences } = useUser();
     const t = useTranslations(preferences.language);
     const toast = useToast();
+    const toastRef = useRef(toast);
+    toastRef.current = toast;
     const [azkar, setAzkar] = useState<Azkar[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [counters, setCounters] = useState<{ [key: number]: number }>({});
+    const [countersInitialized, setCountersInitialized] = useState(false);
     const [showCongrats, setShowCongrats] = useState(false);
     const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Storage key for counters - includes date to reset daily
+    const getCountersStorageKey = useCallback(() => {
+        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+        return `azkar-counters-${today}`;
+    }, []);
+
+    // Load counters from localStorage on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const stored = localStorage.getItem(getCountersStorageKey());
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    setCounters(parsed);
+                }
+            } catch (error) {
+                console.warn('Failed to load azkar counters from localStorage:', error);
+            }
+            setCountersInitialized(true);
+        }
+    }, [getCountersStorageKey]);
+
+    // Save counters to localStorage whenever they change
+    useEffect(() => {
+        if (typeof window !== 'undefined' && countersInitialized && Object.keys(counters).length > 0) {
+            try {
+                localStorage.setItem(getCountersStorageKey(), JSON.stringify(counters));
+            } catch (error) {
+                console.warn('Failed to save azkar counters to localStorage:', error);
+            }
+        }
+    }, [counters, countersInitialized, getCountersStorageKey]);
 
     // Add a list of general duaas for congratulation
     const generalDuaas = useMemo(() => [
@@ -105,23 +141,27 @@ export default function AzkarPage() {
                 setAzkar(data);
 
                 // Initialize counters only for categories that need them
-                const initialCounters: { [key: number]: number } = {};
-                data.forEach(zikr => {
-                    if (zikr.id && shouldHaveCounter(zikr.category)) {
-                        initialCounters[zikr.id] = 0;
-                    }
+                // Merge with existing counters from localStorage (preserve progress)
+                setCounters(prevCounters => {
+                    const mergedCounters: { [key: number]: number } = {};
+                    data.forEach(zikr => {
+                        if (zikr.id && shouldHaveCounter(zikr.category)) {
+                            // Keep existing counter value if it exists, otherwise start at 0
+                            mergedCounters[zikr.id] = prevCounters[zikr.id] ?? 0;
+                        }
+                    });
+                    return mergedCounters;
                 });
-                setCounters(initialCounters);
             } catch (error: unknown) {
                 const errorMessage = error instanceof Error ? error.message : t.errorLoadingAzkar;
-                toast.showToast({ type: 'error', message: errorMessage });
+                toastRef.current.showToast({ type: 'error', message: errorMessage });
             } finally {
                 setLoading(false);
             }
         };
 
         loadAzkar();
-    }, [preferences.language, t.errorLoadingAzkar, toast, shouldHaveCounter]);
+    }, [preferences.language, t.errorLoadingAzkar, shouldHaveCounter]);
 
     // Get unique categories
     const categories = useMemo(() => {

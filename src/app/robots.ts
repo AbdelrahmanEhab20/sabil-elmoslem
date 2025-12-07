@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/api/', '/admin/'],
         },
-        sitemap: 'https://islamic-site.com/sitemap.xml',
+        sitemap: 'https://sabil-elmoslem.vercel.app/sitemap.xml',
     }
 } 

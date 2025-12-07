@@ -156,7 +156,7 @@ export default function RootLayout({
               "@type": "WebSite",
               "name": "سبيل المسلم | Sabil Elmoslem",
               "alternateName": ["Sabil Elmoslem", "سبيل المسلم"],
-              "url": "https://islamic-site.com",
+              "url": "https://sabil-elmoslem.vercel.app",
               "description": {
                 "@type": "Text",
                 "ar": "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم",
@@ -165,13 +165,13 @@ export default function RootLayout({
               "inLanguage": ["ar", "en"],
               "potentialAction": {
                 "@type": "SearchAction",
-                "target": "https://islamic-site.com/search?q={search_term_string}",
+                "target": "https://sabil-elmoslem.vercel.app/search?q={search_term_string}",
                 "query-input": "required name=search_term_string"
               },
               "publisher": {
                 "@type": "Organization",
                 "name": "Sabil Elmoslem",
-                "url": "https://islamic-site.com"
+                "url": "https://sabil-elmoslem.vercel.app"
               }
             })
           }}

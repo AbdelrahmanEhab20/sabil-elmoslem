@@ -1,43 +1,74 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { fetchQuranSurahs, fetchQuranAyahs } from '@/utils/api';
 import { QuranSurah, QuranAyah } from '@/types';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
 import { useToast } from '@/components/ToastProvider';
-// import TajweedRulesBar from '@/components/TajweedRulesBar';
-// import TajweedText from '@/components/TajweedText';
+
+// Storage keys for reading progress
+const STORAGE_KEYS = {
+    LAST_SURAH: 'quran-last-surah',
+    FONT_SIZE: 'quran-font-size',
+} as const;
 
 export default function QuranPage() {
     const { preferences } = useUser();
     const t = useTranslations(preferences.language);
     const toast = useToast();
+    const toastRef = useRef(toast);
+    toastRef.current = toast;
     const [surahs, setSurahs] = useState<QuranSurah[]>([]);
     const [selectedSurah, setSelectedSurah] = useState<QuranSurah | null>(null);
     const [ayahs, setAyahs] = useState<QuranAyah[]>([]);
-    // const [tajweedRules, setTajweedRules] = useState<TajweedRule[]>([]);
     const [loading, setLoading] = useState(true);
     const [surahLoading, setSurahLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [view, setView] = useState<'surah-list' | 'ayah-view'>('surah-list');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    // const [showTajweed, setShowTajweed] = useState(true);
     const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>('2xl');
+    const [hasRestoredProgress, setHasRestoredProgress] = useState(false);
 
-    // Load Tajweed rules - HASHED FOR NOW
-    // useEffect(() => {
-    //     const loadTajweedRules = async () => {
-    //         try {
-    //             const rulesData = await import('@/data/tajweed-rules.json');
-    //             setTajweedRules(rulesData.rules);
-    //         } catch (error) {
-    //             console.error('Failed to load Tajweed rules:', error);
-    //         }
-    //     };
-    //     loadTajweedRules();
-    // }, []);
+    // Load saved font size from localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                const savedFontSize = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+                if (savedFontSize && ['lg', 'xl', '2xl', '3xl', '4xl'].includes(savedFontSize)) {
+                    setFontSize(savedFontSize as typeof fontSize);
+                }
+            } catch (error) {
+                console.warn('Failed to load font size from localStorage:', error);
+            }
+        }
+    }, []);
+
+    // Save font size to localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            try {
+                localStorage.setItem(STORAGE_KEYS.FONT_SIZE, fontSize);
+            } catch (error) {
+                console.warn('Failed to save font size to localStorage:', error);
+            }
+        }
+    }, [fontSize]);
+
+    // Save last read surah to localStorage
+    useEffect(() => {
+        if (typeof window !== 'undefined' && selectedSurah) {
+            try {
+                localStorage.setItem(STORAGE_KEYS.LAST_SURAH, JSON.stringify({
+                    number: selectedSurah.number,
+                    timestamp: Date.now()
+                }));
+            } catch (error) {
+                console.warn('Failed to save reading progress to localStorage:', error);
+            }
+        }
+    }, [selectedSurah]);
 
     // Fetch surahs on mount
     useEffect(() => {
@@ -46,18 +77,36 @@ export default function QuranPage() {
                 setLoading(true);
                 const surahsData = await fetchQuranSurahs();
                 setSurahs(surahsData);
+
+                // Restore last read surah if available (only once)
+                if (!hasRestoredProgress && typeof window !== 'undefined') {
+                    try {
+                        const savedProgress = localStorage.getItem(STORAGE_KEYS.LAST_SURAH);
+                        if (savedProgress) {
+                            const { number } = JSON.parse(savedProgress);
+                            const lastSurah = surahsData.find(s => s.number === number);
+                            if (lastSurah) {
+                                setSelectedSurah(lastSurah);
+                                setView('ayah-view');
+                            }
+                        }
+                    } catch (error) {
+                        console.warn('Failed to restore reading progress:', error);
+                    }
+                    setHasRestoredProgress(true);
+                }
             } catch (error: unknown) {
                 const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
-                toast.showToast({ type: 'error', message: errorMessage });
+                toastRef.current.showToast({ type: 'error', message: errorMessage });
             } finally {
                 setLoading(false);
             }
         };
 
         loadSurahs();
-    }, [t.errorLoadingQuran, toast]);
+    }, [t.errorLoadingQuran, hasRestoredProgress]);
 
-    // Fetch ayahs when selectedSurah changes - SIMPLIFIED VERSION
+    // Fetch ayahs when selectedSurah changes
     useEffect(() => {
         const loadAyahs = async () => {
             if (selectedSurah) {
@@ -67,14 +116,14 @@ export default function QuranPage() {
                     setAyahs(ayahsData);
                 } catch (error: unknown) {
                     const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
-                    toast.showToast({ type: 'error', message: errorMessage });
+                    toastRef.current.showToast({ type: 'error', message: errorMessage });
                 } finally {
                     setSurahLoading(false);
                 }
             }
         };
         loadAyahs();
-    }, [selectedSurah, t.errorLoadingQuran, toast]);
+    }, [selectedSurah, t.errorLoadingQuran]);
 
     // Normalize Arabic text by removing tashkeel (diacritics) for flexible search
     const normalizeArabic = (text: string): string => {
@@ -299,7 +348,7 @@ export default function QuranPage() {
                                     {preferences.language === 'ar' ? 'اقرأ وتأمل في كلام الله' : 'Read and reflect upon the words of Allah'}
                                 </motion.p>
                             </div>
-                        )}البَقَرَةالبَقَرَة
+                        )}
 
                         {view === 'surah-list' ? (
                             <>

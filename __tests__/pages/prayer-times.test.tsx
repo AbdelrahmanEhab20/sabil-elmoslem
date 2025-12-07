@@ -114,14 +114,18 @@ describe('PrayerTimesPage', () => {
         test('renders prayer times page with title', () => {
             render(<PrayerTimesPage />)
             
-            expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
+            // Use getAllByText since title might appear multiple times
+            const titles = screen.getAllByText(/Prayer Times/i)
+            expect(titles.length).toBeGreaterThan(0)
         })
 
         test('displays all prayer time labels', () => {
             render(<PrayerTimesPage />)
 
             expect(screen.getByText(/Fajr/i)).toBeInTheDocument()
-            expect(screen.getByText(/Dhuhr/i)).toBeInTheDocument()
+            // Use getAllByText for Dhuhr as it might appear multiple times
+            const dhuhrElements = screen.getAllByText(/Dhuhr/i)
+            expect(dhuhrElements.length).toBeGreaterThan(0)
             expect(screen.getByText(/Asr/i)).toBeInTheDocument()
             expect(screen.getByText(/Maghrib/i)).toBeInTheDocument()
             expect(screen.getByText(/Isha/i)).toBeInTheDocument()
@@ -166,7 +170,9 @@ describe('PrayerTimesPage', () => {
         test('renders without errors', () => {
             render(<PrayerTimesPage />)
 
-            expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
+            // Use getAllByText since title might appear multiple times
+            const titles = screen.getAllByText(/Prayer Times/i)
+            expect(titles.length).toBeGreaterThan(0)
         })
 
         test('fetches prayer times on mount', async () => {

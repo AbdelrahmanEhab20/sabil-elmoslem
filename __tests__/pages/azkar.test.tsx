@@ -166,10 +166,18 @@ describe('AzkarPage', () => {
         test('shows category filter buttons', async () => {
             render(<AzkarPage />)
 
+            // Wait for content to load first
             await waitFor(() => {
-                expect(screen.getByText(/All Categories/i)).toBeInTheDocument()
-                expect(screen.getByText(/Morning Adhkar/i)).toBeInTheDocument()
+                expect(screen.getByText(/سبحان الله/)).toBeInTheDocument()
             }, WAIT_TIMEOUT)
+
+            // Then check for category buttons
+            await waitFor(() => {
+                const allCategories = screen.getAllByText(/All Categories/i)
+                expect(allCategories.length).toBeGreaterThan(0)
+                const morningAdhkar = screen.getAllByText(/Morning Adhkar/i)
+                expect(morningAdhkar.length).toBeGreaterThan(0)
+            }, { timeout: 3000 })
         })
     })
 

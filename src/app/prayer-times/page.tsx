@@ -278,22 +278,70 @@ export default function PrayerTimesPage() {
         }
     ];
 
+    const isArabic = preferences.language === 'ar';
+
     return (
-        <div className="min-h-screen py-4 sm:py-6 md:py-8">
-            <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-6 sm:mb-8">
-                    <motion.h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {/* Hero Header */}
+            <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white py-12 md:py-16 overflow-hidden">
+                {/* Decorative pattern */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                    }} />
+                </div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <motion.div
+                        className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 6v6l4 2" strokeLinecap="round" />
+                        </svg>
+                    </motion.div>
+                    <motion.h1
+                        className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isArabic ? 'font-arabic-display' : ''}`}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                    >
                         {t.prayerTimes}
                     </motion.h1>
-                    <motion.p className="text-base sm:text-lg text-gray-600 dark:text-gray-400 px-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+                    <motion.p
+                        className={`text-lg md:text-xl text-blue-100 max-w-2xl mx-auto ${isArabic ? 'font-arabic-body' : ''}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.15 }}
+                    >
                         {t.prayerTimesDescription}
                     </motion.p>
                 </div>
 
+                {/* Bottom wave */}
+                <div className="absolute bottom-0 left-0 right-0">
+                    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+                        <path d="M0 30L60 25C120 20 240 10 360 15C480 20 600 40 720 45C840 50 960 40 1080 30C1200 20 1320 10 1380 5L1440 0V60H0V30Z" className="fill-gray-50 dark:fill-gray-900" />
+                    </svg>
+                </div>
+            </section>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
                 {/* Location Settings */}
-                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
-                    <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+                <motion.div
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-5 sm:p-7 mb-8"
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4 }}
+                >
+                    <h2 className={`text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-3 ${isArabic ? 'font-arabic-display' : ''}`}>
+                        <span className="w-8 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full" />
                         {t.location}
                     </h2>
 
@@ -305,7 +353,7 @@ export default function PrayerTimesPage() {
                             <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
                                 {locationLoading ? (
                                     <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-green-600"></div>
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
                                         <span className="text-sm text-gray-600 dark:text-gray-400">
                                             {preferences.language === 'ar' ? 'جاري تحديد الموقع...' : 'Getting location...'}
                                         </span>
@@ -313,7 +361,7 @@ export default function PrayerTimesPage() {
                                 ) : location ? (
                                     <div className="space-y-2">
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                            <svg className="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <svg className="h-4 w-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                                             </svg>
                                             <div className="space-y-1">
@@ -365,7 +413,7 @@ export default function PrayerTimesPage() {
                                         type="checkbox"
                                         checked={useAutoTimezone}
                                         onChange={(e) => setUseAutoTimezone(e.target.checked)}
-                                        className="h-4 w-4 accent-green-600"
+                                        className="h-4 w-4 accent-blue-600"
                                     />
                                     <span>{preferences.language === 'ar' ? 'تحديد المنطقة الزمنية تلقائياً' : 'Automatic timezone detection'}</span>
                                 </label>
@@ -376,7 +424,7 @@ export default function PrayerTimesPage() {
                                 </p>
                                 {timezoneInfo && (
                                     <div className="mt-2 p-2 bg-green-50 dark:bg-green-900/20 rounded text-xs">
-                                        <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                                        <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
                                             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                                             </svg>
@@ -398,7 +446,7 @@ export default function PrayerTimesPage() {
                                         value={searchCity}
                                         onChange={(e) => handleCityInputChange(e.target.value)}
                                         placeholder={preferences.language === 'ar' ? 'ابحث عن مدينة...' : 'Search for a city...'}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                                         onKeyPress={(e) => e.key === 'Enter' && handleLocationSearch()}
                                         onFocus={() => setShowSuggestions(citySuggestions.length > 0)}
                                         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
@@ -428,7 +476,7 @@ export default function PrayerTimesPage() {
                                     <button
                                         onClick={() => handleLocationSearch()}
                                         disabled={searchLoading || !searchCity.trim()}
-                                        className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center space-x-2 rtl:space-x-reverse"
+                                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 flex items-center justify-center space-x-2 rtl:space-x-reverse"
                                     >
                                         {searchLoading ? (
                                             <>
@@ -472,15 +520,26 @@ export default function PrayerTimesPage() {
 
                 {/* Next Prayer Countdown */}
                 {nextPrayer && (
-                    <motion.div className="bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}>
-                        <div className="text-center">
-                            <h2 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 sm:mb-3">
+                    <motion.div
+                        className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 text-white rounded-2xl shadow-xl p-6 sm:p-8 mb-8 overflow-hidden"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        {/* Subtle pattern overlay */}
+                        <div className="absolute inset-0 opacity-10">
+                            <div className="absolute inset-0" style={{
+                                backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M20 0l4 12h12.5l-10 7.5 4 12.5-10.5-8-10.5 8 4-12.5-10-7.5H16l4-12z'/%3E%3C/g%3E%3C/svg%3E")`
+                            }} />
+                        </div>
+                        <div className="text-center relative z-10">
+                            <h2 className={`text-lg sm:text-xl md:text-2xl font-bold mb-3 ${isArabic ? 'font-arabic-display' : ''}`}>
                                 {t.nextPrayer}: {getPrayerName(nextPrayer)}
                             </h2>
-                            <div className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold mb-2 sm:mb-3">
+                            <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold mb-3 drop-shadow-lg">
                                 {timeUntilNext}
                             </div>
-                            <p className="text-green-100 text-sm sm:text-base">
+                            <p className={`text-green-100 text-sm sm:text-base ${isArabic ? 'font-arabic-body' : ''}`}>
                                 {t.timeRemaining}
                             </p>
                         </div>
@@ -489,19 +548,20 @@ export default function PrayerTimesPage() {
 
                 {/* Prayer Times Grid */}
                 {loading ? (
-                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
+                    <motion.div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-5 sm:p-7" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
                         <div className="animate-pulse">
-                            <div className="h-5 sm:h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-4 sm:mb-6"></div>
-                            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                            <div className="h-6 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-6"></div>
+                            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                                    <div key={i} className="h-16 sm:h-20 md:h-24 bg-gray-300 dark:bg-gray-600 rounded-lg"></div>
+                                    <div key={i} className="h-32 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
                                 ))}
                             </div>
                         </div>
                     </motion.div>
                 ) : prayerTimes ? (
-                    <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
-                        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4 sm:mb-6">
+                    <motion.div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-5 sm:p-7" initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4 }}>
+                        <h2 className={`text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center gap-3 ${isArabic ? 'font-arabic-display' : ''}`}>
+                            <span className="w-8 h-1 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full" />
                             {t.prayerTimes}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -540,7 +600,7 @@ export default function PrayerTimesPage() {
 
                                         {/* Next prayer indicator */}
                                         {nextPrayer === prayer.name && (
-                                            <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                            <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">
                                                 {preferences.language === 'ar' ? 'التالية' : 'Next'}
                                             </div>
                                         )}

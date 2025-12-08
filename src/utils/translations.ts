@@ -4,6 +4,7 @@ export interface Translations {
     prayerTimes: string;
     azkar: string;
     quran: string;
+    qibla: string;
     islamicSite: string;
 
     // Theme
@@ -34,6 +35,8 @@ export interface Translations {
     azkarDescription: string;
     quranTitle: string;
     quranDescription: string;
+    qiblaTitle: string;
+    qiblaDescription: string;
 
     // Feature Details
     accuratePrayerTimes: string;
@@ -113,6 +116,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         prayerTimes: 'Prayer Times',
         azkar: 'Azkar',
         quran: 'Quran',
+        qibla: 'Qibla',
         islamicSite: 'Sabil Elmoslem',
 
         // Theme
@@ -143,6 +147,8 @@ export const translations: Record<'en' | 'ar', Translations> = {
         azkarDescription: 'Morning and evening supplications',
         quranTitle: 'Quran Reader',
         quranDescription: 'Read Quran with Tajweed and translations',
+        qiblaTitle: 'Qibla Direction',
+        qiblaDescription: 'Find the direction of Qibla from your location',
 
         // Feature Details
         accuratePrayerTimes: 'Accurate Prayer Times',
@@ -220,6 +226,7 @@ export const translations: Record<'en' | 'ar', Translations> = {
         prayerTimes: 'أوقات الصلاة',
         azkar: 'الأذكار',
         quran: 'القرآن',
+        qibla: 'القبلة',
         islamicSite: 'سبيل المسلم',
 
         // Theme
@@ -250,6 +257,8 @@ export const translations: Record<'en' | 'ar', Translations> = {
         azkarDescription: 'أذكار الصباح والمساء',
         quranTitle: 'قارئ القرآن',
         quranDescription: 'اقرأ القرآن بالتجويد والترجمات',
+        qiblaTitle: 'اتجاه القبلة',
+        qiblaDescription: 'اعرف اتجاه القبلة من موقعك',
 
         // Feature Details
         accuratePrayerTimes: 'أوقات صلاة دقيقة',

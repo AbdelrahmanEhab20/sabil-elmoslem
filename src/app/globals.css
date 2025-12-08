@@ -1,9 +1,23 @@
-@import url("https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Scheherazade+New:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Scheherazade+New:wght@400;500;600;700&family=Noto+Sans+Arabic:wght@300;400;500;600;700&family=Tajawal:wght@300;400;500;700;800&family=Cairo:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* Islamic-inspired color palette */
+  --islamic-green: #1a7f5a;
+  --islamic-green-light: #22a06b;
+  --islamic-green-dark: #0d5c3f;
+  --islamic-gold: #c9a227;
+  --islamic-gold-light: #e8c547;
+  --islamic-cream: #f8f5e8;
+  --islamic-teal: #0d9488;
+  
+  /* Arabic Typography - using CSS variables from next/font + fallbacks */
+  --font-arabic-display: var(--font-cairo), "Cairo", "Tajawal", "Noto Sans Arabic", sans-serif;
+  --font-arabic-body: var(--font-tajawal), "Tajawal", "Noto Sans Arabic", sans-serif;
+  --font-arabic-quran: "Amiri Quran", "Scheherazade New", serif;
 }
 
 :root {
@@ -28,11 +42,37 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Arabic text styling */
+/* Enhanced Arabic text styling */
 .font-arabic {
-  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
-    sans-serif;
-  line-height: 2;
+  font-family: var(--font-arabic-quran);
+  line-height: 2.2;
+  font-feature-settings: "liga" 1, "calt" 1;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Arabic display font for headings */
+.font-arabic-display {
+  font-family: var(--font-arabic-display);
+  font-weight: 700;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+/* Arabic body font for paragraphs */
+.font-arabic-body {
+  font-family: var(--font-arabic-body);
+  font-weight: 400;
+  line-height: 1.9;
+}
+
+/* Quranic text with special styling */
+.font-quran {
+  font-family: var(--font-arabic-quran);
+  line-height: 2.4;
+  font-size: 1.25em;
+  letter-spacing: 0.02em;
 }
 
 /* RTL support */
@@ -51,6 +91,116 @@ body {
 
 [dir="rtl"] .rtl\:ml-2 {
   margin-left: 0.5rem;
+}
+
+/* Islamic decorative patterns */
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.islamic-pattern-dark {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.08'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Star pattern overlay */
+.islamic-stars {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M40 0l4.5 13.82h14.53l-11.76 8.55 4.5 13.81L40 27.64l-11.77 8.54 4.5-13.81-11.76-8.55H35.5L40 0z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Gradient overlays for hero sections */
+.hero-gradient {
+  background: linear-gradient(135deg, 
+    rgba(22, 101, 52, 1) 0%, 
+    rgba(21, 128, 61, 1) 25%,
+    rgba(22, 163, 74, 1) 50%,
+    rgba(21, 128, 61, 1) 75%,
+    rgba(22, 101, 52, 1) 100%
+  );
+}
+
+.hero-gradient-enhanced {
+  background: linear-gradient(135deg, 
+    #0d503c 0%, 
+    #166534 30%,
+    #15803d 50%,
+    #166534 70%,
+    #0d503c 100%
+  );
+  position: relative;
+}
+
+.hero-gradient-enhanced::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Shimmer animation for special text */
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.text-shimmer {
+  background: linear-gradient(90deg, 
+    var(--islamic-gold) 0%, 
+    var(--islamic-gold-light) 25%, 
+    #fff 50%, 
+    var(--islamic-gold-light) 75%, 
+    var(--islamic-gold) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Glow effect for important elements */
+.glow-green {
+  box-shadow: 0 0 20px rgba(22, 163, 74, 0.3),
+              0 0 40px rgba(22, 163, 74, 0.2),
+              0 0 60px rgba(22, 163, 74, 0.1);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(201, 162, 39, 0.3),
+              0 0 40px rgba(201, 162, 39, 0.2);
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Pulse glow animation */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(22, 163, 74, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(22, 163, 74, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
 
 /* Custom scrollbar */
@@ -91,10 +241,12 @@ body {
 }
 
 /* Better Arabic text rendering */
-[lang="ar"] {
-  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
-    sans-serif;
-  line-height: 1.8;
+[lang="ar"],
+html[lang="ar"] body {
+  font-family: var(--font-arabic-body);
+  line-height: 1.9;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
 [lang="ar"] h1,
@@ -103,9 +255,49 @@ body {
 [lang="ar"] h4,
 [lang="ar"] h5,
 [lang="ar"] h6 {
-  font-family: "Amiri Quran", "Scheherazade New", "Noto Sans Arabic", Arial,
-    sans-serif;
-  font-weight: 600;
+  font-family: var(--font-arabic-display);
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+}
+
+[lang="ar"] h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  line-height: 1.3;
+}
+
+[lang="ar"] h2 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  line-height: 1.4;
+}
+
+[lang="ar"] p {
+  font-family: var(--font-arabic-body);
+  line-height: 2;
+}
+
+/* Arabic text with better word spacing */
+.arabic-text {
+  font-family: var(--font-arabic-body);
+  word-spacing: 0.05em;
+  text-align: justify;
+  text-align-last: center;
+}
+
+/* Quranic verse styling */
+.verse-arabic {
+  font-family: var(--font-arabic-quran);
+  font-size: 1.5rem;
+  line-height: 2.5;
+  text-align: center;
+  color: inherit;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Diacritics enhancement for Arabic text */
+.arabic-diacritics {
+  font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
+  -webkit-font-feature-settings: "liga" 1, "calt" 1, "kern" 1;
 }
 
 /* RTL specific spacing adjustments */

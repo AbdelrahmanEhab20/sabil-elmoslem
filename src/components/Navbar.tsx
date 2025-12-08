@@ -43,6 +43,7 @@ const Navbar: React.FC = () => {
     const navItems = [
         { href: '/', label: t.home, icon: '🏠' },
         { href: '/prayer-times', label: t.prayerTimes, icon: '🕌' },
+        { href: '/qibla', label: t.qibla, icon: '🧭' },
         { href: '/azkar', label: t.azkar, icon: '📿' },
         { href: '/quran', label: t.quran, icon: '📖' }
     ];

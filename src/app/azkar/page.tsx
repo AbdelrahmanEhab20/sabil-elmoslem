@@ -327,21 +327,67 @@ export default function AzkarPage() {
         );
     }
 
+    const isArabic = preferences.language === 'ar';
+
     return (
-        <div className="min-h-screen py-8">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <motion.h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {/* Hero Header */}
+            <section className="relative bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white py-12 md:py-16 overflow-hidden">
+                {/* Decorative pattern */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                    }} />
+                </div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <motion.div
+                        className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </motion.div>
+                    <motion.h1
+                        className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isArabic ? 'font-arabic-display' : ''}`}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                    >
                         {t.azkar}
                     </motion.h1>
-                    <motion.p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+                    <motion.p
+                        className={`text-lg md:text-xl text-green-100 max-w-2xl mx-auto ${isArabic ? 'font-arabic-body' : ''}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.15 }}
+                    >
                         {t.azkarDescription}
                     </motion.p>
                 </div>
 
+                {/* Bottom wave */}
+                <div className="absolute bottom-0 left-0 right-0">
+                    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+                        <path d="M0 30L60 25C120 20 240 10 360 15C480 20 600 40 720 45C840 50 960 40 1080 30C1200 20 1320 10 1380 5L1440 0V60H0V30Z" className="fill-gray-50 dark:fill-gray-900" />
+                    </svg>
+                </div>
+            </section>
+
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
                 {/* Search and Filters */}
-                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
+                <motion.div
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-5 sm:p-7 mb-8"
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4 }}
+                >
                     <div className="space-y-4">
                         {/* Search Bar */}
                         <div className="relative">
@@ -350,7 +396,7 @@ export default function AzkarPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={preferences.language === 'ar' ? 'ابحث في الأذكار...' : 'Search azkar...'}
-                                className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                             />
                             <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
@@ -360,7 +406,7 @@ export default function AzkarPage() {
                             <button
                                 onClick={() => setSelectedCategory('')}
                                 className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === ''
-                                    ? 'bg-green-600 text-white'
+                                    ? 'bg-emerald-600 text-white'
                                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                     }`}
                             >
@@ -371,7 +417,7 @@ export default function AzkarPage() {
                                     key={category}
                                     onClick={() => setSelectedCategory(category)}
                                     className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === category
-                                        ? 'bg-green-600 text-white'
+                                        ? 'bg-emerald-600 text-white'
                                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                         }`}
                                 >
@@ -391,11 +437,11 @@ export default function AzkarPage() {
                                         <div className="flex items-center space-x-2 rtl:space-x-reverse">
                                             <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                                 <div
-                                                    className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                                                    className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
                                                     style={{ width: `${getCategoryProgress.percentage}%` }}
                                                 ></div>
                                             </div>
-                                            <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                                            <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
                                                 {getCategoryProgress.percentage}%
                                             </span>
                                         </div>
@@ -419,12 +465,12 @@ export default function AzkarPage() {
                         return (
                             <motion.div
                                 key={zikr.id}
-                                className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-200 ${isComplete ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900/10' : ''
+                                className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-xl ${isComplete ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : ''
                                     }`}
-                                initial={{ opacity: 0, y: 8 }}
+                                initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.25 }}
+                                transition={{ duration: 0.3 }}
                             >
                                 {/* Counter Section */}
                                 {hasCounter && (
@@ -442,7 +488,7 @@ export default function AzkarPage() {
                                             <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                                 <div
                                                     className={`h-full transition-all duration-500 ease-out ${isComplete
-                                                        ? 'bg-gradient-to-r from-green-400 to-green-600'
+                                                        ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
                                                         : 'bg-gradient-to-r from-blue-400 to-blue-600'
                                                         }`}
                                                     style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
@@ -457,7 +503,7 @@ export default function AzkarPage() {
                                                 disabled={isComplete}
                                                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${isComplete
                                                     ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 dark:from-green-900/30 dark:to-green-800/30 dark:text-green-200 cursor-not-allowed'
-                                                    : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-green-500/25'
+                                                    : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25'
                                                     }`}
                                             >
                                                 {isComplete ? (
@@ -487,7 +533,7 @@ export default function AzkarPage() {
 
                                 {/* Content */}
                                 <div className="mb-4">
-                                    <div className={`text-xl sm:text-2xl leading-relaxed text-gray-900 dark:text-white ${preferences.language === 'ar' ? 'text-right font-arabic' : 'text-left'}`}>
+                                    <div className={`text-xl sm:text-2xl leading-relaxed text-gray-900 dark:text-white ${isArabic ? 'text-right font-arabic' : 'text-left'}`}>
                                         {zikr.content}
                                     </div>
                                 </div>
@@ -495,7 +541,7 @@ export default function AzkarPage() {
                                 {/* Description */}
                                 {zikr.description && (
                                     <div className="mb-4">
-                                        <div className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                        <div className={`text-gray-600 dark:text-gray-400 leading-relaxed ${isArabic ? 'font-arabic-body' : ''}`}>
                                             {zikr.description}
                                         </div>
                                     </div>
@@ -565,10 +611,10 @@ export default function AzkarPage() {
                     </div>
                     {randomDuaa && (
                         <div className="mb-4 text-center">
-                            <div className="text-xl font-semibold text-green-800 dark:text-green-200 mb-2">
+                            <div className="text-xl font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
                                 {preferences.language === 'ar' ? 'دُعَاءٌ لَكَ:' : 'A Duʿāʾ for You:'}
                             </div>
-                            <div className="text-lg text-gray-900 dark:text-white mb-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="text-lg text-gray-900 dark:text-white mb-2 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                                 {preferences.language === 'ar' ? randomDuaa.ar : randomDuaa.en}
                             </div>
                         </div>
@@ -580,7 +626,7 @@ export default function AzkarPage() {
                     </div>
                     <button
                         onClick={handleCloseCongrats}
-                        className="w-full mt-2 px-4 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200"
+                        className="w-full mt-2 px-4 py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors duration-200"
                     >
                         {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
                     </button>

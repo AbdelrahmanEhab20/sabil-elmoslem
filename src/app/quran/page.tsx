@@ -17,6 +17,36 @@ const STORAGE_KEYS = {
     RECITER: 'quran-reciter',
 } as const;
 
+// Helper functions for localStorage with lazy initialization
+const getStoredFontSize = (): 'lg' | 'xl' | '2xl' | '3xl' | '4xl' => {
+    if (typeof window === 'undefined') return '2xl';
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+        if (saved && ['lg', 'xl', '2xl', '3xl', '4xl'].includes(saved)) {
+            return saved as 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+        }
+    } catch (error) {
+        console.warn('Failed to load font size from localStorage:', error);
+    }
+    return '2xl';
+};
+
+const getStoredReciter = (): number => {
+    if (typeof window === 'undefined') return 1;
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.RECITER);
+        if (saved) {
+            const reciterId = parseInt(saved);
+            if (QURAN_RECITERS.some(r => r.id === reciterId)) {
+                return reciterId;
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to load reciter from localStorage:', error);
+    }
+    return 1;
+};
+
 export default function QuranPage() {
     const { preferences } = useUser();
     const t = useTranslations(preferences.language);
@@ -31,57 +61,30 @@ export default function QuranPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [view, setView] = useState<'surah-list' | 'ayah-view'>('surah-list');
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>('2xl');
+
+    // Use lazy initialization to read from localStorage only once, avoiding re-renders
+    const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
+    const [selectedReciter, setSelectedReciter] = useState(getStoredReciter);
+
+    // Track if initial mount is complete to prevent saving defaults on first render
+    const isInitialMount = useRef(true);
 
     // Audio state
-    const [selectedReciter, setSelectedReciter] = useState(1); // Default: Mishary Alafasy
     const [playingAyah, setPlayingAyah] = useState<number | null>(null);
     const [isAutoPlay, setIsAutoPlay] = useState(false);
 
     // Refs for auto-scroll
     const ayahRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
-    // Load saved reciter from localStorage
+    // Save reciter to localStorage (only after initial mount)
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const savedReciter = localStorage.getItem(STORAGE_KEYS.RECITER);
-                if (savedReciter) {
-                    const reciterId = parseInt(savedReciter);
-                    if (QURAN_RECITERS.some(r => r.id === reciterId)) {
-                        setSelectedReciter(reciterId);
-                    }
-                }
-            } catch (error) {
-                console.warn('Failed to load reciter from localStorage:', error);
-            }
-        }
-    }, []);
-
-    // Save reciter to localStorage
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem(STORAGE_KEYS.RECITER, selectedReciter.toString());
-            } catch (error) {
-                console.warn('Failed to save reciter to localStorage:', error);
-            }
+        if (isInitialMount.current) return;
+        try {
+            localStorage.setItem(STORAGE_KEYS.RECITER, selectedReciter.toString());
+        } catch (error) {
+            console.warn('Failed to save reciter to localStorage:', error);
         }
     }, [selectedReciter]);
-
-    // Load saved font size from localStorage
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                const savedFontSize = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
-                if (savedFontSize && ['lg', 'xl', '2xl', '3xl', '4xl'].includes(savedFontSize)) {
-                    setFontSize(savedFontSize as typeof fontSize);
-                }
-            } catch (error) {
-                console.warn('Failed to load font size from localStorage:', error);
-            }
-        }
-    }, []);
 
     // Auto-scroll to playing ayah
     useEffect(() => {
@@ -96,16 +99,20 @@ export default function QuranPage() {
         }
     }, [playingAyah]);
 
-    // Save font size to localStorage
+    // Save font size to localStorage (only after initial mount)
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem(STORAGE_KEYS.FONT_SIZE, fontSize);
-            } catch (error) {
-                console.warn('Failed to save font size to localStorage:', error);
-            }
+        if (isInitialMount.current) return;
+        try {
+            localStorage.setItem(STORAGE_KEYS.FONT_SIZE, fontSize);
+        } catch (error) {
+            console.warn('Failed to save font size to localStorage:', error);
         }
     }, [fontSize]);
+
+    // Mark initial mount as complete after first render
+    useEffect(() => {
+        isInitialMount.current = false;
+    }, []);
 
     // Fetch surahs on mount
     useEffect(() => {
@@ -284,13 +291,65 @@ export default function QuranPage() {
         );
     }
 
+    const isArabic = preferences.language === 'ar';
+
     return (
-        <div className="min-h-screen relative bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="min-h-screen relative bg-gray-50 dark:bg-gray-900">
+            {/* Hero Header - Only show on surah list view */}
+            {view === 'surah-list' && (
+                <section className="relative bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 text-white py-12 md:py-16 overflow-hidden">
+                    {/* Decorative pattern */}
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute inset-0" style={{
+                            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                        }} />
+                    </div>
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                        <motion.div
+                            className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                <path d="M4 19.5A2.5 2.5 0 016.5 17H20" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </motion.div>
+                        <motion.h1
+                            className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isArabic ? 'font-arabic-display' : ''}`}
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4 }}
+                        >
+                            {isArabic ? 'القرآن الكريم' : 'The Holy Quran'}
+                        </motion.h1>
+                        <motion.p
+                            className={`text-lg md:text-xl text-purple-100 max-w-2xl mx-auto ${isArabic ? 'font-arabic-body' : ''}`}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.15 }}
+                        >
+                            {isArabic ? 'اقرأ وتأمل في كلام الله' : 'Read and reflect upon the words of Allah'}
+                        </motion.p>
+                    </div>
+
+                    {/* Bottom wave */}
+                    <div className="absolute bottom-0 left-0 right-0">
+                        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+                            <path d="M0 30L60 25C120 20 240 10 360 15C480 20 600 40 720 45C840 50 960 40 1080 30C1200 20 1320 10 1380 5L1440 0V60H0V30Z" className="fill-gray-50 dark:fill-gray-900" />
+                        </svg>
+                    </div>
+                </section>
+            )}
+
             {/* Sidebar Toggle Button for Mobile */}
             <button
-                className="md:hidden fixed top-20 left-4 z-50 bg-green-600 text-white p-3 rounded-full shadow-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 dark:focus:ring-green-800 transition-all duration-200 rtl:left-auto rtl:right-4"
+                className="md:hidden fixed top-20 left-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-xl hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 transition-all duration-200 rtl:left-auto rtl:right-4"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label={preferences.language === 'ar' ? 'فتح قائمة السور' : 'Open Surah List'}
+                aria-label={isArabic ? 'فتح قائمة السور' : 'Open Surah List'}
             >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -302,11 +361,11 @@ export default function QuranPage() {
                 <aside
                     className={`
                         fixed top-0 left-0 h-full w-80 sm:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl p-6 overflow-y-auto z-40 transition-transform duration-300 ease-in-out
-                        lg:static lg:translate-x-0 lg:w-72 lg:h-[calc(100vh-5rem)] lg:rounded-2xl lg:shadow-xl lg:border-0
+                        lg:static lg:translate-x-0 lg:w-72 lg:h-[calc(100vh-5rem)] lg:rounded-2xl lg:shadow-xl lg:border lg:border-gray-100 lg:dark:border-gray-700
                         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
                     `}
-                    style={{ direction: preferences.language === 'ar' ? 'rtl' : 'ltr' }}
-                    aria-label={preferences.language === 'ar' ? 'قائمة السور' : 'Surah List'}
+                    style={{ direction: isArabic ? 'rtl' : 'ltr' }}
+                    aria-label={isArabic ? 'قائمة السور' : 'Surah List'}
                 >
                     {/* Sidebar Header */}
                     <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -337,7 +396,7 @@ export default function QuranPage() {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder={preferences.language === 'ar' ? 'ابحث...' : 'Search...'}
-                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                             />
                         </div>
                     )}
@@ -350,14 +409,14 @@ export default function QuranPage() {
                                     onClick={() => { handleSurahSelect(surah); setSidebarOpen(false); }}
                                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 group
                                         ${selectedSurah?.number === surah.number
-                                            ? 'bg-gradient-to-r from-green-600 to-green-700 text-white shadow-lg transform scale-[1.02]'
+                                            ? 'bg-gradient-to-r from-purple-600 to-violet-700 text-white shadow-lg transform scale-[1.02]'
                                             : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-900 dark:text-white hover:shadow-md'
                                         }`}
                                 >
                                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-sm font-bold flex-shrink-0
                                         ${selectedSurah?.number === surah.number
                                             ? 'bg-white/20 text-white'
-                                            : 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400'
+                                            : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400'
                                         }`}>
                                         {surah.number}
                                     </div>
@@ -392,39 +451,15 @@ export default function QuranPage() {
                 {/* Main Content */}
                 <div className="flex-1 w-full min-w-0">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        {/* Header - Only show on surah list view */}
-                        {view === 'surah-list' && (
-                            <div className="text-center mb-8 sm:mb-10 pt-4 sm:pt-6">
-                                <motion.h1
-                                    className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6"
-                                    initial={{ opacity: 0, y: 8 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.35 }}
-                                >
-                                    <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-green-500 bg-clip-text text-transparent">
-                                        {preferences.language === 'ar' ? 'القرآن الكريم' : 'The Holy Quran'}
-                                    </span>
-                                </motion.h1>
-                                <motion.p
-                                    className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 font-medium"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ delay: 0.1 }}
-                                >
-                                    {preferences.language === 'ar' ? 'اقرأ وتأمل في كلام الله' : 'Read and reflect upon the words of Allah'}
-                                </motion.p>
-                            </div>
-                        )}
-
                         {view === 'surah-list' ? (
                             <>
                                 {/* Search Bar - Only show on desktop when sidebar is visible */}
                                 <motion.div
-                                    className="hidden lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 mb-8"
-                                    initial={{ opacity: 0, y: 6 }}
+                                    className="hidden lg:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 mb-8"
+                                    initial={{ opacity: 0, y: 8 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
-                                    transition={{ duration: 0.3 }}
+                                    transition={{ duration: 0.4 }}
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1 relative">
@@ -436,10 +471,10 @@ export default function QuranPage() {
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 placeholder={preferences.language === 'ar' ? 'ابحث عن السور...' : 'Search surahs...'}
-                                                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                                                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                                             />
                                         </div>
-                                        <div className="px-4 py-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-sm font-medium text-green-700 dark:text-green-300 whitespace-nowrap">
+                                        <div className="px-4 py-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-sm font-medium text-purple-700 dark:text-purple-300 whitespace-nowrap">
                                             {filteredSurahs.length} {preferences.language === 'ar' ? 'من' : 'of'} {surahs.length}
                                         </div>
                                     </div>
@@ -451,7 +486,7 @@ export default function QuranPage() {
                                         <motion.button
                                             key={surah.number}
                                             onClick={() => handleSurahSelect(surah)}
-                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-green-200 dark:hover:border-green-700"
+                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700"
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                             initial={{ opacity: 0, y: 20 }}
@@ -459,7 +494,7 @@ export default function QuranPage() {
                                             transition={{ duration: 0.3 }}
                                         >
                                             <div className="flex items-start justify-between mb-4">
-                                                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
+                                                <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
                                                     <span className="text-lg font-bold text-white">
                                                         {surah.number}
                                                     </span>
@@ -469,7 +504,7 @@ export default function QuranPage() {
                                                 </span>
                                             </div>
 
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                                                 {surah.englishName}
                                             </h3>
                                             <p className="text-2xl sm:text-3xl text-gray-900 dark:text-white mb-4 font-arabic font-semibold leading-relaxed">
@@ -515,10 +550,10 @@ export default function QuranPage() {
                             <>
                                 {/* Ayah View Header - Enhanced */}
                                 <motion.div
-                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 mb-6 sm:mb-8"
-                                    initial={{ opacity: 0, y: 6 }}
+                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 sm:p-8 mb-6 sm:mb-8"
+                                    initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    transition={{ duration: 0.4 }}
                                 >
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                                         <div className="flex items-center gap-4">
@@ -571,7 +606,7 @@ export default function QuranPage() {
                                                             key={size.key}
                                                             onClick={() => setFontSize(size.key as typeof fontSize)}
                                                             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${fontSize === size.key
-                                                                ? 'bg-green-600 text-white shadow-lg transform scale-105'
+                                                                ? 'bg-purple-600 text-white shadow-lg transform scale-105'
                                                                 : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-green-300'
                                                                 }`}
                                                         >
@@ -588,7 +623,7 @@ export default function QuranPage() {
                                         <div className="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
                                             <div className="flex flex-wrap items-center gap-3">
                                                 {/* Volume Icon */}
-                                                <Volume2 className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0" />
+                                                <Volume2 className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
 
                                                 {/* Reciter Selector - Compact */}
                                                 <div className="relative">
@@ -598,7 +633,7 @@ export default function QuranPage() {
                                                             setSelectedReciter(Number(e.target.value));
                                                             setPlayingAyah(null);
                                                         }}
-                                                        className="appearance-none bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+                                                        className="appearance-none bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
                                                     >
                                                         {QURAN_RECITERS.map((reciter) => (
                                                             <option key={reciter.id} value={reciter.id}>
@@ -615,7 +650,7 @@ export default function QuranPage() {
                                                 {playingAyah === null ? (
                                                     <button
                                                         onClick={handlePlayAll}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm shadow-sm"
+                                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm shadow-sm"
                                                     >
                                                         <Play className="w-4 h-4" />
                                                         <span className="hidden sm:inline">{preferences.language === 'ar' ? 'تشغيل' : 'Play'}</span>
@@ -636,7 +671,7 @@ export default function QuranPage() {
                                                         type="checkbox"
                                                         checked={isAutoPlay}
                                                         onChange={(e) => setIsAutoPlay(e.target.checked)}
-                                                        className="w-4 h-4 accent-green-600 rounded"
+                                                        className="w-4 h-4 accent-purple-600 rounded"
                                                     />
                                                     <span className="hidden sm:inline">{preferences.language === 'ar' ? 'تشغيل تلقائي' : 'Auto-play'}</span>
                                                     <span className="sm:hidden">{preferences.language === 'ar' ? 'تلقائي' : 'Auto'}</span>
@@ -649,7 +684,7 @@ export default function QuranPage() {
                                 {/* Bismillah Header for non-Fatiha surahs - Enhanced */}
                                 {selectedSurah && selectedSurah.number !== 1 && selectedSurah.number !== 9 && (
                                     <motion.div
-                                        className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl shadow-xl p-8 sm:p-12 mb-8 border border-green-100 dark:border-green-800"
+                                        className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20 rounded-2xl shadow-xl p-8 sm:p-12 mb-8 border border-purple-100 dark:border-purple-800"
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         whileInView={{ opacity: 1, scale: 1 }}
                                         viewport={{ once: true }}
@@ -659,7 +694,7 @@ export default function QuranPage() {
                                             <div className="text-3xl sm:text-4xl lg:text-5xl leading-relaxed text-gray-900 dark:text-white font-arabic mb-6">
                                                 بِسۡمِ ٱللَّهِ ٱلرَّحۡمَـٰنِ ٱلرَّحِیمِ
                                             </div>
-                                            <div className="w-24 h-1.5 bg-gradient-to-r from-green-500 to-emerald-500 mx-auto rounded-full"></div>
+                                            <div className="w-24 h-1.5 bg-gradient-to-r from-purple-500 to-violet-500 mx-auto rounded-full"></div>
                                         </div>
                                     </motion.div>
                                 )}
@@ -704,18 +739,18 @@ export default function QuranPage() {
                                                     ref={(el) => {
                                                         if (el) ayahRefs.current.set(ayah.numberInSurah, el);
                                                     }}
-                                                    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 sm:p-8 transition-all duration-300 border-2 ${playingAyah === ayah.numberInSurah
-                                                        ? 'border-green-500 ring-2 ring-green-500/20'
+                                                    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 sm:p-8 transition-all duration-300 border ${playingAyah === ayah.numberInSurah
+                                                        ? 'border-purple-500 ring-2 ring-purple-500/20'
                                                         : 'border-gray-100 dark:border-gray-700'
                                                         }`}
-                                                    initial={{ opacity: 0, y: 8 }}
+                                                    initial={{ opacity: 0, y: 10 }}
                                                     whileInView={{ opacity: 1, y: 0 }}
                                                     viewport={{ once: true }}
-                                                    transition={{ duration: 0.3 }}
+                                                    transition={{ duration: 0.35 }}
                                                 >
                                                     <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-md">
+                                                            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md">
                                                                 <span className="text-sm font-bold text-white">
                                                                     {ayah.numberInSurah}
                                                                 </span>
@@ -772,7 +807,7 @@ export default function QuranPage() {
 
                                                     {/* Translation - Enhanced */}
                                                     {preferences.language === 'en' && ayah.translation && (
-                                                        <div className="text-left text-base sm:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-r-4 border-green-500">
+                                                        <div className="text-left text-base sm:text-lg leading-relaxed text-gray-700 dark:text-gray-300 mb-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border-r-4 border-purple-500">
                                                             {ayah.translation}
                                                         </div>
                                                     )}

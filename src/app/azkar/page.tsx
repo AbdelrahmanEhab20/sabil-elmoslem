@@ -7,7 +7,26 @@ import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
 import CustomModal from '@/components/CustomModal';
-import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered } from 'lucide-react';
+import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered, Type, ChevronDown, Grid3X3 } from 'lucide-react';
+
+// Storage key for font size preference
+const STORAGE_KEYS = {
+    FONT_SIZE: 'azkar-font-size',
+} as const;
+
+// Helper function for localStorage with lazy initialization
+const getStoredFontSize = (): 'lg' | 'xl' | '2xl' | '3xl' | '4xl' => {
+    if (typeof window === 'undefined') return '2xl';
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+        if (saved && ['lg', 'xl', '2xl', '3xl', '4xl'].includes(saved)) {
+            return saved as 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+        }
+    } catch (error) {
+        console.warn('Failed to load font size from localStorage:', error);
+    }
+    return '2xl';
+};
 
 export default function AzkarPage() {
     const { preferences } = useUser();
@@ -24,6 +43,27 @@ export default function AzkarPage() {
     const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Font size state with lazy initialization from localStorage
+    const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
+
+    // Track if initial mount is complete to prevent saving defaults on first render
+    const isInitialMount = useRef(true);
+
+    // Save font size to localStorage (only after initial mount)
+    useEffect(() => {
+        if (isInitialMount.current) return;
+        try {
+            localStorage.setItem(STORAGE_KEYS.FONT_SIZE, fontSize);
+        } catch (error) {
+            console.warn('Failed to save font size to localStorage:', error);
+        }
+    }, [fontSize]);
+
+    // Mark initial mount as complete after first render
+    useEffect(() => {
+        isInitialMount.current = false;
+    }, []);
 
     // Storage key for counters - includes date to reset daily
     const getCountersStorageKey = useCallback(() => {
@@ -327,21 +367,67 @@ export default function AzkarPage() {
         );
     }
 
+    const isArabic = preferences.language === 'ar';
+
     return (
-        <div className="min-h-screen py-8">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Header */}
-                <div className="text-center mb-8">
-                    <motion.h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white mb-4" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.35 }}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {/* Hero Header */}
+            <section className="relative bg-gradient-to-br from-emerald-600 via-green-600 to-teal-700 text-white py-12 md:py-16 overflow-hidden">
+                {/* Decorative pattern */}
+                <div className="absolute inset-0 opacity-10">
+                    <div className="absolute inset-0" style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M30 0L60 30L30 60L0 30L30 0zm0 8.5L51.5 30L30 51.5L8.5 30L30 8.5z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+                    }} />
+                </div>
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1)_0%,transparent_50%)]" />
+
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <motion.div
+                        className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6 backdrop-blur-sm"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4 }}
+                    >
+                        <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </motion.div>
+                    <motion.h1
+                        className={`text-3xl sm:text-4xl md:text-5xl font-bold mb-4 ${isArabic ? 'font-arabic-display' : ''}`}
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4 }}
+                    >
                         {t.azkar}
                     </motion.h1>
-                    <motion.p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+                    <motion.p
+                        className={`text-lg md:text-xl text-green-100 max-w-2xl mx-auto ${isArabic ? 'font-arabic-body' : ''}`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.15 }}
+                    >
                         {t.azkarDescription}
                     </motion.p>
                 </div>
 
+                {/* Bottom wave */}
+                <div className="absolute bottom-0 left-0 right-0">
+                    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full">
+                        <path d="M0 30L60 25C120 20 240 10 360 15C480 20 600 40 720 45C840 50 960 40 1080 30C1200 20 1320 10 1380 5L1440 0V60H0V30Z" className="fill-gray-50 dark:fill-gray-900" />
+                    </svg>
+                </div>
+            </section>
+
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+
                 {/* Search and Filters */}
-                <motion.div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-8" initial={{ opacity: 0, y: 6 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.3 }}>
+                <motion.div
+                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-5 sm:p-7 mb-8"
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4 }}
+                >
                     <div className="space-y-4">
                         {/* Search Bar */}
                         <div className="relative">
@@ -350,61 +436,123 @@ export default function AzkarPage() {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={preferences.language === 'ar' ? 'ابحث في الأذكار...' : 'Search azkar...'}
-                                className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                className="w-full px-4 py-3 pl-10 pr-4 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                             />
                             <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
 
-                        {/* Category Filter */}
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setSelectedCategory('')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === ''
-                                    ? 'bg-green-600 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                                    }`}
-                            >
-                                {preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}
-                            </button>
-                            {categories.map((category) => (
+                        {/* Category Filter - Dropdown on mobile, buttons on desktop */}
+                        {/* Mobile: Dropdown Select */}
+                        <div className="sm:hidden">
+                            <div className="relative">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Grid3X3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {preferences.language === 'ar' ? 'اختر الفئة' : 'Select Category'}
+                                    </span>
+                                </div>
+                                <div className="relative">
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border-2 border-emerald-200 dark:border-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer"
+                                    >
+                                        <option value="">{preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}</option>
+                                        {categories.map((category) => (
+                                            <option key={category} value={category}>
+                                                {getCategoryDisplayName(category)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600 dark:text-emerald-400 pointer-events-none" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Desktop: Button Pills */}
+                        <div className="hidden sm:block">
+                            <div className="flex flex-wrap gap-2">
                                 <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === category
-                                        ? 'bg-green-600 text-white'
+                                    onClick={() => setSelectedCategory('')}
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 ${selectedCategory === ''
+                                        ? 'bg-emerald-600 text-white shadow-md'
                                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                         }`}
                                 >
-                                    {getCategoryDisplayName(category)}
+                                    {preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}
                                 </button>
-                            ))}
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 ${selectedCategory === category
+                                            ? 'bg-emerald-600 text-white shadow-md'
+                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                            }`}
+                                    >
+                                        {getCategoryDisplayName(category)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Stats and Controls */}
                         {selectedCategory && (
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3 sm:space-y-0">
-                                <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                        {filteredAzkar.length} {preferences.language === 'ar' ? (filteredAzkar.length === 1 ? 'دعاء' : 'أدعية') : `item${filteredAzkar.length !== 1 ? 's' : ''}`}
-                                    </p>
-                                    {getCategoryProgress.total > 0 && (
-                                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                            <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                                <div
-                                                    className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                                                    style={{ width: `${getCategoryProgress.percentage}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="text-sm text-green-600 dark:text-green-400 font-medium">
-                                                {getCategoryProgress.percentage}%
-                                            </span>
+                            <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                    {filteredAzkar.length} {preferences.language === 'ar' ? (filteredAzkar.length === 1 ? 'دعاء' : 'أدعية') : `item${filteredAzkar.length !== 1 ? 's' : ''}`}
+                                </p>
+                                {getCategoryProgress.total > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-16 sm:w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                            <div
+                                                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${getCategoryProgress.percentage}%` }}
+                                            ></div>
                                         </div>
-                                    )}
-                                </div>
+                                        <span className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap">
+                                            {getCategoryProgress.percentage}%
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         )}
-                    </div>
-                </motion.div>
+
+                            {/* Font Size Control */}
+                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-xl p-4 shadow-sm border border-emerald-100 dark:border-emerald-800">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            <Type className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                            <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 sm:gap-2">
+                                            {[
+                                                { key: 'lg', label: 'S' },
+                                                { key: 'xl', label: 'M' },
+                                                { key: '2xl', label: 'L' },
+                                                { key: '3xl', label: 'XL' },
+                                                { key: '4xl', label: 'XXL' }
+                                            ].map((size) => (
+                                                <button
+                                                    key={size.key}
+                                                    onClick={() => setFontSize(size.key as typeof fontSize)}
+                                                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${fontSize === size.key
+                                                        ? 'bg-emerald-600 text-white shadow-lg'
+                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-emerald-300'
+                                                        }`}
+                                                >
+                                                    {size.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
 
                 {/* Azkar List */}
                 <div className="space-y-6">
@@ -419,12 +567,12 @@ export default function AzkarPage() {
                         return (
                             <motion.div
                                 key={zikr.id}
-                                className={`bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 transition-all duration-200 ${isComplete ? 'ring-2 ring-green-500 bg-green-50 dark:bg-green-900/10' : ''
+                                className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 transition-all duration-300 hover:shadow-xl ${isComplete ? 'ring-2 ring-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : ''
                                     }`}
-                                initial={{ opacity: 0, y: 8 }}
+                                initial={{ opacity: 0, y: 10 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ duration: 0.25 }}
+                                transition={{ duration: 0.3 }}
                             >
                                 {/* Counter Section */}
                                 {hasCounter && (
@@ -442,7 +590,7 @@ export default function AzkarPage() {
                                             <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                                 <div
                                                     className={`h-full transition-all duration-500 ease-out ${isComplete
-                                                        ? 'bg-gradient-to-r from-green-400 to-green-600'
+                                                        ? 'bg-gradient-to-r from-emerald-400 to-emerald-600'
                                                         : 'bg-gradient-to-r from-blue-400 to-blue-600'
                                                         }`}
                                                     style={{ width: `${Math.min((currentCount / targetCount) * 100, 100)}%` }}
@@ -457,7 +605,7 @@ export default function AzkarPage() {
                                                 disabled={isComplete}
                                                 className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${isComplete
                                                     ? 'bg-gradient-to-r from-green-100 to-green-200 text-green-800 dark:from-green-900/30 dark:to-green-800/30 dark:text-green-200 cursor-not-allowed'
-                                                    : 'bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-green-500/25'
+                                                    : 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/25'
                                                     }`}
                                             >
                                                 {isComplete ? (
@@ -486,34 +634,34 @@ export default function AzkarPage() {
                                 )}
 
                                 {/* Content */}
-                                <div className="mb-4">
-                                    <div className={`text-xl sm:text-2xl leading-relaxed text-gray-900 dark:text-white ${preferences.language === 'ar' ? 'text-right font-arabic' : 'text-left'}`}>
+                                <div className="mb-4 overflow-hidden">
+                                    <div className={`leading-loose sm:leading-relaxed text-gray-900 dark:text-white break-words ${isArabic ? 'text-right font-arabic' : 'text-left'} ${fontSize === 'lg' ? 'text-base sm:text-lg md:text-xl' : fontSize === 'xl' ? 'text-lg sm:text-xl md:text-2xl' : fontSize === '2xl' ? 'text-xl sm:text-2xl md:text-3xl' : fontSize === '3xl' ? 'text-2xl sm:text-3xl md:text-4xl' : 'text-3xl sm:text-4xl md:text-5xl'}`}>
                                         {zikr.content}
                                     </div>
                                 </div>
 
                                 {/* Description */}
                                 {zikr.description && (
-                                    <div className="mb-4">
-                                        <div className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                                    <div className="mb-4 overflow-hidden">
+                                        <div className={`text-gray-600 dark:text-gray-400 leading-relaxed break-words ${isArabic ? 'font-arabic-body text-right' : 'text-left'} ${fontSize === 'lg' ? 'text-xs sm:text-sm md:text-base' : fontSize === 'xl' ? 'text-sm sm:text-base md:text-lg' : fontSize === '2xl' ? 'text-base sm:text-lg md:text-xl' : fontSize === '3xl' ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>
                                             {zikr.description}
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Reference and Count */}
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 dark:text-gray-400 space-y-2 sm:space-y-0">
-                                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         {zikr.reference && (
-                                            <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <BadgeCheck className="w-5 h-5 p-0.5" aria-hidden="true" />
-                                                <span>{zikr.reference}</span>
+                                            <span className="flex items-center gap-1">
+                                                <BadgeCheck className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                                                <span className="truncate max-w-[150px] sm:max-w-none">{zikr.reference}</span>
                                             </span>
                                         )}
                                         {hasCounter && parseInt(zikr.count) > 1 && (
-                                            <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <ListOrdered className="w-4 h-4" aria-hidden="true" />
-                                                <span>
+                                            <span className="flex items-center gap-1">
+                                                <ListOrdered className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                                                <span className="whitespace-nowrap">
                                                     {preferences.language === 'ar'
                                                         ? `${zikr.count} مرات`
                                                         : `${zikr.count} times`
@@ -522,7 +670,7 @@ export default function AzkarPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded whitespace-nowrap flex-shrink-0">
                                         {getCategoryDisplayName(zikr.category)}
                                     </span>
                                 </div>
@@ -565,10 +713,10 @@ export default function AzkarPage() {
                     </div>
                     {randomDuaa && (
                         <div className="mb-4 text-center">
-                            <div className="text-xl font-semibold text-green-800 dark:text-green-200 mb-2">
+                            <div className="text-xl font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
                                 {preferences.language === 'ar' ? 'دُعَاءٌ لَكَ:' : 'A Duʿāʾ for You:'}
                             </div>
-                            <div className="text-lg text-gray-900 dark:text-white mb-2 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="text-lg text-gray-900 dark:text-white mb-2 p-4 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                                 {preferences.language === 'ar' ? randomDuaa.ar : randomDuaa.en}
                             </div>
                         </div>
@@ -580,7 +728,7 @@ export default function AzkarPage() {
                     </div>
                     <button
                         onClick={handleCloseCongrats}
-                        className="w-full mt-2 px-4 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition-colors duration-200"
+                        className="w-full mt-2 px-4 py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-colors duration-200"
                     >
                         {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
                     </button>

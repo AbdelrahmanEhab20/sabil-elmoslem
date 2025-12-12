@@ -101,8 +101,16 @@ describe('AzkarPage', () => {
         test('displays category filter with All Categories button', async () => {
             render(<AzkarPage />)
 
+            // Wait for content to load first
             await waitFor(() => {
-                expect(screen.getByText(/All Categories/i)).toBeInTheDocument()
+                expect(screen.getByText(/سبحان الله/)).toBeInTheDocument()
+            }, WAIT_TIMEOUT)
+
+            // Then check for category filter - it can be in select option or button
+            // Use getAllByText since it might appear in multiple places
+            await waitFor(() => {
+                const allCategoriesElements = screen.getAllByText(/All Categories/i)
+                expect(allCategoriesElements.length).toBeGreaterThan(0)
             }, WAIT_TIMEOUT)
         })
 

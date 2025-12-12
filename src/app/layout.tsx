@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Cairo, Tajawal } from "next/font/google";
 import "./globals.css";
 import { UserProvider } from "@/contexts/UserContext";
 import Navbar from "@/components/Navbar";
@@ -19,6 +19,22 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+// Arabic display font - Cairo for headings
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+// Arabic body font - Tajawal for paragraphs
+const tajawal = Tajawal({
+  variable: "--font-tajawal",
+  subsets: ["arabic", "latin"],
+  weight: ["300", "400", "500", "700", "800"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -178,7 +194,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50 dark:bg-gray-900 min-h-screen font-sans`}
+        className={`${geistSans.variable} ${geistMono.variable} ${cairo.variable} ${tajawal.variable} antialiased bg-gray-50 dark:bg-gray-900 min-h-screen font-sans`}
       >
         <ErrorBoundary>
           <ToastProvider>

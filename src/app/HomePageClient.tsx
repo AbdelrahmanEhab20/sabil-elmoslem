@@ -135,22 +135,26 @@ export default function HomePageClient() {
                         animate={{ opacity: 1, y: 0 }} 
                         transition={{ duration: 0.6, ease: "easeOut" }}
                     >
-                        {/* Logo with glow effect */}
+                        {/* Logo with white circular background for visibility */}
                         <motion.div 
                             className="relative inline-block mb-6"
                             initial={{ scale: 0.8, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 0.5, delay: 0.1 }}
                         >
-                            <div className="absolute inset-0 bg-white/20 rounded-full blur-xl animate-pulse-glow" />
-                            <Image 
-                                src="/images/logo.png" 
-                                alt="Sabil Elmoslem Logo" 
-                                width={100} 
-                                height={100} 
-                                className="relative mx-auto drop-shadow-2xl"
-                                priority
-                            />
+                            {/* Outer glow effect */}
+                            <div className="absolute -inset-4 bg-white/20 rounded-full blur-2xl animate-pulse-glow" />
+                            {/* White circular background for logo visibility */}
+                            <div className="relative w-28 h-28 sm:w-32 sm:h-32 bg-white rounded-full shadow-2xl flex items-center justify-center mx-auto ring-4 ring-white/30">
+                                <Image 
+                                    src="/images/logo.png" 
+                                    alt="Sabil Elmoslem Logo" 
+                                    width={90} 
+                                    height={90}
+                                    className="object-contain"
+                                    priority
+                                />
+                            </div>
                         </motion.div>
                         
                         {/* Main heading with enhanced Arabic typography */}

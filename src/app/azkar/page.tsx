@@ -7,7 +7,26 @@ import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
 import CustomModal from '@/components/CustomModal';
-import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered } from 'lucide-react';
+import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered, Type, ChevronDown, Grid3X3 } from 'lucide-react';
+
+// Storage key for font size preference
+const STORAGE_KEYS = {
+    FONT_SIZE: 'azkar-font-size',
+} as const;
+
+// Helper function for localStorage with lazy initialization
+const getStoredFontSize = (): 'lg' | 'xl' | '2xl' | '3xl' | '4xl' => {
+    if (typeof window === 'undefined') return '2xl';
+    try {
+        const saved = localStorage.getItem(STORAGE_KEYS.FONT_SIZE);
+        if (saved && ['lg', 'xl', '2xl', '3xl', '4xl'].includes(saved)) {
+            return saved as 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+        }
+    } catch (error) {
+        console.warn('Failed to load font size from localStorage:', error);
+    }
+    return '2xl';
+};
 
 export default function AzkarPage() {
     const { preferences } = useUser();
@@ -24,6 +43,27 @@ export default function AzkarPage() {
     const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Font size state with lazy initialization from localStorage
+    const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
+
+    // Track if initial mount is complete to prevent saving defaults on first render
+    const isInitialMount = useRef(true);
+
+    // Save font size to localStorage (only after initial mount)
+    useEffect(() => {
+        if (isInitialMount.current) return;
+        try {
+            localStorage.setItem(STORAGE_KEYS.FONT_SIZE, fontSize);
+        } catch (error) {
+            console.warn('Failed to save font size to localStorage:', error);
+        }
+    }, [fontSize]);
+
+    // Mark initial mount as complete after first render
+    useEffect(() => {
+        isInitialMount.current = false;
+    }, []);
 
     // Storage key for counters - includes date to reset daily
     const getCountersStorageKey = useCallback(() => {
@@ -401,56 +441,118 @@ export default function AzkarPage() {
                             <Search className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
 
-                        {/* Category Filter */}
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setSelectedCategory('')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === ''
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                                    }`}
-                            >
-                                {preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}
-                            </button>
-                            {categories.map((category) => (
+                        {/* Category Filter - Dropdown on mobile, buttons on desktop */}
+                        {/* Mobile: Dropdown Select */}
+                        <div className="sm:hidden">
+                            <div className="relative">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <Grid3X3 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {preferences.language === 'ar' ? 'اختر الفئة' : 'Select Category'}
+                                    </span>
+                                </div>
+                                <div className="relative">
+                                    <select
+                                        value={selectedCategory}
+                                        onChange={(e) => setSelectedCategory(e.target.value)}
+                                        className="w-full appearance-none px-4 py-3 pr-10 rounded-xl border-2 border-emerald-200 dark:border-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 text-gray-900 dark:text-white font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent cursor-pointer"
+                                    >
+                                        <option value="">{preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}</option>
+                                        {categories.map((category) => (
+                                            <option key={category} value={category}>
+                                                {getCategoryDisplayName(category)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-600 dark:text-emerald-400 pointer-events-none" />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Desktop: Button Pills */}
+                        <div className="hidden sm:block">
+                            <div className="flex flex-wrap gap-2">
                                 <button
-                                    key={category}
-                                    onClick={() => setSelectedCategory(category)}
-                                    className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${selectedCategory === category
-                                        ? 'bg-emerald-600 text-white'
+                                    onClick={() => setSelectedCategory('')}
+                                    className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 ${selectedCategory === ''
+                                        ? 'bg-emerald-600 text-white shadow-md'
                                         : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                         }`}
                                 >
-                                    {getCategoryDisplayName(category)}
+                                    {preferences.language === 'ar' ? 'جميع الفئات' : 'All Categories'}
                                 </button>
-                            ))}
+                                {categories.map((category) => (
+                                    <button
+                                        key={category}
+                                        onClick={() => setSelectedCategory(category)}
+                                        className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors duration-200 ${selectedCategory === category
+                                            ? 'bg-emerald-600 text-white shadow-md'
+                                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                            }`}
+                                    >
+                                        {getCategoryDisplayName(category)}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
                         {/* Stats and Controls */}
                         {selectedCategory && (
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 border-t border-gray-200 dark:border-gray-700 space-y-3 sm:space-y-0">
-                                <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                        {filteredAzkar.length} {preferences.language === 'ar' ? (filteredAzkar.length === 1 ? 'دعاء' : 'أدعية') : `item${filteredAzkar.length !== 1 ? 's' : ''}`}
-                                    </p>
-                                    {getCategoryProgress.total > 0 && (
-                                        <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                            <div className="w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                                <div
-                                                    className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
-                                                    style={{ width: `${getCategoryProgress.percentage}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium">
-                                                {getCategoryProgress.percentage}%
-                                            </span>
+                            <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
+                                    {filteredAzkar.length} {preferences.language === 'ar' ? (filteredAzkar.length === 1 ? 'دعاء' : 'أدعية') : `item${filteredAzkar.length !== 1 ? 's' : ''}`}
+                                </p>
+                                {getCategoryProgress.total > 0 && (
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-16 sm:w-20 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                            <div
+                                                className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+                                                style={{ width: `${getCategoryProgress.percentage}%` }}
+                                            ></div>
                                         </div>
-                                    )}
-                                </div>
+                                        <span className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap">
+                                            {getCategoryProgress.percentage}%
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         )}
-                    </div>
-                </motion.div>
+
+                            {/* Font Size Control */}
+                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-xl p-4 shadow-sm border border-emerald-100 dark:border-emerald-800">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            <Type className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                            <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5 sm:gap-2">
+                                            {[
+                                                { key: 'lg', label: 'S' },
+                                                { key: 'xl', label: 'M' },
+                                                { key: '2xl', label: 'L' },
+                                                { key: '3xl', label: 'XL' },
+                                                { key: '4xl', label: 'XXL' }
+                                            ].map((size) => (
+                                                <button
+                                                    key={size.key}
+                                                    onClick={() => setFontSize(size.key as typeof fontSize)}
+                                                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${fontSize === size.key
+                                                        ? 'bg-emerald-600 text-white shadow-lg'
+                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-emerald-300'
+                                                        }`}
+                                                >
+                                                    {size.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
 
                 {/* Azkar List */}
                 <div className="space-y-6">
@@ -532,34 +634,34 @@ export default function AzkarPage() {
                                 )}
 
                                 {/* Content */}
-                                <div className="mb-4">
-                                    <div className={`text-xl sm:text-2xl leading-relaxed text-gray-900 dark:text-white ${isArabic ? 'text-right font-arabic' : 'text-left'}`}>
+                                <div className="mb-4 overflow-hidden">
+                                    <div className={`leading-loose sm:leading-relaxed text-gray-900 dark:text-white break-words ${isArabic ? 'text-right font-arabic' : 'text-left'} ${fontSize === 'lg' ? 'text-base sm:text-lg md:text-xl' : fontSize === 'xl' ? 'text-lg sm:text-xl md:text-2xl' : fontSize === '2xl' ? 'text-xl sm:text-2xl md:text-3xl' : fontSize === '3xl' ? 'text-2xl sm:text-3xl md:text-4xl' : 'text-3xl sm:text-4xl md:text-5xl'}`}>
                                         {zikr.content}
                                     </div>
                                 </div>
 
                                 {/* Description */}
                                 {zikr.description && (
-                                    <div className="mb-4">
-                                        <div className={`text-gray-600 dark:text-gray-400 leading-relaxed ${isArabic ? 'font-arabic-body' : ''}`}>
+                                    <div className="mb-4 overflow-hidden">
+                                        <div className={`text-gray-600 dark:text-gray-400 leading-relaxed break-words ${isArabic ? 'font-arabic-body text-right' : 'text-left'} ${fontSize === 'lg' ? 'text-xs sm:text-sm md:text-base' : fontSize === 'xl' ? 'text-sm sm:text-base md:text-lg' : fontSize === '2xl' ? 'text-base sm:text-lg md:text-xl' : fontSize === '3xl' ? 'text-lg sm:text-xl md:text-2xl' : 'text-xl sm:text-2xl md:text-3xl'}`}>
                                             {zikr.description}
                                         </div>
                                     </div>
                                 )}
 
                                 {/* Reference and Count */}
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between text-sm text-gray-500 dark:text-gray-400 space-y-2 sm:space-y-0">
-                                    <div className="flex items-center space-x-4 rtl:space-x-reverse">
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-gray-700">
+                                    <div className="flex flex-wrap items-center gap-3">
                                         {zikr.reference && (
-                                            <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <BadgeCheck className="w-5 h-5 p-0.5" aria-hidden="true" />
-                                                <span>{zikr.reference}</span>
+                                            <span className="flex items-center gap-1">
+                                                <BadgeCheck className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                                                <span className="truncate max-w-[150px] sm:max-w-none">{zikr.reference}</span>
                                             </span>
                                         )}
                                         {hasCounter && parseInt(zikr.count) > 1 && (
-                                            <span className="flex items-center space-x-1 rtl:space-x-reverse">
-                                                <ListOrdered className="w-4 h-4" aria-hidden="true" />
-                                                <span>
+                                            <span className="flex items-center gap-1">
+                                                <ListOrdered className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+                                                <span className="whitespace-nowrap">
                                                     {preferences.language === 'ar'
                                                         ? `${zikr.count} مرات`
                                                         : `${zikr.count} times`
@@ -568,7 +670,7 @@ export default function AzkarPage() {
                                             </span>
                                         )}
                                     </div>
-                                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                    <span className="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded whitespace-nowrap flex-shrink-0">
                                         {getCategoryDisplayName(zikr.category)}
                                     </span>
                                 </div>

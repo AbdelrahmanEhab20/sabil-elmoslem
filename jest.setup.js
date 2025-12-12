@@ -164,6 +164,8 @@ jest.mock("lucide-react", () => {
     RefreshCw: createMockIcon("RefreshCw"),
     Globe: createMockIcon("Globe"),
     Languages: createMockIcon("Languages"),
+    Grid3X3: createMockIcon("Grid3X3"),
+    Type: createMockIcon("Type"),
   };
 });
 

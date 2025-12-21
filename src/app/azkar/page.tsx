@@ -7,7 +7,7 @@ import { useToast } from '@/components/ToastProvider';
 import { useTranslations } from '@/utils/translations';
 import { Azkar } from '@/types';
 import CustomModal from '@/components/CustomModal';
-import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered, Type, ChevronDown, Grid3X3 } from 'lucide-react';
+import { Search, Check, Plus, RotateCcw, BadgeCheck, ListOrdered, Type, ChevronDown, Grid3X3, RefreshCw } from 'lucide-react';
 
 // Storage key for font size preference
 const STORAGE_KEYS = {
@@ -43,6 +43,7 @@ export default function AzkarPage() {
     const [randomDuaa, setRandomDuaa] = useState<{ ar: string, en: string } | null>(null);
     const [hasShownCongrats, setHasShownCongrats] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [showResetAllModal, setShowResetAllModal] = useState(false);
 
     // Font size state with lazy initialization from localStorage
     const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
@@ -291,6 +292,37 @@ export default function AzkarPage() {
         setRandomDuaa(null);
     };
 
+    // Handle reset all counters
+    const resetAllCounters = () => {
+        // Reset all counters to empty object
+        setCounters({});
+
+        // Clear localStorage for today's counters
+        if (typeof window !== 'undefined') {
+            try {
+                localStorage.removeItem(getCountersStorageKey());
+            } catch (error) {
+                console.warn('Failed to clear counters from localStorage:', error);
+            }
+        }
+
+        // Reset congrats state
+        setHasShownCongrats(false);
+        setRandomDuaa(null);
+        setShowCongrats(false);
+
+        // Close confirmation modal
+        setShowResetAllModal(false);
+
+        // Show success toast
+        toastRef.current.showToast({
+            type: 'success',
+            message: preferences.language === 'ar'
+                ? 'تم إعادة تعيين جميع العدادات بنجاح'
+                : 'All counters have been reset successfully'
+        });
+    };
+
     // Set smart default category when azkar loads
     useEffect(() => {
         if (categories.length > 0 && selectedCategory === '') {
@@ -518,41 +550,63 @@ export default function AzkarPage() {
                             </div>
                         )}
 
-                            {/* Font Size Control */}
-                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-xl p-4 shadow-sm border border-emerald-100 dark:border-emerald-800">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                                        <div className="flex items-center gap-2 flex-shrink-0">
-                                            <Type className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
-                                            <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
-                                                {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
-                                            </span>
-                                        </div>
-                                        <div className="flex items-center gap-1.5 sm:gap-2">
-                                            {[
-                                                { key: 'lg', label: 'S' },
-                                                { key: 'xl', label: 'M' },
-                                                { key: '2xl', label: 'L' },
-                                                { key: '3xl', label: 'XL' },
-                                                { key: '4xl', label: 'XXL' }
-                                            ].map((size) => (
-                                                <button
-                                                    key={size.key}
-                                                    onClick={() => setFontSize(size.key as typeof fontSize)}
-                                                    className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${fontSize === size.key
-                                                        ? 'bg-emerald-600 text-white shadow-lg'
-                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-emerald-300'
-                                                        }`}
-                                                >
-                                                    {size.label}
-                                                </button>
-                                            ))}
-                                        </div>
+                        {/* Font Size Control */}
+                        <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-xl p-4 shadow-sm border border-emerald-100 dark:border-emerald-800">
+                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <Type className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
+                                        <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                            {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
+                                        </span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 sm:gap-2">
+                                        {[
+                                            { key: 'lg', label: 'S' },
+                                            { key: 'xl', label: 'M' },
+                                            { key: '2xl', label: 'L' },
+                                            { key: '3xl', label: 'XL' },
+                                            { key: '4xl', label: 'XXL' }
+                                        ].map((size) => (
+                                            <button
+                                                key={size.key}
+                                                onClick={() => setFontSize(size.key as typeof fontSize)}
+                                                className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${fontSize === size.key
+                                                    ? 'bg-emerald-600 text-white shadow-lg'
+                                                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-emerald-300'
+                                                    }`}
+                                            >
+                                                {size.label}
+                                            </button>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </motion.div>
+
+                        {/* Reset All Counters Control */}
+                        {Object.keys(counters).length > 0 && (
+                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                                <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900/20 dark:to-orange-900/20 rounded-xl p-4 shadow-sm border border-red-100 dark:border-red-800">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                        <div className="flex items-center gap-2 flex-shrink-0">
+                                            <RefreshCw className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+                                            <span className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white whitespace-nowrap">
+                                                {preferences.language === 'ar' ? 'إعادة تعيين العدادات' : 'Reset All Counters'}
+                                            </span>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowResetAllModal(true)}
+                                            className="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-white dark:bg-gray-700 text-red-600 dark:text-red-400 border-2 border-red-300 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-500"
+                                        >
+                                            {preferences.language === 'ar' ? 'إعادة تعيين الكل' : 'Reset All'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </motion.div>
 
                 {/* Azkar List */}
                 <div className="space-y-6">
@@ -732,6 +786,35 @@ export default function AzkarPage() {
                     >
                         {preferences.language === 'ar' ? 'إغلاق' : 'Close'}
                     </button>
+                </CustomModal>
+
+                {/* Reset All Counters Confirmation Modal */}
+                <CustomModal
+                    isOpen={showResetAllModal}
+                    onClose={() => setShowResetAllModal(false)}
+                    title={preferences.language === 'ar'
+                        ? 'تأكيد إعادة التعيين'
+                        : 'Confirm Reset'}
+                >
+                    <div className="text-lg text-gray-700 dark:text-gray-200 mb-4 text-center">
+                        {preferences.language === 'ar'
+                            ? 'هل أنت متأكد من إعادة تعيين جميع العدادات؟ سيتم حذف جميع التقدم المحفوظ.'
+                            : 'Are you sure you want to reset all counters? All saved progress will be lost.'}
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 mt-4">
+                        <button
+                            onClick={() => setShowResetAllModal(false)}
+                            className="flex-1 px-4 py-3 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+                        >
+                            {preferences.language === 'ar' ? 'إلغاء' : 'Cancel'}
+                        </button>
+                        <button
+                            onClick={resetAllCounters}
+                            className="flex-1 px-4 py-3 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700 transition-colors duration-200"
+                        >
+                            {preferences.language === 'ar' ? 'إعادة التعيين' : 'Reset All'}
+                        </button>
+                    </div>
                 </CustomModal>
             </div>
         </div>

@@ -111,6 +111,7 @@ export default function QuranPage() {
     const [ayahReloadKey, setAyahReloadKey] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { uiState, errorMessage, isNavigating } = viewState;
+    const isFirstSurahLoadRef = useRef(true);
 
     // Use lazy initialization to read from localStorage only once, avoiding re-renders
     const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
@@ -184,6 +185,19 @@ export default function QuranPage() {
     // Fetch surahs on mount
     useEffect(() => {
         const loadSurahList = async () => {
+            const hasCachedList = surahs.length > 0;
+            const isForcedReload = surahReloadKey > 0;
+            const shouldFetchList = !hasCachedList || isForcedReload;
+
+            // Avoid re-triggering full-page loading when list already exists.
+            if (!shouldFetchList) {
+                setLoading(false);
+                if (uiState === 'loading') {
+                    dispatchView({ type: 'SET_SURAH_LIST' });
+                }
+                return;
+            }
+
             if (surahListAbortRef.current) {
                 surahListAbortRef.current.abort();
             }
@@ -191,8 +205,10 @@ export default function QuranPage() {
             surahListAbortRef.current = controller;
 
             try {
-                setLoading(true);
-                dispatchView({ type: 'SET_LOADING' });
+                if (isFirstSurahLoadRef.current) {
+                    setLoading(true);
+                    dispatchView({ type: 'SET_LOADING' });
+                }
                 await loadSurahs(controller.signal);
                 dispatchView({ type: 'SET_SURAH_LIST' });
                 // Always start with surah list - user chooses which surah to read
@@ -204,6 +220,7 @@ export default function QuranPage() {
                 dispatchView({ type: 'SET_ERROR', message: errorMessage });
                 toastRef.current.showToast({ type: 'error', message: errorMessage });
             } finally {
+                isFirstSurahLoadRef.current = false;
                 setLoading(false);
             }
         };
@@ -214,7 +231,7 @@ export default function QuranPage() {
                 surahListAbortRef.current.abort();
             }
         };
-    }, [t.errorLoadingQuran, surahReloadKey, loadSurahs]);
+    }, [t.errorLoadingQuran, surahReloadKey, loadSurahs, surahs.length, uiState]);
 
     // Fetch ayahs when selectedSurah changes
     useEffect(() => {
@@ -505,7 +522,7 @@ export default function QuranPage() {
     const isArabic = preferences.language === 'ar';
 
     return (
-        <div className="min-h-screen relative bg-gray-50 dark:bg-gray-900">
+        <div className="min-h-screen relative bg-gray-50 dark:bg-gray-900 pt-14 sm:pt-16">
             {/* Hero Header - Only show on surah list view */}
             {uiState === 'surah-list' && (
                 <section className="relative bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 text-white py-12 md:py-16 overflow-hidden">
@@ -559,7 +576,7 @@ export default function QuranPage() {
             {/* Sidebar Toggle Button for Mobile */}
             {uiState !== 'error' && (
                 <button
-                    className="md:hidden fixed top-20 left-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-xl hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 transition-all duration-200 rtl:left-auto rtl:right-4"
+                    className="md:hidden fixed top-24 sm:top-28 left-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-xl hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 transition-all duration-200 rtl:left-auto rtl:right-4"
                     onClick={() => setSidebarOpen(!sidebarOpen)}
                     aria-label={isArabic ? 'فتح قائمة السور' : 'Open Surah List'}
                 >
@@ -569,7 +586,7 @@ export default function QuranPage() {
                 </button>
             )}
 
-            <div className="py-6 sm:py-8 lg:py-10 flex w-full gap-4 lg:gap-6">
+            <div className="py-4 sm:py-8 lg:py-10 flex w-full gap-3 sm:gap-4 lg:gap-6">
                 {/* Sidebar: Surah List - Enhanced Design */}
                 {uiState !== 'error' && (
                 <aside
@@ -665,7 +682,7 @@ export default function QuranPage() {
 
                 {/* Main Content */}
                 <div className="flex-1 w-full min-w-0">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="max-w-7xl mx-auto px-2.5 sm:px-6 lg:px-8">
                         {uiState === 'error' ? (
                             <motion.div
                                 className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 sm:p-8 text-center"
@@ -794,13 +811,13 @@ export default function QuranPage() {
                             <>
                                 {/* Ayah View Header - Enhanced */}
                                 <motion.div
-                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 sm:p-8 mb-6 sm:mb-8"
+                                    className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-8 mb-5 sm:mb-8"
                                     initial={{ opacity: 0, y: 8 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.4 }}
                                 >
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                                        <div className="flex items-center gap-4">
+                                    <div className="flex flex-col gap-4 mb-5 sm:mb-6">
+                                        <div className="flex flex-wrap items-start gap-3 sm:gap-4">
                                             <button
                                                 onClick={handleBackToList}
                                                 className="p-2 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-all duration-200"
@@ -810,7 +827,7 @@ export default function QuranPage() {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                                 </svg>
                                             </button>
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 flex-wrap">
                                                 <button
                                                     onClick={handlePreviousSurah}
                                                     disabled={!previousSurah || isNavigating}
@@ -826,11 +843,11 @@ export default function QuranPage() {
                                                     {preferences.language === 'ar' ? 'السورة التالية' : 'Next Surah'}
                                                 </button>
                                             </div>
-                                            <div>
-                                                <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                                            <div className="min-w-0">
+                                                <h2 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1 truncate">
                                                     {selectedSurah?.englishName}
                                                 </h2>
-                                                <div className="flex items-center gap-3">
+                                                <div className="flex items-center gap-2.5 flex-wrap">
                                                     <p className="text-gray-600 dark:text-gray-400">
                                                         {selectedSurah?.numberOfAyahs} {preferences.language === 'ar' ? 'آية' : 'verses'}
                                                     </p>
@@ -841,20 +858,20 @@ export default function QuranPage() {
                                             </div>
                                         </div>
                                         <div className="text-right sm:text-left">
-                                            <p className="text-3xl sm:text-4xl lg:text-5xl font-arabic font-bold text-gray-900 dark:text-white mb-2 leading-relaxed">
+                                            <p className="text-2xl sm:text-4xl lg:text-5xl font-arabic font-bold text-gray-900 dark:text-white mb-1.5 leading-relaxed break-words">
                                                 {selectedSurah?.name}
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Font Size Control - Enhanced */}
-                                    <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
+                                    <div className="pt-4 sm:pt-6 border-t border-gray-200 dark:border-gray-700">
                                         <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-4 sm:p-5 shadow-sm border border-green-100 dark:border-green-800">
-                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
                                                 <span className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                                                     {preferences.language === 'ar' ? 'حجم الخط' : 'Font Size'}
                                                 </span>
-                                                <div className="flex items-center gap-2 flex-wrap">
+                                                <div className="grid grid-cols-5 gap-2 w-full sm:w-auto">
                                                     {[
                                                         { key: 'lg', label: 'S' },
                                                         { key: 'xl', label: 'M' },
@@ -865,7 +882,7 @@ export default function QuranPage() {
                                                         <button
                                                             key={size.key}
                                                             onClick={() => setFontSize(size.key as typeof fontSize)}
-                                                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${fontSize === size.key
+                                                            className={`px-2.5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all duration-200 ${fontSize === size.key
                                                                 ? 'bg-purple-600 text-white shadow-lg transform scale-105'
                                                                 : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 hover:border-green-300'
                                                                 }`}
@@ -879,9 +896,9 @@ export default function QuranPage() {
                                     </div>
 
                                     {/* Audio Controls - Compact and Clean */}
-                                    <div className="pt-4">
-                                        <div className="bg-white dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-600">
-                                            <div className="flex flex-wrap items-center gap-3">
+                                    <div className="pt-3 sm:pt-4">
+                                        <div className="bg-white dark:bg-gray-700/50 rounded-xl p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
+                                            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
                                                 {/* Volume Icon */}
                                                 <Volume2 className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
 
@@ -893,7 +910,7 @@ export default function QuranPage() {
                                                             setSelectedReciter(Number(e.target.value));
                                                             setPlayingAyah(null);
                                                         }}
-                                                        className="appearance-none bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg px-3 py-2 pr-8 text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                                                        className="appearance-none bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-lg px-3 py-2 pr-8 text-xs sm:text-sm font-medium text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer max-w-[170px] sm:max-w-none"
                                                     >
                                                         {QURAN_RECITERS.map((reciter) => (
                                                             <option key={reciter.id} value={reciter.id}>
@@ -910,7 +927,7 @@ export default function QuranPage() {
                                                 {playingAyah === null ? (
                                                     <button
                                                         onClick={handlePlayAll}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm shadow-sm"
+                                                        className="flex items-center gap-2 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-xs sm:text-sm shadow-sm"
                                                     >
                                                         <Play className="w-4 h-4" />
                                                         <span className="hidden sm:inline">{preferences.language === 'ar' ? 'تشغيل' : 'Play'}</span>
@@ -918,7 +935,7 @@ export default function QuranPage() {
                                                 ) : (
                                                     <button
                                                         onClick={handleStopAll}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm shadow-sm"
+                                                        className="flex items-center gap-2 px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-xs sm:text-sm shadow-sm"
                                                     >
                                                         <Pause className="w-4 h-4" />
                                                         <span className="hidden sm:inline">{preferences.language === 'ar' ? 'إيقاف' : 'Stop'}</span>
@@ -926,7 +943,7 @@ export default function QuranPage() {
                                                 )}
 
                                                 {/* Auto-play Toggle */}
-                                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer ltr:ml-auto rtl:mr-auto">
+                                                <label className="flex items-center gap-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300 cursor-pointer ltr:ml-auto rtl:mr-auto">
                                                     <input
                                                         type="checkbox"
                                                         checked={isAutoPlay}
@@ -971,7 +988,7 @@ export default function QuranPage() {
                                         ))}
                                     </div>
                                 ) : (
-                                    <div className="space-y-6 sm:space-y-8">
+                                    <div className="space-y-4 sm:space-y-8">
                                         {ayahs.map((ayah) => {
                                             let ayahText = ayah.text;
 
@@ -1000,7 +1017,7 @@ export default function QuranPage() {
                                                     ref={(el) => {
                                                         if (el) ayahRefs.current.set(ayah.numberInSurah, el);
                                                     }}
-                                                    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-6 sm:p-8 transition-all duration-300 border ${playingAyah === ayah.numberInSurah
+                                                    className={`bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl p-4 sm:p-8 transition-all duration-300 border ${playingAyah === ayah.numberInSurah
                                                         ? 'border-purple-500 ring-2 ring-purple-500/20'
                                                         : 'border-gray-100 dark:border-gray-700'
                                                         }`}
@@ -1009,8 +1026,8 @@ export default function QuranPage() {
                                                     viewport={{ once: true }}
                                                     transition={{ duration: 0.35 }}
                                                 >
-                                                    <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-                                                        <div className="flex items-center gap-3">
+                                                    <div className="flex flex-wrap items-center justify-between gap-2.5 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-700">
+                                                        <div className="flex items-center gap-2.5 sm:gap-3">
                                                             <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-md">
                                                                 <span className="text-sm font-bold text-white">
                                                                     {ayah.numberInSurah}

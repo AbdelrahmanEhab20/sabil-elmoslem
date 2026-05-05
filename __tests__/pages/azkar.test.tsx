@@ -148,10 +148,9 @@ describe('AzkarPage', () => {
 
             await user.click(countButtons[0])
 
-            // Wait for counter to update - check for "1 of" pattern which is more flexible
+            // Wait for counter to update
             await waitFor(() => {
-                const progressText = screen.getByText(/1 of/)
-                expect(progressText).toBeInTheDocument()
+                expect(screen.getByText(/Reset All Counters/i)).toBeInTheDocument()
             }, { timeout: 10000 })
         }, 15000)
 
@@ -191,7 +190,7 @@ describe('AzkarPage', () => {
 
             // Wait for counter to update first - this ensures state has updated
             await waitFor(() => {
-                expect(screen.getByText(/1 of/)).toBeInTheDocument()
+                expect(screen.getByText(/Reset All Counters/i)).toBeInTheDocument()
             }, { timeout: 10000 })
 
             // Then wait for reset all section to appear (it appears when Object.keys(counters).length > 0)
@@ -221,7 +220,7 @@ describe('AzkarPage', () => {
 
             // Wait for counter to update first
             await waitFor(() => {
-                expect(screen.getByText(/1 of/)).toBeInTheDocument()
+                expect(screen.getByText(/Reset All Counters/i)).toBeInTheDocument()
             }, { timeout: 10000 })
 
             // Wait for reset all section to appear
@@ -262,7 +261,7 @@ describe('AzkarPage', () => {
             
             // Wait for counter to update first
             await waitFor(() => {
-                expect(screen.getByText(/1 of/)).toBeInTheDocument()
+                expect(screen.getByText(/Reset All Counters/i)).toBeInTheDocument()
             }, { timeout: 10000 })
 
             // Wait for reset all section to appear

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
 import Image from 'next/image';
+import { Home, Clock3, Compass, HandCoins, BookOpen } from 'lucide-react';
 
 const Navbar: React.FC = () => {
     const { preferences, toggleLanguage } = useUser();
@@ -41,11 +42,11 @@ const Navbar: React.FC = () => {
     // };
 
     const navItems = [
-        { href: '/', label: t.home, icon: '🏠' },
-        { href: '/prayer-times', label: t.prayerTimes, icon: '🕌' },
-        { href: '/qibla', label: t.qibla, icon: '🧭' },
-        { href: '/azkar', label: t.azkar, icon: '📿' },
-        { href: '/quran', label: t.quran, icon: '📖' }
+        { href: '/', label: t.home, icon: Home },
+        { href: '/prayer-times', label: t.prayerTimes, icon: Clock3 },
+        { href: '/qibla', label: t.qibla, icon: Compass },
+        { href: '/azkar', label: t.azkar, icon: HandCoins },
+        { href: '/quran', label: t.quran, icon: BookOpen }
     ];
 
     // Check if a nav item is active
@@ -74,6 +75,7 @@ const Navbar: React.FC = () => {
                     <div className="hidden md:flex items-center space-x-8 rtl:space-x-reverse">
                         {navItems.map((item) => {
                             const active = isActive(item.href);
+                            const Icon = item.icon;
                             return (
                                 <Link
                                     key={item.href}
@@ -83,7 +85,7 @@ const Navbar: React.FC = () => {
                                         : 'text-gray-700 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-800'
                                         }`}
                                 >
-                                    <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
+                                    <Icon className="inline-block w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" aria-hidden="true" />
                                     {item.label}
                                 </Link>
                             );
@@ -152,6 +154,7 @@ const Navbar: React.FC = () => {
                         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
                             {navItems.map((item) => {
                                 const active = isActive(item.href);
+                                const Icon = item.icon;
                                 return (
                                     <Link
                                         key={item.href}
@@ -162,7 +165,7 @@ const Navbar: React.FC = () => {
                                             }`}
                                         onClick={() => setIsMenuOpen(false)}
                                     >
-                                        <span className="mr-2 rtl:mr-0 rtl:ml-2">{item.icon}</span>
+                                        <Icon className="inline-block w-4 h-4 mr-2 rtl:mr-0 rtl:ml-2" aria-hidden="true" />
                                         {item.label}
                                     </Link>
                                 );

@@ -1,10 +1,10 @@
-# Islamic Site - Prayer Times, Azkar & Quran
+# Sabil Elmoslem - Prayer Times, Azkar & Quran
 
 A comprehensive Islamic web platform providing prayer times, daily azkar (supplications), and Quran reading with a beautiful, modern UI.
 
 ## 🌐 Live Demo
 
-**Visit the live site:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)
+**Visit the live site:** [https://sabil-elmoslem.vercel.app/](https://sabil-elmoslem.vercel.app/)
 
 ## 🌟 Features
 
@@ -63,7 +63,7 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd islamic-site
+   cd sabil-elmoslem
    ```
 
 2. **Install dependencies**
@@ -109,7 +109,7 @@ A comprehensive Islamic web platform providing prayer times, daily azkar (suppli
 ## 📁 Project Structure
 
 ```
-islamic-site/
+sabil-elmoslem/
 ├── src/
 │   ├── app/                 # Next.js App Router pages
 │   │   ├── page.tsx         # Home page
@@ -202,7 +202,7 @@ Complete Quran reading experience:
 3. Add environment variables in Vercel dashboard
 4. Deploy automatically
 
-**Live Demo:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)
+**Live Demo:** [https://sabil-elmoslem.vercel.app/](https://sabil-elmoslem.vercel.app/)
 
 ### Other Platforms
 The app can be deployed to any platform supporting Next.js:
@@ -273,4 +273,4 @@ This Islamic site was built with the intention of providing Muslims worldwide wi
 
 *Built with ❤️ for the Ummah*
 
-**Live Site:** [https://islamic-site-lemon.vercel.app/](https://islamic-site-lemon.vercel.app/)
+**Live Site:** [https://sabil-elmoslem.vercel.app/](https://sabil-elmoslem.vercel.app/)

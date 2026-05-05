@@ -82,6 +82,11 @@ export const retry = async <T>(
                 throw error;
             }
 
+            // Respect request cancellation (e.g. route/surah switches)
+            if ((error as Error)?.name === 'AbortError') {
+                throw error;
+            }
+
             // Wait before retrying
             await new Promise(resolve => setTimeout(resolve, delay * Math.pow(backoff, attempt - 1)));
         }
@@ -162,6 +167,11 @@ export const withErrorHandling = <T extends unknown[], R>(
         try {
             return await fn(...args);
         } catch (error) {
+            // Request cancellation is expected in navigation-heavy flows
+            // (e.g. Quran surah switching with AbortController).
+            if ((error as Error)?.name === 'AbortError') {
+                throw error;
+            }
             logError(error as Error, context, { args });
             throw error;
         }

@@ -112,7 +112,7 @@ describe('QiblaPage', () => {
             render(<QiblaPage />)
 
             await waitFor(() => {
-                const searchInput = screen.getByPlaceholderText(/Search city/i)
+                const searchInput = screen.getByPlaceholderText(/Search for a city/i)
                 expect(searchInput).toBeInTheDocument()
             }, WAIT_TIMEOUT)
         })
@@ -122,11 +122,11 @@ describe('QiblaPage', () => {
             render(<QiblaPage />)
 
             await waitFor(() => {
-                const searchInput = screen.getByPlaceholderText(/Search city/i)
+                const searchInput = screen.getByPlaceholderText(/Search for a city/i)
                 expect(searchInput).toBeInTheDocument()
             }, WAIT_TIMEOUT)
 
-            const searchInput = screen.getByPlaceholderText(/Search city/i)
+            const searchInput = screen.getByPlaceholderText(/Search for a city/i)
             await user.type(searchInput, 'Riyadh')
             await user.keyboard('{Enter}')
 
@@ -141,7 +141,7 @@ describe('QiblaPage', () => {
             render(<QiblaPage />)
 
             await waitFor(() => {
-                const button = screen.getByText(/Use Current Location/i)
+                const button = screen.getByText(/Use My Current Location/i)
                 expect(button).toBeInTheDocument()
             }, WAIT_TIMEOUT)
         })
@@ -151,11 +151,11 @@ describe('QiblaPage', () => {
             render(<QiblaPage />)
 
             await waitFor(() => {
-                const button = screen.getByText(/Use Current Location/i)
+                const button = screen.getByText(/Use My Current Location/i)
                 expect(button).toBeInTheDocument()
             }, WAIT_TIMEOUT)
 
-            const button = screen.getByText(/Use Current Location/i)
+            const button = screen.getByText(/Use My Current Location/i)
             await user.click(button)
 
             await waitFor(() => {
@@ -166,13 +166,15 @@ describe('QiblaPage', () => {
 
     describe('Error Handling', () => {
         test('calls toast on location error', async () => {
-            // Reset mocks
+            const user = userEvent.setup()
             mockGetCurrentLocation.mockReset()
             mockGetCurrentLocation.mockRejectedValueOnce(new Error('Location Error'))
 
             render(<QiblaPage />)
 
-            // Wait a bit for the useEffect to run
+            const button = await screen.findByText(/Use My Current Location/i)
+            await user.click(button)
+
             await waitFor(() => {
                 expect(mockShowToast).toHaveBeenCalledWith(
                     expect.objectContaining({
@@ -190,11 +192,11 @@ describe('QiblaPage', () => {
             render(<QiblaPage />)
 
             await waitFor(() => {
-                const searchInput = screen.queryByPlaceholderText(/Search city/i) || screen.queryByPlaceholderText(/city/i)
+                const searchInput = screen.queryByPlaceholderText(/Search for a city/i) || screen.queryByPlaceholderText(/city/i)
                 expect(searchInput).toBeInTheDocument()
             }, WAIT_TIMEOUT)
 
-            const searchInput = screen.queryByPlaceholderText(/Search city/i) || screen.queryByPlaceholderText(/city/i)
+            const searchInput = screen.queryByPlaceholderText(/Search for a city/i) || screen.queryByPlaceholderText(/city/i)
             if (searchInput) {
                 await user.type(searchInput, 'InvalidCity')
                 await user.keyboard('{Enter}')

@@ -61,14 +61,10 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://sabil-elmoslem.vercel.app/'),
   alternates: {
     canonical: '/',
-    languages: {
-      'ar': '/ar',
-      'en': '/en',
-    },
   },
   openGraph: {
     type: 'website',
-    locale: 'ar_SA',
+    locale: 'ar_EG',
     alternateLocale: 'en_US',
     url: 'https://sabil-elmoslem.vercel.app/',
     siteName: 'سبيل المسلم | Sabil Elmoslem',
@@ -88,7 +84,6 @@ export const metadata: Metadata = {
     title: 'سبيل المسلم - أوقات الصلاة والأذكار والقرآن | Sabil Elmoslem - Prayer Times, Azkar & Quran',
     description: 'منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم. مجاني وسهل الاستخدام. | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading with Tajweed. Free and user-friendly.',
     images: ['/images/logo.png'],
-    creator: '@sabilelmoslem',
   },
   robots: {
     index: true,
@@ -101,11 +96,7 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    yahoo: 'your-yahoo-verification-code',
-  },
+  verification: {},
   category: 'religion',
   classification: 'Islamic',
   icons: {
@@ -173,17 +164,8 @@ export default function RootLayout({
               "name": "سبيل المسلم | Sabil Elmoslem",
               "alternateName": ["Sabil Elmoslem", "سبيل المسلم"],
               "url": "https://sabil-elmoslem.vercel.app",
-              "description": {
-                "@type": "Text",
-                "ar": "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم",
-                "en": "A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading"
-              },
+              "description": "منصة إسلامية شاملة لأوقات الصلاة والأذكار اليومية وقراءة القرآن الكريم | A comprehensive Islamic platform providing prayer times, daily azkar, and Quran reading",
               "inLanguage": ["ar", "en"],
-              "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://sabil-elmoslem.vercel.app/search?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-              },
               "publisher": {
                 "@type": "Organization",
                 "name": "Sabil Elmoslem",

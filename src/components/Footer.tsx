@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
+import { Clock3, HandCoins, BookOpen, Compass, Info, Mail } from 'lucide-react';
 
 const Footer: React.FC = () => {
     const { preferences } = useUser();
@@ -13,10 +14,10 @@ const Footer: React.FC = () => {
     const isArabic = preferences.language === 'ar';
 
     const quickLinks = [
-        { href: '/prayer-times', label: t.prayerTimes, icon: '🕌' },
-        { href: '/azkar', label: t.azkar, icon: '📿' },
-        { href: '/quran', label: t.quran, icon: '📖' },
-        { href: '/qibla', label: t.qibla, icon: '🧭' },
+        { href: '/prayer-times', label: t.prayerTimes, icon: Clock3 },
+        { href: '/azkar', label: t.azkar, icon: HandCoins },
+        { href: '/quran', label: t.quran, icon: BookOpen },
+        { href: '/qibla', label: t.qibla, icon: Compass },
     ];
 
     return (
@@ -70,21 +71,21 @@ const Footer: React.FC = () => {
                             {t.quickLinks}
                         </h3>
                         <ul className="space-y-3">
-                            {quickLinks.map((link) => (
+                            {quickLinks.map((link) => {
+                                const Icon = link.icon;
+                                return (
                                 <li key={link.href}>
                                     <Link 
                                         href={link.href} 
                                         className="group flex items-center gap-2.5 text-gray-300 hover:text-white transition-colors duration-200"
                                     >
-                                        <span className="text-base group-hover:scale-110 transition-transform duration-200">
-                                            {link.icon}
-                                        </span>
+                                        <Icon className="w-4 h-4 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" />
                                         <span className={`text-sm ${isArabic ? 'font-arabic-body' : ''}`}>
                                             {link.label}
                                         </span>
                                     </Link>
                                 </li>
-                            ))}
+                            )})}
                         </ul>
                     </div>
 
@@ -105,6 +106,27 @@ const Footer: React.FC = () => {
                             <div className="flex items-start gap-3 text-sm text-gray-400">
                                 <span className="text-green-500 mt-0.5">✓</span>
                                 <span className={isArabic ? 'font-arabic-body' : ''}>{t.openSourceInfo}</span>
+                            </div>
+                            <div className="pt-4 space-y-2">
+                                <p className={`text-xs text-gray-500 ${isArabic ? 'font-arabic-body' : ''}`}>
+                                    {isArabic ? 'روابط مهمة' : 'Important links'}
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Link
+                                        href="/about"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700 text-sm text-gray-200 hover:bg-gray-700 hover:text-white transition-colors"
+                                    >
+                                        <Info className="w-4 h-4" aria-hidden="true" />
+                                        <span>{isArabic ? 'عن المشروع' : 'About'}</span>
+                                    </Link>
+                                    <Link
+                                        href="/contact"
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-600/90 border border-green-500 text-sm text-white hover:bg-green-600 transition-colors shadow-sm"
+                                    >
+                                        <Mail className="w-4 h-4" aria-hidden="true" />
+                                        <span className="font-semibold">{isArabic ? 'تواصل معنا' : 'Contact Us'}</span>
+                                    </Link>
+                                </div>
                             </div>
                         </div>
                     </div>

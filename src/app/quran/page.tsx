@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useReducer } from 'react';
 import { motion } from 'framer-motion';
-import { fetchQuranSurahs, fetchQuranAyahs } from '@/utils/api';
 import { QuranSurah, QuranAyah } from '@/types';
 import { useUser } from '@/contexts/UserContext';
 import { useTranslations } from '@/utils/translations';
@@ -10,6 +9,52 @@ import { useToast } from '@/components/ToastProvider';
 import AudioPlayer from '@/components/AudioPlayer';
 import { QURAN_RECITERS, getAyahAudioUrl } from '@/data/reciters';
 import { Play, Pause, Volume2 } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useQuranData } from '@/contexts/QuranDataContext';
+
+type QuranUiState = 'loading' | 'surah-list' | 'surah-reading' | 'error';
+type QuranStatus = 'idle' | 'loading' | 'success' | 'error';
+
+interface QuranViewState {
+    uiState: QuranUiState;
+    status: QuranStatus;
+    errorMessage: string | null;
+    isNavigating: boolean;
+}
+
+type QuranViewAction =
+    | { type: 'SET_LOADING' }
+    | { type: 'SET_SURAH_LIST' }
+    | { type: 'SET_SURAH_READING' }
+    | { type: 'SET_ERROR'; message: string }
+    | { type: 'SET_NAVIGATING'; value: boolean }
+    | { type: 'CLEAR_ERROR' };
+
+const initialQuranViewState: QuranViewState = {
+    uiState: 'loading',
+    status: 'idle',
+    errorMessage: null,
+    isNavigating: false,
+};
+
+function quranViewReducer(state: QuranViewState, action: QuranViewAction): QuranViewState {
+    switch (action.type) {
+        case 'SET_LOADING':
+            return { ...state, uiState: 'loading', status: 'loading', errorMessage: null };
+        case 'SET_SURAH_LIST':
+            return { ...state, uiState: 'surah-list', status: 'success', errorMessage: null };
+        case 'SET_SURAH_READING':
+            return { ...state, uiState: 'surah-reading', status: 'success' };
+        case 'SET_ERROR':
+            return { ...state, uiState: 'error', status: 'error', errorMessage: action.message };
+        case 'SET_NAVIGATING':
+            return { ...state, isNavigating: action.value };
+        case 'CLEAR_ERROR':
+            return { ...state, errorMessage: null, status: state.status === 'error' ? 'idle' : state.status };
+        default:
+            return state;
+    }
+}
 
 // Storage keys for preferences
 const STORAGE_KEYS = {
@@ -49,18 +94,23 @@ const getStoredReciter = (): number => {
 
 export default function QuranPage() {
     const { preferences } = useUser();
+    const router = useRouter();
+    const pathname = usePathname();
     const t = useTranslations(preferences.language);
     const toast = useToast();
+    const { surahs, loadSurahs, loadSurahAyahs } = useQuranData();
     const toastRef = useRef(toast);
     toastRef.current = toast;
-    const [surahs, setSurahs] = useState<QuranSurah[]>([]);
     const [selectedSurah, setSelectedSurah] = useState<QuranSurah | null>(null);
     const [ayahs, setAyahs] = useState<QuranAyah[]>([]);
     const [loading, setLoading] = useState(true);
     const [surahLoading, setSurahLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [view, setView] = useState<'surah-list' | 'ayah-view'>('surah-list');
+    const [viewState, dispatchView] = useReducer(quranViewReducer, initialQuranViewState);
+    const [surahReloadKey, setSurahReloadKey] = useState(0);
+    const [ayahReloadKey, setAyahReloadKey] = useState(0);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const { uiState, errorMessage, isNavigating } = viewState;
 
     // Use lazy initialization to read from localStorage only once, avoiding re-renders
     const [fontSize, setFontSize] = useState<'lg' | 'xl' | '2xl' | '3xl' | '4xl'>(getStoredFontSize);
@@ -75,6 +125,10 @@ export default function QuranPage() {
 
     // Refs for auto-scroll
     const ayahRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+    const surahListAbortRef = useRef<AbortController | null>(null);
+    const ayahAbortRef = useRef<AbortController | null>(null);
+    const prefetchAbortRef = useRef<AbortController | null>(null);
+    const prefetchedSurahsRef = useRef<Set<number>>(new Set());
 
     // Save reciter to localStorage (only after initial mount)
     useEffect(() => {
@@ -99,6 +153,19 @@ export default function QuranPage() {
         }
     }, [playingAyah]);
 
+    // Support deep links like /quran/1#ayah-7
+    useEffect(() => {
+        if (typeof window === 'undefined' || ayahs.length === 0 || uiState !== 'surah-reading') return;
+        const hash = window.location.hash;
+        const match = hash.match(/^#ayah-(\d+)$/);
+        if (!match) return;
+        const ayahNumber = parseInt(match[1], 10);
+        const target = document.getElementById(`ayah-${ayahNumber}`);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [ayahs, uiState]);
+
     // Save font size to localStorage (only after initial mount)
     useEffect(() => {
         if (isInitialMount.current) return;
@@ -116,44 +183,156 @@ export default function QuranPage() {
 
     // Fetch surahs on mount
     useEffect(() => {
-        const loadSurahs = async () => {
+        const loadSurahList = async () => {
+            if (surahListAbortRef.current) {
+                surahListAbortRef.current.abort();
+            }
+            const controller = new AbortController();
+            surahListAbortRef.current = controller;
+
             try {
                 setLoading(true);
-                const surahsData = await fetchQuranSurahs();
-                setSurahs(surahsData);
+                dispatchView({ type: 'SET_LOADING' });
+                await loadSurahs(controller.signal);
+                dispatchView({ type: 'SET_SURAH_LIST' });
                 // Always start with surah list - user chooses which surah to read
             } catch (error: unknown) {
+                if (error instanceof Error && error.name === 'AbortError') {
+                    return;
+                }
                 const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
+                dispatchView({ type: 'SET_ERROR', message: errorMessage });
                 toastRef.current.showToast({ type: 'error', message: errorMessage });
             } finally {
                 setLoading(false);
             }
         };
 
-        loadSurahs();
-    }, [t.errorLoadingQuran]);
+        loadSurahList();
+        return () => {
+            if (surahListAbortRef.current) {
+                surahListAbortRef.current.abort();
+            }
+        };
+    }, [t.errorLoadingQuran, surahReloadKey, loadSurahs]);
 
     // Fetch ayahs when selectedSurah changes
     useEffect(() => {
         const loadAyahs = async () => {
             if (selectedSurah) {
+                if (ayahAbortRef.current) {
+                    ayahAbortRef.current.abort();
+                }
+                const controller = new AbortController();
+                ayahAbortRef.current = controller;
                 try {
+                    dispatchView({ type: 'CLEAR_ERROR' });
+                    dispatchView({ type: 'SET_SURAH_READING' });
                     setSurahLoading(true);
+                    dispatchView({ type: 'SET_NAVIGATING', value: true });
                     // Clear refs and reset audio state when switching surahs
                     ayahRefs.current.clear();
                     setPlayingAyah(null);
-                    const ayahsData = await fetchQuranAyahs(selectedSurah.number);
+
+                    const ayahsData = await loadSurahAyahs(selectedSurah.number, controller.signal);
                     setAyahs(ayahsData);
                 } catch (error: unknown) {
+                    if (error instanceof Error && error.name === 'AbortError') {
+                        return;
+                    }
                     const errorMessage = error instanceof Error ? error.message : t.errorLoadingQuran;
+                    dispatchView({ type: 'SET_ERROR', message: errorMessage });
                     toastRef.current.showToast({ type: 'error', message: errorMessage });
                 } finally {
                     setSurahLoading(false);
+                    dispatchView({ type: 'SET_NAVIGATING', value: false });
                 }
             }
         };
         loadAyahs();
-    }, [selectedSurah, t.errorLoadingQuran]);
+        return () => {
+            if (ayahAbortRef.current) {
+                ayahAbortRef.current.abort();
+            }
+        };
+    }, [selectedSurah, t.errorLoadingQuran, ayahReloadKey, loadSurahAyahs]);
+
+    // Prefetch first surah in background after list is loaded.
+    useEffect(() => {
+        if (uiState !== 'surah-list' || surahs.length === 0) return;
+
+        const firstSurahNumber = surahs[0].number;
+        if (prefetchedSurahsRef.current.has(firstSurahNumber)) {
+            return;
+        }
+
+        if (prefetchAbortRef.current) {
+            prefetchAbortRef.current.abort();
+        }
+        const controller = new AbortController();
+        prefetchAbortRef.current = controller;
+        prefetchedSurahsRef.current.add(firstSurahNumber);
+
+        loadSurahAyahs(firstSurahNumber, controller.signal)
+            .then(() => {
+                // Loaded into shared cache.
+            })
+            .catch((error: unknown) => {
+                if (!(error instanceof Error && error.name === 'AbortError')) {
+                    prefetchedSurahsRef.current.delete(firstSurahNumber);
+                }
+            });
+
+        return () => {
+            if (prefetchAbortRef.current) {
+                prefetchAbortRef.current.abort();
+            }
+        };
+    }, [surahs, uiState, loadSurahAyahs]);
+
+    // While reading, prefetch adjacent surahs for near-instant navigation.
+    useEffect(() => {
+        if (uiState !== 'surah-reading' || !selectedSurah || surahs.length === 0) return;
+        const currentIndex = surahs.findIndex((s) => s.number === selectedSurah.number);
+        if (currentIndex < 0) return;
+
+        const controller = new AbortController();
+        const candidates: number[] = [];
+        if (currentIndex + 1 < surahs.length) candidates.push(surahs[currentIndex + 1].number);
+        if (currentIndex - 1 >= 0) candidates.push(surahs[currentIndex - 1].number);
+
+        candidates.forEach((surahNumber) => {
+            if (prefetchedSurahsRef.current.has(surahNumber)) return;
+            prefetchedSurahsRef.current.add(surahNumber);
+            loadSurahAyahs(surahNumber, controller.signal).catch((error: unknown) => {
+                if (!(error instanceof Error && error.name === 'AbortError')) {
+                    prefetchedSurahsRef.current.delete(surahNumber);
+                }
+            });
+        });
+
+        return () => controller.abort();
+    }, [uiState, selectedSurah, surahs, loadSurahAyahs]);
+
+    // Sync selected surah with URL /quran/[surahNumber]
+    useEffect(() => {
+        if (surahs.length === 0) return;
+        const match = pathname.match(/^\/quran\/(\d+)$/);
+        if (!match) {
+            if (selectedSurah !== null) {
+                setSelectedSurah(null);
+                dispatchView({ type: 'SET_SURAH_LIST' });
+            }
+            return;
+        }
+
+        const surahNumber = parseInt(match[1], 10);
+        const routeSurah = surahs.find((s) => s.number === surahNumber) || null;
+        if (routeSurah && selectedSurah?.number !== routeSurah.number) {
+            setSelectedSurah(routeSurah);
+            dispatchView({ type: 'SET_SURAH_READING' });
+        }
+    }, [pathname, surahs, selectedSurah]);
 
     // Normalize Arabic text by removing tashkeel (diacritics) for flexible search
     const normalizeArabic = (text: string): string => {
@@ -180,9 +359,13 @@ export default function QuranPage() {
     });
 
     const handleSurahSelect = (surah: QuranSurah) => {
+        if (isNavigating) return;
+        if (pathname !== `/quran/${surah.number}`) {
+            router.push(`/quran/${surah.number}`);
+        }
         setSelectedSurah(surah);
         setSearchTerm(''); // Clear search when selecting a surah
-        setView('ayah-view');
+        dispatchView({ type: 'SET_SURAH_READING' });
         setPlayingAyah(null); // Stop any playing audio
     };
 
@@ -190,8 +373,36 @@ export default function QuranPage() {
         setSelectedSurah(null);
         setAyahs([]);
         setSearchTerm(''); // Clear search when going back to list
-        setView('surah-list');
+        dispatchView({ type: 'SET_SURAH_LIST' });
         setPlayingAyah(null); // Stop any playing audio
+        if (pathname !== '/quran') {
+            router.push('/quran');
+        }
+    };
+
+    const selectedSurahIndex = selectedSurah ? surahs.findIndex((s) => s.number === selectedSurah.number) : -1;
+    const previousSurah = selectedSurahIndex > 0 ? surahs[selectedSurahIndex - 1] : null;
+    const nextSurah = selectedSurahIndex >= 0 && selectedSurahIndex < surahs.length - 1 ? surahs[selectedSurahIndex + 1] : null;
+
+    const handlePreviousSurah = () => {
+        if (!previousSurah || isNavigating) return;
+        handleSurahSelect(previousSurah);
+    };
+
+    const handleNextSurah = () => {
+        if (!nextSurah || isNavigating) return;
+        handleSurahSelect(nextSurah);
+    };
+
+    const handleRetry = () => {
+        dispatchView({ type: 'CLEAR_ERROR' });
+        if (selectedSurah) {
+            dispatchView({ type: 'SET_SURAH_READING' });
+            setAyahReloadKey(prev => prev + 1);
+            return;
+        }
+        dispatchView({ type: 'SET_LOADING' });
+        setSurahReloadKey(prev => prev + 1);
     };
 
     // Audio control functions
@@ -274,7 +485,7 @@ export default function QuranPage() {
         };
     }, [sidebarOpen]);
 
-    if (loading) {
+    if (uiState === 'loading' || loading) {
         return (
             <div className="min-h-screen py-8">
                 <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -296,7 +507,7 @@ export default function QuranPage() {
     return (
         <div className="min-h-screen relative bg-gray-50 dark:bg-gray-900">
             {/* Hero Header - Only show on surah list view */}
-            {view === 'surah-list' && (
+            {uiState === 'surah-list' && (
                 <section className="relative bg-gradient-to-br from-purple-600 via-violet-600 to-purple-700 text-white py-12 md:py-16 overflow-hidden">
                     {/* Decorative pattern */}
                     <div className="absolute inset-0 opacity-10">
@@ -346,18 +557,21 @@ export default function QuranPage() {
             )}
 
             {/* Sidebar Toggle Button for Mobile */}
-            <button
-                className="md:hidden fixed top-20 left-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-xl hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 transition-all duration-200 rtl:left-auto rtl:right-4"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                aria-label={isArabic ? 'فتح قائمة السور' : 'Open Surah List'}
-            >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-            </button>
+            {uiState !== 'error' && (
+                <button
+                    className="md:hidden fixed top-20 left-4 z-50 bg-purple-600 text-white p-3 rounded-full shadow-xl hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 dark:focus:ring-purple-800 transition-all duration-200 rtl:left-auto rtl:right-4"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    aria-label={isArabic ? 'فتح قائمة السور' : 'Open Surah List'}
+                >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            )}
 
             <div className="py-6 sm:py-8 lg:py-10 flex w-full gap-4 lg:gap-6">
                 {/* Sidebar: Surah List - Enhanced Design */}
+                {uiState !== 'error' && (
                 <aside
                     className={`
                         fixed top-0 left-0 h-full w-80 sm:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-2xl p-6 overflow-y-auto z-40 transition-transform duration-300 ease-in-out
@@ -389,7 +603,7 @@ export default function QuranPage() {
                     </div>
 
                     {/* Sidebar Search (when in surah list view) */}
-                    {view === 'surah-list' && (
+                    {uiState === 'surah-list' && (
                         <div className="mb-4">
                             <input
                                 type="text"
@@ -407,7 +621,7 @@ export default function QuranPage() {
                             <li key={surah.number}>
                                 <button
                                     onClick={() => { handleSurahSelect(surah); setSidebarOpen(false); }}
-                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 group
+                                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl ${isArabic ? 'text-right' : 'text-left'} transition-all duration-200 group
                                         ${selectedSurah?.number === surah.number
                                             ? 'bg-gradient-to-r from-purple-600 to-violet-700 text-white shadow-lg transform scale-[1.02]'
                                             : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-900 dark:text-white hover:shadow-md'
@@ -438,9 +652,10 @@ export default function QuranPage() {
                         ))}
                     </ul>
                 </aside>
+                )}
 
                 {/* Overlay for mobile sidebar */}
-                {sidebarOpen && (
+                {uiState !== 'error' && sidebarOpen && (
                     <div
                         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-30 lg:hidden"
                         onClick={() => setSidebarOpen(false)}
@@ -451,7 +666,36 @@ export default function QuranPage() {
                 {/* Main Content */}
                 <div className="flex-1 w-full min-w-0">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        {view === 'surah-list' ? (
+                        {uiState === 'error' ? (
+                            <motion.div
+                                className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-6 sm:p-8 text-center"
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div className="text-5xl mb-4">⚠️</div>
+                                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                                    {isArabic ? 'تعذر تحميل المحتوى' : 'Failed to load content'}
+                                </h2>
+                                <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                    {errorMessage || (isArabic ? 'حدث خطأ غير متوقع أثناء تحميل القرآن.' : 'An unexpected error occurred while loading Quran data.')}
+                                </p>
+                                <div className="flex flex-wrap justify-center gap-3">
+                                    <button
+                                        onClick={handleRetry}
+                                        className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+                                    >
+                                        {isArabic ? 'إعادة المحاولة' : 'Retry'}
+                                    </button>
+                                    <button
+                                        onClick={handleBackToList}
+                                        className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    >
+                                        {isArabic ? 'العودة لقائمة السور' : 'Back to Surah List'}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        ) : uiState === 'surah-list' ? (
                             <>
                                 {/* Search Bar - Only show on desktop when sidebar is visible */}
                                 <motion.div
@@ -463,7 +707,7 @@ export default function QuranPage() {
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="flex-1 relative">
-                                            <svg className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <svg className={`absolute top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 ${isArabic ? 'right-4' : 'left-4'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                             </svg>
                                             <input
@@ -471,7 +715,7 @@ export default function QuranPage() {
                                                 value={searchTerm}
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 placeholder={preferences.language === 'ar' ? 'ابحث عن السور...' : 'Search surahs...'}
-                                                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                                                className={`w-full py-3 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all ${isArabic ? 'pr-12 pl-4 text-right' : 'pl-12 pr-4 text-left'}`}
                                             />
                                         </div>
                                         <div className="px-4 py-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-sm font-medium text-purple-700 dark:text-purple-300 whitespace-nowrap">
@@ -486,7 +730,7 @@ export default function QuranPage() {
                                         <motion.button
                                             key={surah.number}
                                             onClick={() => handleSurahSelect(surah)}
-                                            className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl p-6 text-left transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700"
+                                            className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl p-6 transition-all duration-300 hover:-translate-y-1 border border-gray-100 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700 ${isArabic ? 'text-right' : 'text-left'}`}
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                             initial={{ opacity: 0, y: 20 }}
@@ -566,6 +810,22 @@ export default function QuranPage() {
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                                 </svg>
                                             </button>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={handlePreviousSurah}
+                                                    disabled={!previousSurah || isNavigating}
+                                                    className="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                >
+                                                    {preferences.language === 'ar' ? 'السورة السابقة' : 'Prev Surah'}
+                                                </button>
+                                                <button
+                                                    onClick={handleNextSurah}
+                                                    disabled={!nextSurah || isNavigating}
+                                                    className="px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                                >
+                                                    {preferences.language === 'ar' ? 'السورة التالية' : 'Next Surah'}
+                                                </button>
+                                            </div>
                                             <div>
                                                 <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-1">
                                                     {selectedSurah?.englishName}
@@ -641,7 +901,7 @@ export default function QuranPage() {
                                                             </option>
                                                         ))}
                                                     </select>
-                                                    <svg className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <svg className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none ${isArabic ? 'left-2' : 'right-2'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                                     </svg>
                                                 </div>
@@ -666,7 +926,7 @@ export default function QuranPage() {
                                                 )}
 
                                                 {/* Auto-play Toggle */}
-                                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer ml-auto">
+                                                <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 cursor-pointer ltr:ml-auto rtl:mr-auto">
                                                     <input
                                                         type="checkbox"
                                                         checked={isAutoPlay}
@@ -736,6 +996,7 @@ export default function QuranPage() {
                                             return (
                                                 <motion.div
                                                     key={ayah.number}
+                                                    id={`ayah-${ayah.numberInSurah}`}
                                                     ref={(el) => {
                                                         if (el) ayahRefs.current.set(ayah.numberInSurah, el);
                                                     }}

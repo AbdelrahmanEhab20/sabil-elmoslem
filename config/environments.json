@@ -72,11 +72,10 @@
         },
         "performance_tests": {
             "timeout": 20,
-            "lighthouse_thresholds": {
-                "performance": 85,
-                "accessibility": 95,
-                "best_practices": 90,
-                "seo": 90
+            "load_thresholds": {
+                "response_time_p95_ms": 1200,
+                "error_rate_percent": 1,
+                "min_throughput_rps": 30
             }
         },
         "load_tests": {

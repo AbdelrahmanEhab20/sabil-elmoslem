@@ -66,10 +66,10 @@ describe('HomePageClient', () => {
             render(<HomePageClient />)
 
             await waitFor(() => {
-                expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
-                expect(screen.getByText(/Azkar/i)).toBeInTheDocument()
-                expect(screen.getByText(/Quran/i)).toBeInTheDocument()
-                expect(screen.getByText(/Qibla/i)).toBeInTheDocument()
+                expect(screen.getAllByText(/Prayer Times/i).length).toBeGreaterThan(0)
+                expect(screen.getAllByText(/Azkar/i).length).toBeGreaterThan(0)
+                expect(screen.getAllByText(/Quran/i).length).toBeGreaterThan(0)
+                expect(screen.getAllByText(/Qibla/i).length).toBeGreaterThan(0)
             }, WAIT_TIMEOUT)
         })
 
@@ -78,33 +78,13 @@ describe('HomePageClient', () => {
 
             // Wait for features to render
             await waitFor(() => {
-                expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
+                expect(screen.getAllByText(/Prayer Times/i).length).toBeGreaterThan(0)
             }, WAIT_TIMEOUT)
 
-            // Check links exist
-            const prayerLink = screen.getByText(/Prayer Times/i).closest('a')
-            expect(prayerLink).toBeInTheDocument()
-            if (prayerLink) {
-                expect(prayerLink).toHaveAttribute('href', '/prayer-times')
-            }
-
-            const azkarLink = screen.getByText(/Azkar/i).closest('a')
-            expect(azkarLink).toBeInTheDocument()
-            if (azkarLink) {
-                expect(azkarLink).toHaveAttribute('href', '/azkar')
-            }
-
-            const quranLink = screen.getByText(/Quran/i).closest('a')
-            expect(quranLink).toBeInTheDocument()
-            if (quranLink) {
-                expect(quranLink).toHaveAttribute('href', '/quran')
-            }
-
-            const qiblaLink = screen.getByText(/Qibla/i).closest('a')
-            expect(qiblaLink).toBeInTheDocument()
-            if (qiblaLink) {
-                expect(qiblaLink).toHaveAttribute('href', '/qibla')
-            }
+            expect(document.querySelector('a[href="/prayer-times"]')).toBeInTheDocument()
+            expect(document.querySelector('a[href="/azkar"]')).toBeInTheDocument()
+            expect(document.querySelector('a[href="/quran"]')).toBeInTheDocument()
+            expect(document.querySelector('a[href="/qibla"]')).toBeInTheDocument()
         }, 10000)
     })
 
@@ -113,14 +93,14 @@ describe('HomePageClient', () => {
             render(<HomePageClient />)
 
             await waitFor(() => {
-                expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
+                expect(screen.getAllByText(/Prayer Times/i).length).toBeGreaterThan(0)
             }, WAIT_TIMEOUT)
 
             // Check all features are present
-            expect(screen.getByText(/Prayer Times/i)).toBeInTheDocument()
-            expect(screen.getByText(/Azkar/i)).toBeInTheDocument()
-            expect(screen.getByText(/Quran/i)).toBeInTheDocument()
-            expect(screen.getByText(/Qibla/i)).toBeInTheDocument()
+            expect(screen.getAllByText(/Prayer Times/i).length).toBeGreaterThan(0)
+            expect(screen.getAllByText(/Azkar/i).length).toBeGreaterThan(0)
+            expect(screen.getAllByText(/Quran/i).length).toBeGreaterThan(0)
+            expect(screen.getAllByText(/Qibla/i).length).toBeGreaterThan(0)
         }, 10000)
     })
 

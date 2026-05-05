@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useUser } from '@/contexts/UserContext';
 import { fetchPrayerTimes, getCurrentLocation } from '@/utils/api';
 import { useTranslations } from '@/utils/translations';
@@ -13,6 +14,10 @@ export default function PrayerTimesCard() {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [nextPrayer, setNextPrayer] = useState<string | null>(null);
     const [timeUntilNext, setTimeUntilNext] = useState<string>('');
+    const [locationAttempted, setLocationAttempted] = useState(false);
+    const [locationError, setLocationError] = useState(false);
+    const [prayerFetchError, setPrayerFetchError] = useState(false);
+    const [showLoadingFallback, setShowLoadingFallback] = useState(false);
     const t = useTranslations(preferences.language);
     const toast = useToast();
 
@@ -29,11 +34,17 @@ export default function PrayerTimesCard() {
         const initializeLocation = async () => {
             if (!location) {
                 try {
+                    setLocationError(false);
                     const userLocation = await getCurrentLocation();
                     setLocation(userLocation);
                 } catch {
+                    setLocationError(true);
                     toast.showToast({ type: 'error', message: t.errorGettingLocation });
+                } finally {
+                    setLocationAttempted(true);
                 }
+            } else {
+                setLocationAttempted(true);
             }
         };
 
@@ -46,6 +57,7 @@ export default function PrayerTimesCard() {
             if (location) {
                 try {
                     setLoading(true);
+                    setPrayerFetchError(false);
                     
                     // Fetch prayer times with automatic timezone detection
                     const result = await fetchPrayerTimes(
@@ -59,6 +71,7 @@ export default function PrayerTimesCard() {
                     const { timezoneInfo, ...times } = result;
                     setPrayerTimes(times);
                 } catch {
+                    setPrayerFetchError(true);
                     toast.showToast({ type: 'error', message: t.errorFetchingPrayerTimes });
                 } finally {
                     setLoading(false);
@@ -68,6 +81,20 @@ export default function PrayerTimesCard() {
 
         getPrayerTimes();
     }, [location, preferences.calculationMethod, preferences.madhab, preferences.language, setPrayerTimes, setLoading, t.errorFetchingPrayerTimes, toast]);
+
+    // Avoid an endless skeleton if network/geolocation is slow.
+    useEffect(() => {
+        if (!loading) {
+            setShowLoadingFallback(false);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setShowLoadingFallback(true);
+        }, 5000);
+
+        return () => clearTimeout(timer);
+    }, [loading]);
 
     // Calculate next prayer and time until
     useEffect(() => {
@@ -119,7 +146,23 @@ export default function PrayerTimesCard() {
         return getPrayerNameTranslated(name, t);
     };
 
-    if (loading) {
+    const handleRetryLocation = async () => {
+        try {
+            setLocationError(false);
+            setPrayerFetchError(false);
+            setLoading(true);
+            const userLocation = await getCurrentLocation();
+            setLocation(userLocation);
+        } catch {
+            setLocationError(true);
+            toast.showToast({ type: 'error', message: t.errorGettingLocation });
+        } finally {
+            setLoading(false);
+            setLocationAttempted(true);
+        }
+    };
+
+    if (loading && !showLoadingFallback) {
         return (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                 <div className="animate-pulse">
@@ -135,14 +178,40 @@ export default function PrayerTimesCard() {
     }
 
     if (!prayerTimes) {
+        const showActionState = showLoadingFallback || locationError || prayerFetchError || locationAttempted;
+
         return (
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 sm:p-6">
                 <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-4">
                     {t.prayerTimes}
                 </h3>
-                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                    {t.loading}
-                </p>
+                {showActionState ? (
+                    <div className="space-y-3">
+                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                            {preferences.language === 'ar'
+                                ? 'تعذر تحميل أوقات الصلاة تلقائياً. يرجى إعادة المحاولة أو فتح صفحة أوقات الصلاة لاختيار المدينة.'
+                                : 'Could not load prayer times automatically. Retry or open the Prayer Times page to select your city.'}
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            <button
+                                onClick={handleRetryLocation}
+                                className="px-3 py-2 rounded-md bg-green-600 text-white text-sm hover:bg-green-700 transition-colors"
+                            >
+                                {preferences.language === 'ar' ? 'إعادة المحاولة' : 'Retry'}
+                            </button>
+                            <Link
+                                href="/prayer-times"
+                                className="px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                            >
+                                {preferences.language === 'ar' ? 'فتح صفحة أوقات الصلاة' : 'Open Prayer Times'}
+                            </Link>
+                        </div>
+                    </div>
+                ) : (
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+                        {t.loading}
+                    </p>
+                )}
             </div>
         );
     }
@@ -263,7 +332,7 @@ export default function PrayerTimesCard() {
                                     {getPrayerName(prayer.name)}
                                 </span>
                             </div>
-                            <span className={`font-mono text-sm ml-2 ${nextPrayer === prayer.name
+                            <span className={`font-mono text-sm ltr:ml-2 rtl:mr-2 ${nextPrayer === prayer.name
                                 ? 'text-green-800 dark:text-green-200'
                                 : 'text-gray-600 dark:text-gray-400'
                                 }`}>

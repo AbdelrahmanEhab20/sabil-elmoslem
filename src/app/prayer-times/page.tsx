@@ -460,7 +460,7 @@ export default function PrayerTimesPage() {
                                                 <button
                                                     key={index}
                                                     onClick={() => handleSuggestionClick(suggestion)}
-                                                    className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600 focus:outline-none first:rounded-t-md last:rounded-b-md"
+                                                    className={`w-full px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600 focus:outline-none first:rounded-t-md last:rounded-b-md ${isArabic ? 'text-right' : 'text-left'}`}
                                                 >
                                                     <div className="text-sm text-gray-900 dark:text-white">
                                                         {suggestion.name}

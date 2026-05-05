@@ -31,8 +31,18 @@ const API_CONFIG = {
 
 // Enhanced fetch wrapper with error handling
 const apiFetch = async (url: string, options?: RequestInit): Promise<Response> => {
+    const externalSignal = options?.signal;
+    const controller = new AbortController();
+    const abortExternal = () => controller.abort((externalSignal as AbortSignal).reason);
+
     try {
-        const controller = new AbortController();
+        if (externalSignal) {
+            if (externalSignal.aborted) {
+                controller.abort((externalSignal as AbortSignal).reason);
+            } else {
+                externalSignal.addEventListener('abort', abortExternal, { once: true });
+            }
+        }
         const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT);
 
         const response = await fetch(url, {
@@ -56,11 +66,19 @@ const apiFetch = async (url: string, options?: RequestInit): Promise<Response> =
             throw error;
         }
 
+        if ((error as Error)?.name === 'AbortError') {
+            throw error;
+        }
+
         if (error instanceof TypeError && error.message.includes('fetch')) {
             throw new NetworkError('Network connection failed', error);
         }
 
         throw new NetworkError('Request failed', error as Error);
+    } finally {
+        if (externalSignal) {
+            externalSignal.removeEventListener('abort', abortExternal);
+        }
     }
 };
 
@@ -304,7 +322,7 @@ export const fetchHijriDate = withErrorHandling(async (): Promise<HijriDate> => 
 }, 'fetchHijriDate');
 
 // Quran Surahs API
-export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]> => {
+export const fetchQuranSurahs = withErrorHandling(async (signal?: AbortSignal): Promise<QuranSurah[]> => {
     const cacheKey = 'quran-surahs';
 
     const cached = getCachedData<QuranSurah[]>(cacheKey);
@@ -316,7 +334,7 @@ export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]
     const url = `${API_CONFIG.QURAN_COM_BASE_URL}/chapters?language=en`;
 
     return retry(async () => {
-        const response = await apiFetch(url);
+        const response = await apiFetch(url, { signal });
         const data = await response.json();
 
         if (!Array.isArray(data.chapters)) {
@@ -341,7 +359,7 @@ export const fetchQuranSurahs = withErrorHandling(async (): Promise<QuranSurah[]
 }, 'fetchQuranSurahs');
 
 // Quran Ayahs API with English translations
-export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Promise<QuranAyah[]> => {
+export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number, signal?: AbortSignal): Promise<QuranAyah[]> => {
     const cacheKey = `quran-ayahs-${surahNumber}`;
 
     const cached = getCachedData<QuranAyah[]>(cacheKey);
@@ -353,7 +371,7 @@ export const fetchQuranAyahs = withErrorHandling(async (surahNumber: number): Pr
     const url = `${API_CONFIG.QURAN_COM_BASE_URL}/verses/by_chapter/${surahNumber}?language=en&fields=text_uthmani,juz_number,page_number,hizb_number,rub_el_hizb_number,manzil_number,ruku_number,sajdah_number&translations=20&per_page=all`;
 
     return retry(async () => {
-        const response = await apiFetch(url);
+        const response = await apiFetch(url, { signal });
         const data = await response.json();
 
         if (!Array.isArray(data.verses)) {

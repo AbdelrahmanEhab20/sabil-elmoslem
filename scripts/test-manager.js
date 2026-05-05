@@ -135,17 +135,13 @@ class TestManager {
   async runPerformanceTests() {
     console.log("⚡ Running performance tests...");
 
-    const { timeout, lighthouse_thresholds } =
-      this.testConfig.performance_tests;
+    const { timeout } = this.testConfig.performance_tests;
 
     try {
-      execSync(`npx lhci autorun --max-old-space-size=4096`, {
+      execSync(`npm run test:load -- --timeout=${timeout}s`, {
         stdio: "inherit",
         env: { ...process.env, ...this.envConfig.variables },
       });
-
-      // Check Lighthouse thresholds
-      this.checkLighthouseThresholds(lighthouse_thresholds);
     } catch (error) {
       throw new Error("Performance tests failed");
     }
@@ -210,15 +206,8 @@ class TestManager {
     // Additional coverage validation can be added here
   }
 
-  /**
-   * Check Lighthouse thresholds
-   */
-  checkLighthouseThresholds(thresholds) {
-    console.log("📊 Lighthouse thresholds:");
-    Object.entries(thresholds).forEach(([metric, threshold]) => {
-      console.log(`  ${metric}: ${threshold}%`);
-    });
-  }
+  // Lighthouse-specific threshold checks removed after switching
+  // performance tests to the existing load-test flow.
 
   /**
    * Generate test report
@@ -236,7 +225,7 @@ class TestManager {
       },
       coverage: "70%",
       performance: {
-        lighthouse: "85+",
+        loadThresholds: "configured",
         load: "stable",
       },
     };

@@ -111,7 +111,7 @@ class TestManager {
 
     for (let attempt = 1; attempt <= retry_attempts; attempt++) {
       try {
-        execSync(`npm run test:integration -- --timeout=${timeout * 1000}`, {
+        execSync(`jest --testPathPatterns=integration --passWithNoTests --timeout=${timeout * 1000}`, {
           stdio: "inherit",
           env: { ...process.env, ...this.envConfig.variables },
         });

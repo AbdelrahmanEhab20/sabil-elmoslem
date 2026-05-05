@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: "18"
+  NODE_VERSION: "20"
 
 jobs:
   # Unit Tests
@@ -154,8 +154,11 @@ jobs:
         run: |
           timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
-      - name: Run Lighthouse CI
-        run: npx lhci autorun || echo "Lighthouse tests completed with warnings"
+      - name: Setup K6
+        uses: grafana/setup-k6-action@v1
+
+      - name: Run performance tests
+        run: npm run test:performance || echo "Performance tests completed with warnings"
         continue-on-error: true
 
       - name: Stop application
@@ -195,16 +198,11 @@ jobs:
         run: |
           timeout 60 bash -c 'until curl -f http://localhost:3000; do sleep 2; done'
 
-      - name: Install K6
-        run: |
-          sudo gpg -k
-          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
-          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
-          sudo apt-get update
-          sudo apt-get install k6
+      - name: Setup K6
+        uses: grafana/setup-k6-action@v1
 
       - name: Run K6 load tests
-        run: k6 run load-test.js || echo "Load tests completed with warnings"
+        run: npm run test:load || echo "Load tests completed with warnings"
         env:
           BASE_URL: http://localhost:3000
         continue-on-error: true
